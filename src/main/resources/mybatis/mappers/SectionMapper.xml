@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SectionMapper">
+	<sql id="section_map_columns" >
+		sc.seq as sectionSeq
+		, sc.desc
+		, sc.level
+		, sc.basket_ref
+		, sc.chapter
+	</sql>
+	<resultMap type="Section" id="section_map">
+		<id column="sectionSeq" property="seq"/>
+		<result column="desc" property="description"/>
+		<result column="level" property="level"/>
+		<result column="basket_ref" property="basketRef"/>
+	</resultMap>
+	
+	<sql id="section_with_desc_map_columns">
+		sc.seq as sectionSeq
+		, sc.desc
+		, sc.level
+		, sc.basket_ref
+		, sc.chapter
+		
+		, dc.basket_ref
+		, dc.ordernum
+		, dc.description as desc_path
+		, dc.format
+	</sql>
+	<resultMap type="Section" id="section_with_desc_map" extends="section_map">
+		<collection property="notes" ofType="Note" notNullColumn="ordernum">
+			<id column="basket_ref" property="basketRef"/>
+			<id column="ordernum" property="orderNum"/>	
+			<result column="desc_path" property="text"/>
+			<result column="format" property="format"/>
+		</collection>
+	</resultMap>
+	
+	<!-- section의 문장들까지 모두 로드할때 사용함 -->
+	<resultMap type="Section" id="full_section" extends="section_with_desc_map">
+		<collection property="sentences" ofType="Sentence" resultMap="SentenceMapper.sen"></collection>
+	</resultMap>
+	
+	
+	<!-- <resultMap type="string" id="desc_map">
+		<result column="desc_path" />
+	</resultMap> -->
+	
+	<select id="find" parameterType="int" resultMap="section_map">
+		SELECT
+		<include refid="section_map_columns"></include>
+		FROM wr_section sc
+		WHERE sc.seq = #{id}
+	</select>
+	
+	<select id="findByOrigin" parameterType="string" resultMap="section_map">
+		SELECT
+		<include refid="section_map_columns"></include>
+		FROM wr_chapter ctr
+		JOIN wr_section sc
+		  ON ctr.seq  = sc.chapter
+		WHERE ctr.origin = #{origin}
+	</select>
+</mapper>

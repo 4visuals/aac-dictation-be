@@ -1,4 +1,4 @@
-package github.visual4.aacweb.dictation.tools;
+package github.visual4.aacweb.dictation.domain.sentence;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -20,6 +20,8 @@ public class EjElem {
 	String text;
 	String pumsa;
 	String picturePath;
+	
+	public EjElem() {}
 	public EjElem(
 			Integer sentenceRef,
 			Integer order,

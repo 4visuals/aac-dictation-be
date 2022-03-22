@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
-import github.visual4.aacweb.dictation.tools.Chapter;
+import github.visual4.aacweb.dictation.domain.chapter.Chapter;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.tools.Origin;
-import github.visual4.aacweb.dictation.tools.Sentence;
-import github.visual4.aacweb.dictation.tools.Sentence.SentenceType;
 
 @RestController
 @RequestMapping("/api")

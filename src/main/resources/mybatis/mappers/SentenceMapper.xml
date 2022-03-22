@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SentenceMapper">
+	<sql id="sen_columns" >
+		sen.seq         as sen_seq
+		, sen.sentence  as sen_sentence
+		, sen.origin    as sen_origin
+		, sen.scene_pic as sen_scene_pic
+		, sen.cate      as sen_cate
+	</sql>
+	
+	<sql id="full_columns" >
+		sen.seq         as sen_seq
+		, sen.sentence  as sen_sentence
+		, sen.origin    as sen_origin
+		, sen.scene_pic as sen_scene_pic
+		, sen.cate      as sen_cate
+		, wrp.wr_sen     as ej_sentence
+		, wrp.wr_eojeol  as ej_eojeol
+		, wrp.pumsa      as ej_pumsa
+		, wrp.pic        as ej_pic
+		, wrp.ordernum   as ej_ordernum
+		, ej.text        as ej_text
+	</sql>
+	
+	<resultMap type="Sentence" id="sen">
+		<id column="sen_seq" property="seq"/>
+		<result column="sen_sentence" property="sentence"/>
+		<result column="sen_origin" property="origin"/>
+		<result column="sen_scene_pic" property="scenePicture"/>
+		<result column="sen_cate" property="sectionRef"/>
+		<collection property="eojeols" ofType="EjElem" notNullColumn="ej_sentence">
+			<id column="ej_sentence" property="sentenceRef"/>
+			<id column="ej_ordernum" property="order"/>
+			<result column="ej_eojeol" property="eojeolRef"/>
+			<result column="ej_text" property="text"/>
+			<result column="ej_pumsa" property="pumsa"/>
+			<result column="ej_pic" property="picturePath"/>
+		</collection>
+	</resultMap>
+	
+</mapper>

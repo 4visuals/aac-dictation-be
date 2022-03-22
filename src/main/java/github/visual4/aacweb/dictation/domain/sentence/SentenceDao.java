@@ -2,11 +2,9 @@ package github.visual4.aacweb.dictation.domain.sentence;
 
 import java.sql.ResultSet;
 
-import github.visual4.aacweb.dictation.tools.EjElem;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.tools.Origin;
 import github.visual4.aacweb.dictation.tools.Rset;
-import github.visual4.aacweb.dictation.tools.Sentence;
-import github.visual4.aacweb.dictation.tools.Sentence.SentenceType;
 
 public class SentenceDao {
 
@@ -17,9 +15,10 @@ public class SentenceDao {
 		Integer level = rs.Int("level");
 		Origin origin = Origin.valueOf(rs.str("origin"));
 		SentenceType type = SentenceType.valueOf(rs.str("type"));
+		String scenePicture = rs.str("scene_pic");
 		Integer sectionRef = rs.Int("cate");
 		
-		Sentence sen = new Sentence(seq, sentence, level, origin, type, sectionRef);
+		Sentence sen = new Sentence(seq, sentence, level, origin, type, scenePicture, sectionRef);
 		return sen;
 	}
 

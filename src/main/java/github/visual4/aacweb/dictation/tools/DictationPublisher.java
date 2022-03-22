@@ -10,7 +10,9 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import github.visual4.aacweb.dictation.tools.Sentence.SentenceType;
+import github.visual4.aacweb.dictation.domain.section.Section;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 
 public class DictationPublisher {
 	
@@ -94,7 +96,7 @@ public class DictationPublisher {
 				+ " FROM sentence_basket sb\n"
 				+ " WHERE  sb.owner = 7 AND sb.`type` = 'SENTENCE' AND sb.seq >= 10768;";
 		Rset rset = Db.stmt(con, query).select();
-		Stmt insertSection = Db.stmt(con, "INSERT INTO wr_section (seq, `desc`, `level`, chapter) VALUES (?, ?, ?, ? )");
+		Stmt insertSection = Db.stmt(con, "INSERT INTO wr_section (seq, `desc`, `level`, basket_ref, chapter) VALUES (?, ?, ?, ?, ? )");
 		Stmt insertChapter = Db.stmt(con, "INSERT INTO wr_chapter( seq, `desc`, origin ) VALUES (?, ?, ?)");
 		List<Section> sections = new ArrayList<>();
 		List<Section> sectionsInChapter = new ArrayList<>();
@@ -145,7 +147,8 @@ public class DictationPublisher {
 				.bind(1, s.getSeq())
 				.bind(2, s.getDescription())
 				.bind(3, s.getLevel())
-				.bind(4, chapterSeq)
+				.bind(4, s.getBasketRef())
+				.bind(5, chapterSeq)
 				.update();
 		}
 	}
@@ -207,6 +210,7 @@ public class DictationPublisher {
 						section.getLevel(),
 						origin,
 						isWord ? SentenceType.W : SentenceType.S,
+						null,
 						section.getSeq());
 				insertSentence.clear()
 					.bind(1, sen.getSeq())
@@ -273,11 +277,13 @@ public class DictationPublisher {
 	}
 
 	public static void main(String[] args) {
+		/* aacweb에서 배포함
 		String url = "jdbc:mariadb://localhost:3306/aacweb";
 		DataSource ds = new  DriverManagerDataSource(url, "root", "1111");
 		
 		DictationPublisher m = new DictationPublisher(ds);
 		m.run();
+		*/
 	}
 	
 

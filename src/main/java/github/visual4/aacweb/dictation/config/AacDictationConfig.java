@@ -20,8 +20,8 @@ public class AacDictationConfig implements WebMvcConfigurer{
 	@Value("${dictation.cors.allowed-urls}")
     String [] corsAllowedUrls;
 	
-	@Value("${aacdict.mode}") String mode;
-	@Value("${aacdict.version}") String version;
+	@Value("${dictation.mode}") String mode;
+	@Value("${dictation.version}") String version;
 	
 	@Value("${spring.datasource.url}") String dbUrl;
 	

@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
-import github.visual4.aacweb.dictation.domain.section.SectionService;
-import github.visual4.aacweb.dictation.tools.Chapter;
 import github.visual4.aacweb.dictation.tools.Origin;
 
 @RestController
@@ -18,11 +16,11 @@ import github.visual4.aacweb.dictation.tools.Origin;
 public class ChapterController {
 
 	@Autowired
-	SectionService sectionService;
+	ChapterService chapterService;
 	
 	@GetMapping("/origin/{origin}")
 	public Object listChapters(@PathVariable Origin origin) {
-		Collection<Chapter> chapters = sectionService.findChapter(origin);
+		Collection<Chapter> chapters = chapterService.findChapters(origin);
 		return Res.success("chapters", chapters);
 	}
 }

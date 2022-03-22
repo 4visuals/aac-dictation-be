@@ -8,28 +8,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import github.visual4.aacweb.dictation.Dao;
 import github.visual4.aacweb.dictation.Query;
+import github.visual4.aacweb.dictation.domain.chapter.Chapter;
 import github.visual4.aacweb.dictation.domain.chapter.ChapterDao;
+import github.visual4.aacweb.dictation.domain.sentence.EjElem;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence;
 import github.visual4.aacweb.dictation.domain.sentence.SentenceDao;
-import github.visual4.aacweb.dictation.tools.Chapter;
-import github.visual4.aacweb.dictation.tools.EjElem;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.tools.Origin;
 import github.visual4.aacweb.dictation.tools.Rset;
-import github.visual4.aacweb.dictation.tools.Section;
-import github.visual4.aacweb.dictation.tools.Sentence;
-import github.visual4.aacweb.dictation.tools.Sentence.SentenceType;
 
 @Repository
 public class SectionDao {
 
 	@Autowired
 	JdbcTemplate jdbc;
+	
+	final SqlSession session;
+	
+	public SectionDao(SqlSession session) {
+		this.session = session;
+	}
 
 	final private static String [] FULL_COLUMN = "seq as secSeq,desc,level".split(",");
+	
+	public Section find(Integer sectionSeq) {
+		return session.selectOne(Dao.mapper(this, "find"), sectionSeq);
+	}
+	public List<Section> findByOrigin(Origin origin) {
+		return session.selectList(Dao.mapper(this, "findByOrigin"), origin.name());
+	}
+
 	/**
 	 * 단계별 퀴즈
 	 * @return

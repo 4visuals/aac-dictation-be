@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ChapterMapper">
+
+	<sql id="chapter_map_columns">
+		  ctr.seq as chap_seq
+		, ctr.desc as chap_desc
+		, ctr.origin
+	</sql>
+	<resultMap type="Chapter" id="chapter_map">
+		<id column="chap_seq" property="seq"/>
+		<result column="chap_desc" property="desc"/>
+		<result column="origin" property="origin"/>
+		<collection 
+			property="sections" ofType="Section"
+			resultMap="SectionMapper.full_section"></collection>
+	</resultMap>
+	
+	<select id="findChapters" parameterType="string" resultMap="chapter_map">
+		SELECT <include refid="chapter_map_columns"></include>
+			,<include refid="SectionMapper.section_with_desc_map_columns"></include>
+			,<include refid="SentenceMapper.full_columns"></include>
+		FROM wr_chapter ctr
+		JOIN wr_section sc
+		  ON ctr.seq  = sc.chapter
+		LEFT
+		JOIN wr_desc dc
+		  ON dc.basket_ref = sc.basket_ref
+		JOIN wr_sentence sen
+		  ON sen.cate = sc.seq
+		JOIN wr_mapping wrp
+		  ON sen.seq = wrp.wr_sen  
+		JOIN wr_eojeol ej
+		  ON wrp.wr_eojeol = ej.seq
+		<if test="origin">
+		WHERE ctr.origin = #{origin}
+		</if>
+	</select>
+</mapper>

@@ -1,8 +1,10 @@
-package github.visual4.aacweb.dictation.tools;
+package github.visual4.aacweb.dictation.domain.chapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import github.visual4.aacweb.dictation.domain.section.Section;
+import github.visual4.aacweb.dictation.tools.Origin;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +19,7 @@ public class Chapter {
 	String desc;
 	Origin origin;
 	List<Section> sections;
+	public Chapter() {}
 	public Chapter(Integer seq, String desc, Origin origin) {
 		super();
 		this.seq = seq;

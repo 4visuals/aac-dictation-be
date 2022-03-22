@@ -1,8 +1,9 @@
-package github.visual4.aacweb.dictation.tools;
+package github.visual4.aacweb.dictation.domain.sentence;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import github.visual4.aacweb.dictation.tools.Origin;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +27,15 @@ public class Sentence {
 	SentenceType type;
 	Integer sectionRef;
 	
+	String scenePicture;
+	
 	List<EjElem> eojeols;
 	
 	Integer aacSentenceRef; // sentence_one의PK
-	public Sentence(Integer seq, String sentence, Integer level, Origin origin, SentenceType type, Integer sectionRef) {
+
+	public Sentence() {}
+	
+	public Sentence(Integer seq, String sentence, Integer level, Origin origin, SentenceType type, String scenePicture, Integer sectionRef) {
 		super();
 		this.seq = seq;
 		this.sentence = sentence;
@@ -37,8 +43,8 @@ public class Sentence {
 		this.origin = origin;
 		this.type = type;
 		this.sectionRef = sectionRef;
+		this.scenePicture = scenePicture;
 		this.eojeols = new ArrayList<>();
 	}
-	
 	
 }

@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import github.visual4.aacweb.dictation.tools.Chapter;
+import github.visual4.aacweb.dictation.domain.chapter.Chapter;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.tools.Origin;
-import github.visual4.aacweb.dictation.tools.Section;
-import github.visual4.aacweb.dictation.tools.Sentence;
-import github.visual4.aacweb.dictation.tools.Sentence.SentenceType;
 
 @Service
 @Transactional
@@ -21,7 +20,7 @@ public class SectionService {
 	SectionDao sectionDao;
 	
 	public List<Section> findByLevel() {
-		return sectionDao.findSections(Origin.L);
+		return sectionDao.findByOrigin(Origin.L);
 	}
 	public Collection<Chapter> findChapter(Origin origin) {
 		return sectionDao.findChapters(origin);
