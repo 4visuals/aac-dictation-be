@@ -18,8 +18,8 @@ public class PubController {
 	
 	@PostMapping("/publish")
 	public Object updateDb(@RequestBody String query) {
-		log.warn("[query] {}", query);
-		System.out.println("[query한글]" + query);
+//		log.warn("[query] {}", query);
+//		System.out.println("[query한글]" + query);
 		pubService.publishDb(query);
 		return Res.success(true);
 	}

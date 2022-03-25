@@ -3,7 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ChapterMapper">
-
+	<cache readOnly="true"></cache>
 	<sql id="chapter_map_columns">
 		  ctr.seq as chap_seq
 		, ctr.desc as chap_desc
@@ -14,7 +14,7 @@
 		<result column="chap_desc" property="desc"/>
 		<result column="origin" property="origin"/>
 		<collection 
-			property="sections" ofType="Section"
+			property="sections" ofType="Section" 
 			resultMap="SectionMapper.full_section"></collection>
 	</resultMap>
 	

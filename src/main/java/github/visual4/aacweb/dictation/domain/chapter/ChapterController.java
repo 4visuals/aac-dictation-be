@@ -20,7 +20,7 @@ public class ChapterController {
 	
 	@GetMapping("/origin/{origin}")
 	public Object listChapters(@PathVariable Origin origin) {
-		Collection<Chapter> chapters = chapterService.findChapters(origin);
+		Collection<Chapter> chapters = chapterService.findChapters(null);
 		return Res.success("chapters", chapters);
 	}
 }
