@@ -113,6 +113,9 @@ public class TypeMap extends HashMap<String, Object> {
         m.put(key, value);
         return m;
     }
+    public static TypeMap copy(TypeMap src) {
+    	return new TypeMap(src);
+    }
     public static TypeMap with(Object ... args) {
         if (args.length % 2 == 1) {
             throw new AppException("SERVER_ERROR", 500, "args [(key,value), ...] expected");

@@ -15,6 +15,7 @@
 		sen.seq         as sen_seq
 		, sen.sentence  as sen_sentence
 		, sen.origin    as sen_origin
+		, sen.type      as sen_type
 		, sen.scene_pic as sen_scene_pic
 		, sen.cate      as sen_cate
 		, wrp.wr_sen     as ej_sentence
@@ -29,6 +30,7 @@
 		<id column="sen_seq" property="seq"/>
 		<result column="sen_sentence" property="sentence"/>
 		<result column="sen_origin" property="origin"/>
+		<result column="sen_type" property="type"/>		
 		<result column="sen_scene_pic" property="scenePicture"/>
 		<result column="sen_cate" property="sectionRef"/>
 		<collection property="eojeols" ofType="EjElem" notNullColumn="ej_sentence">

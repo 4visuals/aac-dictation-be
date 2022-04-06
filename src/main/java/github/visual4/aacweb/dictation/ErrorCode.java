@@ -66,7 +66,10 @@ public enum ErrorCode {
     /**
      * jwt token signiture 값이 이상함
      */
-    BAD_TOKEN_SIGNITURE("invalid token signiture: %s");
+    BAD_TOKEN_SIGNITURE("invalid token signiture: %s"),
+    OAUTH_EXCEPTION("[%s] oauth request faield."), 
+    
+    EXISTING_USER("user exists");
     
 
     private String format;

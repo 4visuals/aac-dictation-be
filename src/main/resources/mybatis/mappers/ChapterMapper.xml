@@ -31,11 +31,12 @@
 		JOIN wr_sentence sen
 		  ON sen.cate = sc.seq
 		JOIN wr_mapping wrp
-		  ON sen.seq = wrp.wr_sen  
+		  ON sen.seq = wrp.wr_sen AND wrp.pumsa != 'SKIPPED'  
 		JOIN wr_eojeol ej
 		  ON wrp.wr_eojeol = ej.seq
 		<if test="origin">
 		WHERE ctr.origin = #{origin}
 		</if>
+        ORDER  BY ctr.seq, sc.seq,  sen.seq, wrp.ordernum ; 
 	</select>
 </mapper>

@@ -1,0 +1,35 @@
+package github.visual4.aacweb.dictation.domain.user;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import github.visual4.aacweb.dictation.TypeMap;
+
+class GoogleAuthServiceTest {
+
+	@Test
+	void test_getProfile() {
+		GoogleAuthService svc = new GoogleAuthService("482880627778-rt7oi0of0fppg08opa0ob8fgqiuepain.apps.googleusercontent.com", null);
+		svc.init();
+		TypeMap res = svc.getUserProfile(TypeMap.with("token", "eyJhbGciOiJSUzI1NiIsImtpZCI6ImNlYzEzZGViZjRiOTY0Nzk2ODM3MzYyMDUwODI0NjZjMTQ3OTdiZDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYmYiOjE2NDg3ODE1MTAsImF1ZCI6IjQ4Mjg4MDYyNzc3OC1ydDdvaTBvZjBmcHBnMDhvcGEwb2I4ZmdxaXVlcGFpbi5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjEwNDQ4OTMxNzUxODY0NzMyNDE0OSIsImVtYWlsIjoiY2htaW4uc2VvQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI0ODI4ODA2Mjc3NzgtcnQ3b2kwb2YwZnBwZzA4b3BhMG9iOGZncWl1ZXBhaW4uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJuYW1lIjoi7ISc7LGE66-8IiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBVFhBSndPNml5ajlEclZwcHFrQkRJMEowZVNJcGc4c2dUZkl0T0RpamtPPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IuyxhOuvvCIsImZhbWlseV9uYW1lIjoi7IScIiwiaWF0IjoxNjQ4NzgxODEwLCJleHAiOjE2NDg3ODU0MTAsImp0aSI6IjliNWQxNGI0ZWRkZWE2ZTg5YWY5ZjMxOThiYTM4MzhiODkwNmJmOTUifQ.nQQI4F9VQIX-y7UdESospD7KxLcd9kkAVPmWS_4lQEn1UWJ1NbuGGHkUQcAQiBEm40JxYZL3-OP9vHroGPzhdNsBjSLByS0vM8gsxl77CjDOXeOFgaGs7BQyZg_jQBAww_Gc0fS8YrN6Xk6e7JbPwJj01GTdEld5qHDLi1YOwL4VoX9PC1Zx4dLLbJNHwYE79Fu4TiRPLPk4jGpGJiT13y5RZmDHpHKLfX7ed6kMqNCvKH5hsaQ_PYxge0Ab5iX5kEyULcOdPQP4-qsfBs4Y-LIKOkb36FAfYFY02a1U4l01TeknFExmHP6BGcfh4Q50gFNmiYc4bqtMEsSZfCmLJw"));
+		System.out.println(res);
+	}
+	
+	@Test
+	public void test_uuid() {
+		System.out.println(UUID.randomUUID().toString().length());
+	}
+	
+	@Test
+	public void test_userinfo() {
+		GoogleAuthService svc = new GoogleAuthService("482880627778-rt7oi0of0fppg08opa0ob8fgqiuepain.apps.googleusercontent.com", new ObjectMapper());
+		TypeMap userInfo = svc.getUserProfile("ya29.A0ARrdaM_ywc3yHF8NYGGya0BBcA4ZVnIiNbhA_whuu3iQAA1nIhbnVPLk0x41q2qCv-VFUyl-oWfZo5bVx9FglIr2JZaLofEjX4EJwjWp_aF2EX0KQ32jNkxxr6VX7mJIE9CkcU3VRY7NSrfPVEFTD5BE5jzajg");
+		System.out.println(userInfo);
+	}
+
+}
