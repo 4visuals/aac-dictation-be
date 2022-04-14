@@ -6,20 +6,24 @@
   	
   	<sql id="usermap_cols">
   		 u.user_seq
+  		,u.user_name
   		,u.user_email
   		,vendor
-  		,created_at 
+  		,created_at
+  		,user_role
   	</sql>
   	<resultMap type="User" id="usermap">
   		<id column="user_seq" property="seq"/>
+  		<result column="user_name" property="name"/>
   		<result column="user_email" property="email"/>
   		<result column="vendor" property="vendor"/>
   		<result column="created_at" property="creationTime"/>
+  		<result column="user_role" property="role"/>
   	</resultMap>
   	<select id="findBy" parameterType="map" resultMap="usermap">
   		SELECT
 	  		<include refid="usermap_cols" />
-	  	FROM wr_users u
+	  	FROM dt_users u
 	  	WHERE ${colname} = #{value}
   	</select>
   	
@@ -27,10 +31,10 @@
   		parameterType="User"
   		useGeneratedKeys="true"
   		keyProperty="seq" keyColumn="user_seq">
-	  	INSERT INTO wr_users(
-	  		user_email, user_pass, vendor, created_at 
+	  	INSERT INTO dt_users(
+	  		user_name, user_email, user_pass, vendor, created_at, user_role 
 	  	) VALUES (
-	  		#{email}, #{pass}, #{vendor}, #{creationTime}
+	  		#{name}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}
 	  	)  
   	</insert>
   </mapper>

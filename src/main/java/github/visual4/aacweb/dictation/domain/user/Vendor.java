@@ -6,7 +6,8 @@ import java.util.Map;
 public enum Vendor {
     GOOGLE("GG"),
     NAVER("NV"),
-    KAKAO("KK");
+    KAKAO("KK"),
+    MANUAL("MN"); // MN(직접 입력, 학생 등록인 경우)
 
     private String code;
     private static Map<String, Vendor> map;

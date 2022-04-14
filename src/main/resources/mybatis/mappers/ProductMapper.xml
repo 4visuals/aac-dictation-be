@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="ProductMapper">
+  	
+  	<sql id="prodmap_cols">
+  		 prod_seq
+  		,prod_name
+  		,prod_code
+  		,prod_price_ko
+  		,prod_desc
+  	</sql>
+  	<resultMap type="Product" id="prodmap">
+  		<id column="prod_seq" property="seq"/>
+  		<result column="prod_name" property="name"/>
+  		<result column="prod_code" property="code"/>
+  		<result column="prod_price_ko" property="priceKrWon"/>
+  		<result column="prod_desc" property="description"/>
+  	</resultMap>
+  	<select id="findBy" parameterType="map" resultMap="prodmap">
+  		SELECT
+	  		<include refid="prodmap_cols" />
+	  	FROM dt_products prod
+	  	WHERE prod.${colname} = #{value}
+  	</select>
+  	
+  </mapper>

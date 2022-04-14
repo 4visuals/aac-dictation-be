@@ -86,12 +86,10 @@ public class TokenService {
             		.parseClaimsJws(jwtToken);
             log.debug("[JWT' {}", res);
             Claims claim = res.getBody();
-//            String value = (String) claim.get("body");
-            // TypeMap props = Util.parseJson(om, aes256.decode(value));
             return new TypeMap(claim);
         } catch (ExpiredJwtException e) {
             String details = e.getMessage();
-            throw new AppException("TOKEN_EXPIRED", 410, details);
+            throw new AppException(ErrorCode.TOKEN_EXIPRED, 410, details);
         } catch (SignatureException e) {
         	String details = e.getMessage();
         	throw new AppException(ErrorCode.BAD_TOKEN_SIGNITURE, 410, details);

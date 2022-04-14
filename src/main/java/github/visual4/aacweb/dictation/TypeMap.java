@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,5 +166,14 @@ public class TypeMap extends HashMap<String, Object> {
 	public boolean is(String prop, Object val) {
 		Object v = this.get(prop);
 		return v != null && v.equals(val);
+	}
+	public LocalDate getLocalDate(String prop) {
+		String value = this.getStr(prop);
+		try {
+			return LocalDate.parse(value);
+			
+		} catch(DateTimeParseException e) {
+			throw new AppException(ErrorCode.INVALID_VALUE, 400);
+		}
 	}
 }

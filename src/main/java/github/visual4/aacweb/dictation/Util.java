@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import github.visual4.aacweb.dictation.domain.product.Product;
+
 
 public class Util {
     public static TypeMap parseJson(ObjectMapper om, String json) {
@@ -40,5 +42,12 @@ public class Util {
 		} catch (IOException e) {
 			throw new AppException(ErrorCode.SERVER_ERROR, 500, "check file path: " + absolutePath);
 		}
+	}
+
+	public static <T> void notNull(T instance, ErrorCode serverError, int code, String msg) {
+		if (instance == null) {
+			throw new AppException(serverError, code, msg);
+		}
+		
 	}
 }

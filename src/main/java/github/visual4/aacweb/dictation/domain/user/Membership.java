@@ -2,8 +2,6 @@ package github.visual4.aacweb.dictation.domain.user;
 
 import java.time.Instant;
 
-import org.springframework.stereotype.Service;
-
 import github.visual4.aacweb.dictation.TypeMap;
 import lombok.Getter;
 

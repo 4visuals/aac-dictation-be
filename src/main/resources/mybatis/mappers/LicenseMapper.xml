@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="LicenseMapper">
+  	
+  	<sql id="lcsmap_cols">
+  		 lcs_seq
+  		,lcs_uuid
+  		,order_ref
+  		,student_ref
+  		,created_at
+  		,duration_hours
+  		,activated_at
+  		,expired_at
+  		,receiver_ref
+  		,issuer_ref
+  	</sql>
+  	<resultMap type="License" id="lcsmap">
+  		<id column="lcs_seq" property="seq"/>
+  		<result column="lcs_uuid" property="uuid"/>
+  		<result column="student_ref" property="studentRef"/>
+  		<result column="order_ref" property="orderRef"/>
+  		<result column="created_at" property="createdAt"/>
+  		<result column="duration_hours" property="durationInHours"/>
+  		<result column="activated_at" property="activatedAt"/>
+  		<result column="expired_at" property="expiredAt"/>
+  		<result column="receiver_ref" property="receiverRef"/>
+  		<result column="issuer_ref" property="issuerRef"/>
+  	</resultMap>
+  	
+  	<select id="findBy" parameterType="map" resultMap="lcsmap">
+  		SELECT
+  			<include refid="lcsmap_cols"/>
+  		FROM dt_licenses lcs
+  		WHERE
+  			${colname} = #{value}
+  	</select>
+  	<insert id="insertLicense"
+  		parameterType="License"
+  		useGeneratedKeys="true"
+  		keyColumn="lcs_seq"
+  		keyProperty="seq">
+  	INSERT INTO dt_licenses (
+  		lcs_uuid, order_ref,  created_at,   receiver_ref,    issuer_ref
+  	) VALUES (
+  		#{uuid}, #{orderRef}, #{createdAt}, #{receiverRef}, #{issuerRef}
+  	)
+  	</insert>
+  	<!--
+  	 수강권에 학생 등록  
+  	 -->
+  	<update id="bindStudent" parameterType="map">
+	  	UPDATE dt_licenses
+	  	SET
+	  	    student_ref = #{student.seq}
+	  	WHERE
+	  		lcs_seq = #{license.seq}
+  	</update>
+  	
+  </mapper>

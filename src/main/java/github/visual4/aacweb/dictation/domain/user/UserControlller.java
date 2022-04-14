@@ -27,24 +27,28 @@ public class UserControlller {
 		String vendor = params.getStr("vendor");
 		String type = params.getStr("type");
 		String accessToken = params.getStr("token"); // access token from google oauth
-		Membership membership = userService.getMembership(vendor, accessToken);
+		TypeMap res = userService.getMembership(vendor, accessToken);
 		
-		String jwtToken = tokenService.generateJwt(membership.getProfile());
-		return Res.success("membership", membership, "jwt", jwtToken);
+		String jwtToken = tokenService.generateJwt(res.<Membership>get("membership").getProfile());
+		res.put("jwt", jwtToken);
+		return Res.success(res);
 	}
 	
 	@PostMapping("/login")
 	public Object login(@JwtProp TypeMap payload) {
 		
-		Membership membership = userService.login(payload);
-		String jwtToken = tokenService.generateJwt(membership.getProfile());
-		return Res.success("membership", membership, "jwt", jwtToken);
+		TypeMap res = userService.login(payload);
+		
+		String jwtToken = tokenService.generateJwt(res.<Membership>get("membership").getProfile());
+		res.put("jwt", jwtToken);
+		return Res.success(res);
 	}
 	
 	@PostMapping("/join")
 	public Object join(@JwtProp TypeMap profile) {
-		Membership membership = userService.join(profile);
-		String jwtToken = tokenService.generateJwt(membership.getProfile());
-		return Res.success("membership", membership, "jwt", jwtToken);
+		TypeMap res = userService.join(profile);
+		String jwtToken = tokenService.generateJwt(res.<Membership>get("membership").getProfile());
+		res.put("jwt", jwtToken);
+		return Res.success(res);
 	}
 }

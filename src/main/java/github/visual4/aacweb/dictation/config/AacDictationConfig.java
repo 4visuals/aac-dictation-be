@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -62,6 +63,7 @@ public class AacDictationConfig implements WebMvcConfigurer{
 		om.registerModule(new JavaTimeModule())
 			.configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
 			;
+		om.setSerializationInclusion(Include.NON_NULL);
 		return om;
 	}
 	@Bean

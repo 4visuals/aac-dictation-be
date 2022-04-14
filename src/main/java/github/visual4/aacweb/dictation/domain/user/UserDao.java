@@ -13,9 +13,9 @@ public class UserDao {
 	@Autowired
 	SqlSession session;
 
-	public User findBy(String column, String value) {
+	public User findBy(User.Column column, Object value) {
 		return session.selectOne(Dao.mapper(this, "findBy"),
-				TypeMap.with("colname", column, "value", value));
+				TypeMap.with("colname", column.name(), "value", value));
 	}
 
 	public void insertUser(User user) {

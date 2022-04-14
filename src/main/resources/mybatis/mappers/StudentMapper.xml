@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="StudentMapper">
+  	
+  	<sql id="studmap_cols">
+  		 std.user_seq
+  		,std.user_name
+  		,std.user_email
+  		,std.vendor
+  		,std.created_at
+  		,std.user_role
+  		,std.teacher_ref
+  	</sql>
+  	<resultMap type="User" id="studmap">
+  		<id column="user_seq" property="seq"/>
+  		<result column="user_name" property="name"/>
+  		<result column="user_email" property="email"/>
+  		<result column="user_birth" property="birth"/>
+  		<result column="vendor" property="vendor"/>
+  		<result column="created_at" property="creationTime"/>
+  		<result column="user_role" property="role"/>
+  		<result column="teacher_ref" property="teacherRef"/>
+  		
+  	</resultMap>
+  	<select id="findStudentsByTeacher" parameterType="long" resultMap="studmap">
+	  	SELECT
+		<include refid="studmap_cols"></include>
+		FROM dt_users std
+		WHERE std.teacher_ref = #{seq}
+  	</select>
+  	
+  	<select id="findBy" parameterType="map" resultMap="studmap">
+  		SELECT
+	  		<include refid="studmap_cols" />
+	  	FROM dt_users std
+	  	WHERE std.${colname} = #{value}
+  	</select>
+  	
+  	<insert id="insertStudent"
+  		parameterType="User"
+  		useGeneratedKeys="true"
+  		keyProperty="seq"
+  		keyColumn="user_seq">
+  		INSERT INTO dt_users(
+	  		user_name, user_email, user_pass, vendor, created_at, user_role, teacher_ref 
+	  	) VALUES (
+	  		#{name}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}, #{teacherRef}
+	  	)
+  	</insert>
+  	
+  </mapper>

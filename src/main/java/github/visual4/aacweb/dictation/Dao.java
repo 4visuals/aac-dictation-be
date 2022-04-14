@@ -4,7 +4,7 @@ public class Dao {
 	public static String mapper(Object dao, String method) {
 		String clsName = dao.getClass().getSimpleName();
 		if (!clsName.endsWith("Dao")) {
-			throw new AppException("SERVER_ERROR", 500);
+			throw new AppException(ErrorCode.APP_BUG, 500, "should end with *Dao, but" + clsName);
 		}
 		String nameSpace = clsName.replace("Dao", "Mapper.");
 		return nameSpace + method;

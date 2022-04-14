@@ -57,7 +57,7 @@ public enum ErrorCode {
     /**
      * 없는 리소스
      */
-    NO_FOUND("resource not found %s"), 
+    NOT_FOUND("resource not found %s"), 
     /**
      * 검증값이 일치하지 않음
      */
@@ -67,9 +67,20 @@ public enum ErrorCode {
      * jwt token signiture 값이 이상함
      */
     BAD_TOKEN_SIGNITURE("invalid token signiture: %s"),
+    /**
+     * 시간 만료됨
+     */
+    TOKEN_EXIPRED("token expired: %s"),
     OAUTH_EXCEPTION("[%s] oauth request faield."), 
-    
-    EXISTING_USER("user exists");
+    EXISTING_USER("user exists"),
+    /**
+     * 교사가 아님
+     */
+    NOT_A_TEACHER("not a teacher"),
+    /**
+     * 애플리케이션 버그 발생
+     */
+    APP_BUG("application bug. %s");
     
 
     private String format;

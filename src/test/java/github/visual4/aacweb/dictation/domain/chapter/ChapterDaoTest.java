@@ -12,14 +12,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import github.visual4.aacweb.dictation.config.AacDaoConfig;
+import github.visual4.aacweb.dictation.BaseDao;
 import github.visual4.aacweb.dictation.domain.section.Section;
 
-@MybatisTest
-@ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import({AacDaoConfig.class, ChapterDao.class})
-class ChapterDaoTest {
+@Import(ChapterDao.class)
+class ChapterDaoTest extends BaseDao {
 
 	@Autowired
 	ChapterDao chapterDao;
