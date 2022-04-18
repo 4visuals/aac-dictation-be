@@ -80,7 +80,7 @@ public enum ErrorCode {
     /**
      * 애플리케이션 버그 발생
      */
-    APP_BUG("application bug. %s");
+    APP_BUG("application bug. %s"), LICENSE_IS_FULL("license is full: %s");
     
 
     private String format;
