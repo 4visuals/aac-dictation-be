@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="ExamPaperMapper">
+  	
+  	<sql id="*_cols">
+  		 
+  	</sql>
+  	<resultMap type="ExamPaper" id="exam_map">
+  		<id column="exam_seq" property="seq"/>
+  		<result column="section_ref" property="sectionRef"/>
+  		<result column="student_ref" property="studentRef"/>
+  		<result column="student_age_month" property="ageInMonth"/>
+  		<result column="type" property="type"/>
+  		<result column="num_of_questions" property="numOfQuestions"/>
+  		<result column="start_time" property="startTime"/>
+  		<result column="endTime" property="endTime"/>
+  	</resultMap>
+  	<!-- <select id="" parameterType="" resultMap="*">
+  	</select> -->
+  	<insert id="insertExamPaper" parameterType="ExamPaper"
+  		useGeneratedKeys="true"
+  		keyColumn="exam_seq"
+  		keyProperty="seq">
+  		INSERT INTO dt_exam_papers (
+ 			  section_ref
+ 			, student_ref
+ 			, student_age_month
+ 			, `type`
+ 			, num_of_questions
+ 			, start_time
+ 			, end_time
+		) VALUES (
+			  #{sectionRef}
+			, #{studentRef}
+			, #{ageInMonth}
+			, #{type}
+			, #{numOfQuestions}
+			, #{startTime}
+			, #{endTime} 
+		);
+  	</insert>
+  </mapper>

@@ -37,4 +37,13 @@ class SectionDaoTest {
 		assertNotNull(sections);
 		assertTrue(sections.size() > 0);
 	}
+	
+	@Test
+	void test_find_by_seq() {
+		Section section = sectionDao.findBy(Section.Column.seq, 8L);
+		assertNotNull(section);
+		assertNotNull(section.getSentences());
+		assertTrue(section.getSentences().size() > 0);
+		section.getSentences().stream().forEach(System.out::println);
+	}
 }

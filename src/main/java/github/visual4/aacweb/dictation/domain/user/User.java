@@ -10,13 +10,16 @@ import org.springframework.util.ReflectionUtils;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.domain.license.License;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class User {
 
 	public enum Column {
@@ -83,6 +86,13 @@ public class User {
 
 	public Boolean isStudentOf(User teacher) {
 		return this.teacherRef.equals(teacher.getSeq());
+	}
+	public Integer getAgeInMonth(Instant now) {
+		// FIXME 가라로 넣음
+		return 36;
+	}
+	public Boolean isLicenseOwner(License license) {
+		return license.getReceiverRef().equals(this.seq);
 	}
 	
 }

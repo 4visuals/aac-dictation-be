@@ -36,9 +36,12 @@ public class AacDaoConfig {
 		fBean.setDataSource(dataSource);
 		fBean.setTypeAliasesPackage("github.visual4.aacweb.dictation.domain.*");
 		
-		Resource[] mappers = new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/mappers/**.xml");
+		Resource[] mappers = new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/mappers/**/**.xml");
 		fBean.setMapperLocations(mappers);
-		fBean.setTypeHandlers(new VendorTypeHanlder(), new UserRoleTypeHanlder());
+		fBean.setTypeHandlers(
+				new VendorTypeHanlder(),
+				new UserRoleTypeHanlder(),
+				new BooleanToYNTypeHanlder());
 		return fBean;
 	}
 	
@@ -87,5 +90,42 @@ public class AacDaoConfig {
 		public UserRole getResult(CallableStatement cs, int columnIndex) throws SQLException {
 			throw new AppException(ErrorCode.SERVER_ERROR, 500, "CallableStatement for enum UserRole not allowed for column " + columnIndex);
 		}
+	}
+	
+	@MappedTypes(Boolean.class)
+	static class BooleanToYNTypeHanlder implements TypeHandler<Boolean> {
+
+		private Boolean tooBoolean(String v, Object msg) {
+			if ("Y".equals(v)) {
+				return Boolean.TRUE;
+			} else if ("N".equals(v)) {
+				return Boolean.FALSE;
+			} else {
+				throw new AppException(ErrorCode.APP_BUG, 500, "not a boolean value: " + v + " on column " + msg);
+			}
+		}
+		
+		@Override
+		public void setParameter(PreparedStatement ps, int i, Boolean parameter, JdbcType jdbcType)
+				throws SQLException {
+			ps.setString(i, parameter ? "Y" : "N");
+		}
+
+		@Override
+		public Boolean getResult(ResultSet rs, String columnName) throws SQLException {
+			String v = rs.getString(columnName);
+			return tooBoolean(v, "column " + columnName);
+		}
+
+		@Override
+		public Boolean getResult(ResultSet rs, int columnIndex) throws SQLException {
+			return tooBoolean(rs.getString(columnIndex), "column index at " + columnIndex);
+		}
+
+		@Override
+		public Boolean getResult(CallableStatement cs, int columnIndex) throws SQLException {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, "CallableStatement for enum UserRole not allowed for column " + columnIndex);
+		}
+		
 	}
 }

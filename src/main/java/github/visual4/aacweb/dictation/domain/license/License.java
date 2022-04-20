@@ -14,7 +14,8 @@ import lombok.ToString;
 public class License {
 	public enum Column {
 		lcs_seq,
-		receiver_ref
+		receiver_ref,
+		lcs_uuid
 	}
 
 	@EqualsAndHashCode.Include

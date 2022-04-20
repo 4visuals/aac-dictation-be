@@ -63,4 +63,20 @@
 		  ON ctr.seq  = sc.chapter
 		WHERE ctr.origin = #{origin}
 	</select>
+	
+	<select id="findFullyBy" parameterType="map" resultMap="full_section">
+		SELECT
+			<include refid="section_with_desc_map_columns"></include>
+			,<include refid="SentenceMapper.full_columns"></include>
+		FROM wr_section sc
+		JOIN wr_sentence sen
+		  ON sen.cate = sc.seq
+		JOIN wr_mapping wrp
+		  ON sen.seq = wrp.wr_sen AND wrp.pumsa != 'SKIPPED'  
+		JOIN wr_eojeol ej
+		  ON wrp.wr_eojeol = ej.seq
+	    LEFT JOIN wr_desc dc
+		  ON dc.basket_ref = sc.basket_ref
+		WHERE sc.${colname} = #{value}
+	</select>
 </mapper>

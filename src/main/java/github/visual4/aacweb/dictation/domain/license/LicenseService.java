@@ -54,8 +54,26 @@ public class LicenseService {
 		return licenses;
 	}
 
-	public List<License> findBy(License.Column column, Object value) {
+	public List<License> findsBy(License.Column column, Object value) {
 		return licenseDao.findBy(column, value);
+	}
+	public License findBy(License.Column column, Object value, boolean checkValidity) {
+		List<License> licenses = findsBy(column, value);
+		if (licenses.size() == 0) {
+			return null;
+		}
+		if (licenses.size() > 1) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, "expected 1 result, but %d, results", licenses.size());
+		}
+		License license = licenses.get(0);
+		if (checkValidity && !license.isAlive(Instant.now())) {
+			// 만료됨
+			throw new AppException(ErrorCode.LICENSE_EXPIRED, 410, value);
+		}
+		return license;
+	}
+	public License findBy(License.Column column, Object value) {
+		return findBy(column, value, false);
 	}
 	/**
 	 * 수강권 등록 

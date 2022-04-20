@@ -15,8 +15,10 @@ import org.springframework.stereotype.Repository;
 
 import github.visual4.aacweb.dictation.Dao;
 import github.visual4.aacweb.dictation.Query;
+import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.chapter.Chapter;
 import github.visual4.aacweb.dictation.domain.chapter.ChapterDao;
+import github.visual4.aacweb.dictation.domain.section.Section.Column;
 import github.visual4.aacweb.dictation.domain.sentence.EjElem;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
 import github.visual4.aacweb.dictation.domain.sentence.SentenceDao;
@@ -127,6 +129,11 @@ public class SectionDao {
 		
 		return senMap.values();
 		
+	}
+	public Section findBy(Column column, Object value) {
+		return session.selectOne(
+				Dao.mapper(this, "findFullyBy"),
+				TypeMap.with("colname", column, "value", value));
 	}
 	
 	

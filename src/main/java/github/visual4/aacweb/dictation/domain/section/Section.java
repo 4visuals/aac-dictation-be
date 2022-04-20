@@ -19,6 +19,10 @@ import lombok.ToString;
 @ToString
 public class Section {
 
+	public enum Column {
+		seq
+	};
+
 	@EqualsAndHashCode.Include
 	Integer seq;
 	

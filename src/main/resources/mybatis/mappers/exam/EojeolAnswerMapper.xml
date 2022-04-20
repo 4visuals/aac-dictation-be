@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EojeolAnswerMapper">
+  	
+	<sql id="*_cols">
+	</sql>
+  	<!-- <resultMap type="" id="*">
+  		<id column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  		<result column="" property=""/>
+  	</resultMap>
+  	<select id="" parameterType="" resultMap="*">
+  	</select> -->
+  	<insert id="insertAnswer" parameterType="list">
+	  	INSERT INTO dt_eojeol_answers (
+		  eojeol_ref
+		, student_ref
+		, student_age_month
+		, trial
+		, correct
+		, elapsed_time ) VALUES 
+		<foreach collection="list" item="submit" open="" separator="," close="" >
+		(
+			 #{submit.eojeolRef}, 
+			 #{submit.studentRef}, 
+			 #{submit.ageInMonth}, 
+			 #{submit.value}, 
+			 #{submit.correct}, 
+			 #{submit.elapsedTimeMillis}
+		 )
+		</foreach>
+  	</insert>
+</mapper>

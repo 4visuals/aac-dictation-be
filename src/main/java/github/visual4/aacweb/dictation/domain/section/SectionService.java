@@ -29,4 +29,7 @@ public class SectionService {
 	public Collection<Sentence> findSentencesBySection(Integer sectionSeq, SentenceType type) {
 		return sectionDao.findSentencesBySection(sectionSeq, type);
 	}
+	public Section findBy(Section.Column column, Object value) {
+		return sectionDao.findBy(column, value);
+	}
 }

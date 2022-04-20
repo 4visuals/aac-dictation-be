@@ -84,7 +84,7 @@ public class UserService {
 		profile.put("useq", user.getSeq());
 		// 만료되지 않은 라이선스만 반환
 		Instant now = Instant.now();
-		List<License> licenses = licenseService.findBy(License.Column.receiver_ref, user.getSeq());
+		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
 		List<License> activeLicenses = licenses
 				.stream()
 				.filter(lcs -> lcs.isAlive(now))
@@ -161,5 +161,8 @@ public class UserService {
 		} else {
 			return null;
 		}
+	}
+	public User findUser(Long userSeq) {
+		return studentDao.findBy(User.Column.user_seq, userSeq);
 	}
 }
