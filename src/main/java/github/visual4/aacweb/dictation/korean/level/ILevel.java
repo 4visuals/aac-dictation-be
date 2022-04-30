@@ -1,10 +1,8 @@
 package github.visual4.aacweb.dictation.korean.level;
 
-import java.util.Set;
-
-import github.visual4.aacweb.dictation.korean.Difficulty;
+import github.visual4.aacweb.dictation.korean.Mark;
 
 public interface ILevel {
 
-	public Difficulty evaludate(CharSequence word);
+	Mark eval(String word);
 }

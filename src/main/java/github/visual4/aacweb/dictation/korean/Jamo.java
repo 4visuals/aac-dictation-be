@@ -18,8 +18,8 @@ package github.visual4.aacweb.dictation.korean;
  *  
  *  <h4>종성 29개</h4>
  *  <table  style="border: 1px solid">
- *  <tr><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td></tr>
- *  <tr><td>_</td><td>ㄱ</td><td>ㄲ</td><td>ㄳ</td><td>ㄴ</td><td>ㄵ</td><td>ㄶ</td><td>ㄷ</td><td>ㄹ</td><td>ㄺ</td><td>ㄻ</td><td>ㄼ</td><td>ㄽ</td><td>ㄾ</td><td>ㄿ</td><td>ㅀ</td><td>ㅁ</td><td>ㅂ</td><td>ㅄ</td><td>ㅅ</td><td>ㅆ</td><td>ㅇ</td><td>ㅈ</td><td>ㅉ</td><td>ㅊ</td><td>ㅋ</td><td>ㅌ</td><td>ㅍ</td><td>ㅎ</td></tr>
+ *  <tr><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>A</td><td>B</td></tr>
+ *  <tr><td>_</td><td>ㄱ</td><td>ㄲ</td><td>ㄳ</td><td>ㄴ</td><td>ㄵ</td><td>ㄶ</td><td>ㄷ</td><td>ㄹ</td><td>ㄺ</td><td>ㄻ</td><td>ㄼ</td><td>ㄽ</td><td>ㄾ</td><td>ㄿ</td><td>ㅀ</td><td>ㅁ</td><td>ㅂ</td><td>ㅄ</td><td>ㅅ</td><td>ㅆ</td><td>ㅇ</td><td>ㅈ</td><td>ㅊ</td><td>ㅋ</td><td>ㅌ</td><td>ㅍ</td><td>ㅎ</td></tr>
  *  </table>
  *  * "_"은 받침없음을 나타냄
  *  
@@ -37,7 +37,7 @@ public class Jamo {
 	// 음소 순서가 중요하므로 바꾸면 안됨.
 	final private static String CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
 	final private static String JUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
-	final private static String JONG = "_ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+	final private static String JONG = "_ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ";
 	
 	/**
 	 * 한글 자모 초성 시작 위치

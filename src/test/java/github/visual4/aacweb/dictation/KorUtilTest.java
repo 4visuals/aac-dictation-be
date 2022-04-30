@@ -44,5 +44,5 @@ class KorUtilTest {
 		int k = 1;
 		System.out.println(k<<0);
 	}
-
+	
 }

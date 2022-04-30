@@ -2,6 +2,8 @@ package github.visual4.aacweb.dictation;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,5 +51,32 @@ public class Util {
 			throw new AppException(serverError, code, msg);
 		}
 		
+	}
+	
+	public static <T> T createInstance (Class<?> cls, Object [] args, Class<?> ...argsTypes ) {
+		Constructor<?> c = null;
+		boolean accessible = false;
+		try {
+//			 c = cls.getConstructor(argsTypes);
+			c = cls.getDeclaredConstructor(argsTypes);
+			accessible = c.canAccess(null);
+			c.setAccessible(true);
+			
+			return (T)c.newInstance(args);
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (SecurityException e) {
+			throw new RuntimeException(e);
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} finally {
+			c.setAccessible(accessible);
+		}
 	}
 }
