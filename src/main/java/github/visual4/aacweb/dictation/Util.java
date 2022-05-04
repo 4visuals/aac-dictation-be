@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import github.visual4.aacweb.dictation.domain.product.Product;
-
 
 public class Util {
     public static TypeMap parseJson(ObjectMapper om, String json) {
@@ -77,6 +76,39 @@ public class Util {
 			throw new RuntimeException(e);
 		} finally {
 			c.setAccessible(accessible);
+		}
+	}
+
+	public static MessageDigest digiester(String algo) {
+		try {
+			return MessageDigest.getInstance(algo);
+		} catch (NoSuchAlgorithmException e) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, algo);
+		}
+	}
+	
+	public static String toHexString(byte[] bytes) {
+	    char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	    char[] hexChars = new char[bytes.length * 2];
+	    int v;
+	    for ( int j = 0; j < bytes.length; j++ ) {
+	        v = bytes[j] & 0xFF;
+	        hexChars[j*2] = hexArray[v/16];
+	        hexChars[j*2 + 1] = hexArray[v%16];
+	    }
+	    return new String(hexChars);
+	}
+	
+	public static class Hash {
+		public static String sha256(String text) {
+			MessageDigest md = Util.digiester("SHA-256");
+			byte [] hashed = md.digest(text.getBytes());
+			return Util.toHexString(hashed);	 
+		}
+		public static String md5(String text) {
+			MessageDigest md= Util.digiester("MD5");
+			byte [] hashed = md.digest(text.getBytes());
+			return Util.toHexString(hashed);
 		}
 	}
 }

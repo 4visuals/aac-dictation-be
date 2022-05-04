@@ -16,5 +16,10 @@ class UtilTest {
 		Level32 lvl = Util.createInstance(cls, new Object[] {ctx}, LevelContext.class);
 		assertNotNull(lvl);
 	}
+	@Test
+	void md5() {
+		String hash = Util.Hash.md5("모두 여기로 모여. ");
+		System.out.println(hash);
+	}
 
 }

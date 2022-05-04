@@ -28,6 +28,8 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.service.codec.RsaCodec;
+import github.visual4.aacweb.dictation.service.tts.ITtsHandler;
+import github.visual4.aacweb.dictation.service.tts.PollyTtsHandler;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -93,6 +95,14 @@ public class AacDictationConfig implements WebMvcConfigurer{
 		
 		return new RsaCodec(privStream, pubStream);
 	}
+	
+	@Bean
+	public ITtsHandler amazonPollyTtsHandler(
+			@Value("${dictation.aws.access-key}") String awsAccessKey,
+			@Value("${dictation.aws.secret-key}") String awsSecretKey) {
+		return new PollyTtsHandler(awsAccessKey, awsSecretKey);
+	}
+	
 	@Override
     public void addCorsMappings(CorsRegistry reg) {
         log.info("[CORS CONFIG] {}", Arrays.toString(corsAllowedUrls));

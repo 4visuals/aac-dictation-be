@@ -51,7 +51,8 @@ public enum ErrorCode {
     APP_BUG("application bug. %s"),
     LICENSE_EXPIRED("expired license: %s"),
     LICENSE_IS_FULL("license is full: %s"), 
-    NOT_A_LICENSE_OWNER("not a license owner");
+    NOT_A_LICENSE_OWNER("not a license owner"), 
+    VOICE_ERROR("fail to speak: voice: [%s], text[%s]");
     
 
     private String format;
