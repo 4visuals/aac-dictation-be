@@ -4,12 +4,12 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 40. 받침 ㄼ ㄽ ㄾ
+ * 41. 받침 ㄳ ㄵ ㅄ
  * 
  * @author chminseo
  */
 public class Level41 implements ILevel {
-	final Jamo pattern = Jamo.pattern("*", "*", "ㄼㄽㄾ");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㄺㄻㄿ");
 	final LevelContext ctx;
 	
 	Level41(LevelContext ctx) {
@@ -18,8 +18,7 @@ public class Level41 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		// FIXME 일단 생략
-		return ctx.findMark(word);
+		return ctx.setMark(Difficulty.L41, pattern, word);
 	}
 
 }

@@ -4,15 +4,14 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 16. 받침 ㄱㄲㅋ이 뒤로 넘어가 소리나요.
+ * 16. 모음  'ㅐ'와 'ㅔ' 구분2
  * 
  * @author chminseo
  *
  */
 public class Level16 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄲㅋ");
-	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
+	final Jamo pattern = Jamo.pattern("*", "ㅐㅔ", "*");
 	final LevelContext ctx;
 	
 	Level16(LevelContext ctx) {
@@ -21,10 +20,6 @@ public class Level16 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		Mark mk = ctx.findMark(word);
-		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L16, range[0], range[1]);
-		});
-		return mk;
+		return this.ctx.setMark(Difficulty.L16, pattern, word);
 	}
 }

@@ -4,20 +4,14 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 32. ㅎ뒤엔 거센소리로 바뀌어요.
- * (ㅎ받침+ㄱㄷㅈ→ㅋㅌㅍㅊ)
+ * 30. 받침 ㄷㅅㅆㅈㅊㅌ은 읽을 때 ㄷ으로 소리나요.
  * 
- * 4장 받침의 발음, 12항 받침 'ㅎ'의 발음
- * https://kornorms.korean.go.kr/regltn/regltnView.do?regltn_code=0002&regltn_no=346#a405
- * 
- * FIXME 국립 국어원의 규칙과 다름. 확인 필요
  * @author chminseo
  *
  */
 public class Level32 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*", "ㅎ");
-	final Jamo next = Jamo.pattern("ㄱㄷㅈ", "*", "*");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㄷㅅㅆㅈㅊㅌ");
 	final LevelContext ctx;
 	
 	Level32(LevelContext ctx) {
@@ -26,10 +20,6 @@ public class Level32 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		Mark mk = ctx.findMark(word);
-		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L32, range[0], range[1]);
-		});
-		return mk;
+		return ctx.setMark(Difficulty.L32, pattern, word);
 	}
 }

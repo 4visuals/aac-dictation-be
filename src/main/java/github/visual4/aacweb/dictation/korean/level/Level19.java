@@ -4,14 +4,15 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 19. 끝에 오는 말: ~아요,~어요.
+ * 19. 받침 ㅂㅍ이 뒤로 넘어가 소리나요.
  * 
  * @author chminseo
  *
  */
 public class Level19 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "*");
+	final Jamo prev = Jamo.pattern("*", "*","ㅂㅍ");
+	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
 	final LevelContext ctx;
 	
 	Level19(LevelContext ctx) {
@@ -21,14 +22,9 @@ public class Level19 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
-		int [] pos = Levels.findSuffixPos(word, pattern, "아요");
-		if (pos.length == 2) {
-			mk.addRange(Difficulty.L19, pos[0] , pos[1]);
-		}
-		pos = Levels.findSuffixPos(word, pattern, "어요");
-		if (pos.length == 2) {
-			mk.addRange(Difficulty.L19, pos[0] , pos[1]);
-		}
+		Levels.findAdjPos(word, prev, next, (range) -> {
+			mk.addRange(Difficulty.L19, range[0], range[1]);
+		});
 		return mk;
 	}
 }

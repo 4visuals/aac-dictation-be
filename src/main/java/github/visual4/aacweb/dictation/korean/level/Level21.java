@@ -4,14 +4,14 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 21. 모음 'ㅝ'와 소리 익히기
+ * 21. 끝에 오는 말: ~아요,~어요.
  * 
  * @author chminseo
  *
  */
 public class Level21 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "ㅝ", "*");
+	final Jamo pattern = Jamo.pattern("*", "*", "*");
 	final LevelContext ctx;
 	
 	Level21(LevelContext ctx) {
@@ -20,6 +20,15 @@ public class Level21 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L21, pattern, word);
+		Mark mk = ctx.findMark(word);
+		int [] pos = Levels.findSuffixPos(word, pattern, "아요");
+		if (pos.length == 2) {
+			mk.addRange(Difficulty.L21, pos[0] , pos[1]);
+		}
+		pos = Levels.findSuffixPos(word, pattern, "어요");
+		if (pos.length == 2) {
+			mk.addRange(Difficulty.L21, pos[0] , pos[1]);
+		}
+		return mk;
 	}
 }

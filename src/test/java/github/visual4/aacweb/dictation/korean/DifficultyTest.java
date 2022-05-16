@@ -15,7 +15,7 @@ class DifficultyTest {
 	
 	@BeforeEach
 	public void initCtx() {
-		ctx = new LevelContext(new MarkFactory());
+		ctx = new LevelContext();
 	}
 	
 	@Test

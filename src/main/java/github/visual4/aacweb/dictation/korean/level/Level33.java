@@ -4,11 +4,17 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 33. ㅎ이 다음에 오면 거센소리로 바뀌어요.
- * (ㄱㄷㅂㅅㅈ+ㅎ→ㅋㅌㅍㅊ)
+ * 33. 된소리로 바뀌어요
+ * (앞의 받침소리 때문에뒤에 있는 첫 자음이 된소리로 바뀜 ㄱㄷㅂㅅㅈ→ㄲㄸㅃㅆㅉ)
  * 
- * 4장 받침의 발음, 12항 받침 'ㅎ'의 발음[붙임 1]
- * https://kornorms.korean.go.kr/regltn/regltnView.do?regltn_code=0002&regltn_no=346#a405
+ * 
+ * 제6장 된소리되기,
+ * 제23항
+ * 받침 
+ * 'ㄱ(ㄲ, ㅋ, ㄳ, ㄺ), ㄷ(ㅅ, ㅆ, ㅈ, ㅊ, ㅌ), ㅂ(ㅍ, ㄼ, ㄿ, ㅄ)'
+ * 뒤에 연결되는 'ㄱ, ㄷ, ㅂ, ㅅ, ㅈ'은 된소리로 발음한다.
+ * 제24항
+ * 어간 받침 ‘ㄴ(ㄵ), ㅁ(ㄻ)’ 뒤에 결합되는 어미의 첫소리 ‘ㄱ, ㄷ, ㅅ, ㅈ’은 된소리로 발음한다.
  * 
  * FIXME 국립 국어원의 규칙과 다름. 확인 필요
  * @author chminseo
@@ -16,8 +22,8 @@ import github.visual4.aacweb.dictation.korean.Mark;
  */
 public class Level33 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄷㅂㅅㅈ");
-	final Jamo next = Jamo.pattern("ㅎ", "*", "*");
+	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄴㄲㄳㄵㄷㄹㄺㄻㄼㄿㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍ");
+	final Jamo next = Jamo.pattern("ㄱㄷㅂㅅㅈ", "*", "*");
 	final LevelContext ctx;
 	
 	Level33(LevelContext ctx) {

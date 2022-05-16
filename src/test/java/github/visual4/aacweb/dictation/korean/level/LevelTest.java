@@ -35,14 +35,14 @@ class LevelTest {
 	
 	@BeforeEach
 	public void initCtx() {
-		ctx = new LevelContext(new MarkFactory());
+		ctx = new LevelContext();
 	}
 	/**
 	 * 자음(ㅇㄱㄴㄷㄹㅁㅂㅅㅈ) + 모음(ㅏㅓㅗㅜㅡㅣ) + 받침없음
 	 */
 	@Test
-	void test_level1() {
-		Level1 lvl = new Level1(ctx);
+	void test_level01() {
+		Level01 lvl = new Level01(ctx);
 		Mark mk = lvl.eval("아기");
 		Pos posData;
 		assertTrue(mk.has(Difficulty.L1));
@@ -66,20 +66,11 @@ class LevelTest {
 		assertArrayEquals(new int[] {3, 5}, posData.rangeAt(1));
 		
 		existing(lvl, Difficulty.L1);
-		
-//		List<String> words = SampleReader.get(Difficulty.L1);
-//		for (String word : words) {
-//			mk = lvl.evaludate(word);
-//			posData = mk.pos(Difficulty.L1);
-//			assertEquals(1, posData.size());
-//			assertArrayEquals(new int[] {0, word.length()}, posData.get(0).arr());
-//		}
-		
 	}
 	
 	@Test
-	void test_level2() {
-		Level2 lvl = new Level2(ctx);
+	void test_level02() {
+		Level02 lvl = new Level02(ctx);
 		Mark mk;
 		
 		mk = lvl.eval("아기");
@@ -101,8 +92,9 @@ class LevelTest {
 	}
 	
 	@Test
-	void test_level3() {
-		Level3 lvl = new Level3(ctx);
+	void test_level03() {
+		Level03 lvl = new Level03(ctx);
+		
 		System.out.println(lvl);
 		assertNull(lvl.eval("아기").pos(Difficulty.L3));
 		assertNull(lvl.eval("우유").pos(Difficulty.L3));
@@ -122,41 +114,36 @@ class LevelTest {
 	}
 	
 	@Test
-	public void test_level4() {
-		Level4 lvl = new Level4(ctx);
+	public void test_level04() {
+		Level04 lvl = new Level04(ctx);
 		existing(lvl, Difficulty.L4);
 	}
 	@Test
-	public void test_level5() {
-		Level5 lvl = new Level5(ctx);
+	public void test_level05() {
+		Level05 lvl = new Level05(ctx);
 		existing(lvl, Difficulty.L5);	
 	}
+	/**
+	 * 6. ~다.
+	 */
 	@Test
-	public void test_level6() {
-		Level6 lvl = new Level6(ctx);
+	public void test_level06() {
+		Level06 lvl = new Level06(ctx);
 		existing(lvl, Difficulty.L6);
 	}
 	@Test
-	public void test_level7() {
-		Level7 lvl = new Level7(ctx);
-		Mark mk = lvl.eval("갑니다");
-		assertEquals(1, mk.pos(Difficulty.L7).size());
-		assertArrayEquals(new int[] {0, 3}, mk.pos(Difficulty.L7).rangeAt(0));
-		
-		mk = lvl.eval("먹습니다.");
-		assertEquals(1, mk.pos(Difficulty.L7).size());
-		assertArrayEquals(new int[] {1, 4}, mk.pos(Difficulty.L7).rangeAt(0));
-		
+	public void test_level07() {
+		Level07 lvl = new Level07(ctx);
 		existing(lvl, Difficulty.L7);
 	}
 	@Test
-	public void test_level8() {
-		Level8 lvl = new Level8(ctx);
+	public void test_level08() {
+		Level08 lvl = new Level08(ctx);
 		existing(lvl, Difficulty.L8);
 	}
 	@Test
-	public void test_level9() {
-		Level9 lvl = new Level9(ctx);
+	public void test_level09() {
+		Level09 lvl = new Level09(ctx);
 		existing(lvl, Difficulty.L9);
 	}
 	@Test
@@ -188,11 +175,6 @@ class LevelTest {
 	public void test_level15() {
 		Level15 lvl = new Level15(ctx);
 		existing(lvl, Difficulty.L15);
-	}
-	@Test
-	public void test_level16() {
-		Level16 lvl = new Level16(ctx);
-		existing(lvl, Difficulty.L16);
 	}
 	@Test
 	public void test_level17() {
@@ -252,6 +234,7 @@ class LevelTest {
 	@Test
 	public void test_level28() {
 		Level28 lvl = new Level28(ctx);
+		lvl.eval("언니와 나는 가위바위보를 했습니다.");
 		existing(lvl, Difficulty.L28);
 	}
 	@Test
@@ -316,9 +299,8 @@ class LevelTest {
 	}
 	@Test
 	public void test_level41() {
-		// FIXME 생략
-//		Level41 lvl = new Level41(ctx);
-//		existing(lvl, Difficulty.L41);
+		Level41 lvl = new Level41(ctx);
+		existing(lvl, Difficulty.L41);
 	}
 	@Test
 	public void test_level42() {
@@ -327,13 +309,41 @@ class LevelTest {
 	}
 	@Test
 	public void test_level43() {
-		Level43 lvl = new Level43(ctx);
-		existing(lvl, Difficulty.L43);
+		// FIXME 43. 글자와 뜻이 달라요1 
 	}
 	@Test
 	public void test_level44() {
-		Level44 lvl = new Level44(ctx);
-		existing(lvl, Difficulty.L44);
+		// FIXME 44. 글자와 뜻이 달라요2 
+	}
+	@Test
+	public void test_level45() {
+		// FIXME 45. 글자와 뜻이 달라요3 
+	}
+	@Test
+	public void test_level46() {
+		Level46 lvl = new Level46(ctx);
+		existing(lvl, Difficulty.L46);
+	}
+	@Test
+	public void test_level47() {
+		Level47 lvl = new Level47(ctx);
+		existing(lvl, Difficulty.L47);
+	}
+	@Test
+	public void test_level48() {
+		Level48 lvl = new Level48(ctx);
+		existing(lvl, Difficulty.L48);
+	}
+	
+	@Test
+	public void test_level49() {
+//		Level49 lvl = new Level49(ctx);
+//		existing(lvl, Difficulty.L49);
+	}
+	@Test
+	public void test_level50() {
+//		Level50 lvl = new Level50(ctx);
+//		existing(lvl, Difficulty.L50);
 	}
 	void existing(ILevel lvl, Difficulty df) {
 		List<String> words = SampleReader.get(df, "sample.txt", ",");

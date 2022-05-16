@@ -17,7 +17,7 @@ public class LevelContext {
 	private Map<CharSequence, Mark> marks ;
 	
 	private List<ILevel> levels;
-	public LevelContext(MarkFactory markFactory) {
+	public LevelContext() {
 		this.marks = new HashMap<>();
 		this.levels = new ArrayList<>();
 		install();
@@ -32,7 +32,7 @@ public class LevelContext {
 	}
 	
 	public static LevelContext createContext() {
-		return new LevelContext(new MarkFactory());
+		return new LevelContext();
 	}
 	public Mark setMark(Difficulty df, Jamo pattern, CharSequence word) {
 		Mark m = findMark(word);
@@ -59,8 +59,10 @@ public class LevelContext {
 		Object [] args = new Object[] {this};
 		StringBuilder fqName = new StringBuilder("github.visual4.aacweb.dictation.korean.level.Level");
 		int offset = fqName.length();
-		// FIXME 41, 44, 46 미구현 상태
-		for(int lvl = 1 ; lvl <= 44 ; lvl++) {
+		for(int lvl = 1 ; lvl <= 50 ; lvl++) {
+			if (lvl < 10) {
+				fqName.append('0');
+			}
 			fqName.append(lvl);
 			try {
 				Class<?> cls = Class.forName(fqName.toString());

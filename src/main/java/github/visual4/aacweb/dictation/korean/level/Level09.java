@@ -4,21 +4,21 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 5. 받침 ㅇㄹㅁㄴ (초성, 중성 상관없음)
+ * 9. 받침 ㅅㅆ
  * @author chminseo
  *
  */
-public class Level5 implements ILevel {
+public class Level09 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㅇㄹㅁㄴ");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㅅㅆ");
 	final LevelContext ctx;
 	
-	Level5(LevelContext ctx) {
+	Level09(LevelContext ctx) {
 		this.ctx = ctx;
 	}
+	
 	@Override
 	public Mark eval(String word) {
-		return this.ctx.setMark(Difficulty.L5, pattern, word);
+		return this.ctx.setMark(Difficulty.L9, pattern, word);
 	}
-
 }

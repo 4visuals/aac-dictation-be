@@ -4,13 +4,13 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 12. 받침 ㅌㅍㅎ
+ * 12. 받침 ㅈㅊㅋ
  * @author chminseo
  *
  */
 public class Level12 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㅌㅍㅎ");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㅈㅊㅋ");
 	final LevelContext ctx;
 	
 	Level12(LevelContext ctx) {

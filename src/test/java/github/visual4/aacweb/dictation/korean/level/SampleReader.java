@@ -25,10 +25,11 @@ public class SampleReader {
 				line = line.substring(1);
 				samples.put(Difficulty.valueOf(line), current = new ArrayList<>());
 			} else {
-				String [] words = line.trim().split(delim);
-				for (String word : words) {
-					current.add(word);
-				}
+				current.add(line.trim());
+//				String [] words = line.trim().split(delim);
+//				for (String word : words) {
+//					current.add(word);
+//				}
 			}
 		}	
 	}

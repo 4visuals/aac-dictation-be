@@ -4,22 +4,20 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 23. 모음 'ㅚ'와  'ㅟ' 소리 익히기
- * 
+ * 7. 받침ㄱㄷㅂ
  * @author chminseo
  *
  */
-public class Level25 implements ILevel {
+public class Level07 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "ㅚㅟ", "*");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㄱㄷㅂ");
 	final LevelContext ctx;
 	
-	Level25(LevelContext ctx) {
+	Level07(LevelContext ctx) {
 		this.ctx = ctx;
 	}
-	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L25, pattern, word);
+		return this.ctx.setMark(Difficulty.L7, pattern, word);
 	}
 }

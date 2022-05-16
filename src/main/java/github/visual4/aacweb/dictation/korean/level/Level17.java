@@ -4,14 +4,14 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 17. 받침 ㅂㅍ이 뒤로 넘어가 소리나요.
+ * 15. 받침 ㄹㅁㄴ이 뒤로 넘어가 소리나요.
  * 
  * @author chminseo
  *
  */
 public class Level17 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*","ㅂㅍ");
+	final Jamo prev = Jamo.pattern("*", "*", "ㄴㄹㅁ");
 	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
 	final LevelContext ctx;
 	

@@ -4,18 +4,19 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 18. 받침 ㄷㅅㅆㅈㅊㅌ이 뒤로 넘어가 소리나요.
+ * 48. 'ㄴ'이나 'ㄹ'를 넣어 발음해요.
+ * (받침+첫소리모음 ㅣㅑㅕㅛㅠ일 때)
  * 
  * @author chminseo
  *
  */
-public class Level20 implements ILevel {
+public class Level48 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*","ㄷㅅㅆㅈㅊㅌ");
-	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
+	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ");
+	final Jamo next = Jamo.pattern("ㅇ", "ㅣㅑㅕㅛㅠ", "*");
 	final LevelContext ctx;
 	
-	Level20(LevelContext ctx) {
+	Level48(LevelContext ctx) {
 		this.ctx = ctx;
 	}
 	
@@ -23,7 +24,7 @@ public class Level20 implements ILevel {
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
 		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L20, range[0], range[1]);
+			mk.addRange(Difficulty.L48, range[0], range[1]);
 		});
 		return mk;
 	}

@@ -4,14 +4,14 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 30. 음절 끝소리가 ㄷ으로 소리 나도 원래 받침 ㅅㅆㅈㅊㅌ으로 써요.
+ * 30. 받침 ㅂㅍ은 읽을 때 ㅂ으로 소리나요
  * 
  * @author chminseo
  *
  */
 public class Level30 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㄷㅅㅆㅈㅊㅌ");
+	final Jamo pattern = Jamo.pattern("*", "*", "ㅂㅍ");
 	final LevelContext ctx;
 	
 	Level30(LevelContext ctx) {

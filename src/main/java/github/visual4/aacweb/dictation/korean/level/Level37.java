@@ -4,12 +4,16 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 37. 받침 ㄶ ㅀ
+ * 37. 소리를 닮아가요(1)
+ * (뒤에 ㄴㅁㄹ이 오면 ㄱㄲㅋ→ㅇ, ㄷㅅㅆㅈㅊㅌㅂㅍ→ㄴㅁ 으로 바뀌어 소리나요)
  * 
  * @author chminseo
+ *
  */
 public class Level37 implements ILevel {
-	final Jamo pattern = Jamo.pattern("*", "*", "ㄶㅀ");
+
+	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄲㅋㄷㅅㅆㅈㅊㅌㅂㅍ");
+	final Jamo next = Jamo.pattern("ㄴㅁㄹ", "*", "*");
 	final LevelContext ctx;
 	
 	Level37(LevelContext ctx) {
@@ -18,7 +22,10 @@ public class Level37 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L37, pattern, word);
+		Mark mk = ctx.findMark(word);
+		Levels.findAdjPos(word, prev, next, (range) -> {
+			mk.addRange(Difficulty.L37, range[0], range[1]);
+		});
+		return mk;
 	}
-
 }
