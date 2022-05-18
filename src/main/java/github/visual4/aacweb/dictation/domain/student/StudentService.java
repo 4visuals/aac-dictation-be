@@ -40,6 +40,13 @@ public class StudentService {
 		}
 		
 		String name = studentInfo.getStr("name");
+		if (name == null || name.trim().length() == 0 ) {
+			throw new AppException(ErrorCode.INVALID_VALUE, 400);
+		}
+		String password = studentInfo.getStr("password");
+		if (password == null || password.trim().length() == 0) {
+			password = UUID.randomUUID().toString(); 
+		}
 		LocalDate birth = studentInfo.getLocalDate("birth");
 		User student = new User();
 		student.setName(name);
@@ -47,7 +54,7 @@ public class StudentService {
 		student.setTeacherRef(teacher.getSeq());
 		student.setEmail("");
 		student.setCreationTime(Instant.now());
-		student.setPass(UUID.randomUUID().toString());
+		student.setPass(password);
 		student.setVendor(Vendor.MANUAL);
 		student.setRole(UserRole.STUDENT);
 		return studentDao.insertStudent(student);

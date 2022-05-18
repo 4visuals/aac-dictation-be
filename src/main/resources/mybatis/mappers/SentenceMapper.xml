@@ -43,4 +43,15 @@
 		</collection>
 	</resultMap>
 	
+	<select id="findBy" parameterType="map" resultMap="sen">
+		SELECT 
+			<include refid="full_columns"></include>
+		FROM wr_sentence sen
+		JOIN wr_mapping wrp
+		  ON sen.seq = wrp.wr_sen AND wrp.pumsa != 'SKIPPED'  
+		JOIN wr_eojeol ej
+		  ON wrp.wr_eojeol = ej.seq
+		WHERE sen.${col} = #{val}
+	</select>
+	
 </mapper>

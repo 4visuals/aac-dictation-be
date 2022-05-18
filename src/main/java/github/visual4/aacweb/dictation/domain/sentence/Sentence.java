@@ -14,6 +14,9 @@ import lombok.ToString;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class Sentence {
+	public enum Column {
+		seq
+	}
 	public enum SentenceType {
 		W, // 단어 학습(한 단어짜리 문장)
 		S // 문장 학습(두 개 이상의 어절로 구성된 문장)

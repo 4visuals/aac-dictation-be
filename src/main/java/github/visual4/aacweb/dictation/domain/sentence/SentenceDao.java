@@ -1,14 +1,28 @@
 package github.visual4.aacweb.dictation.domain.sentence;
 
 import java.sql.ResultSet;
+import java.util.List;
 
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import github.visual4.aacweb.dictation.Dao;
+import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.tools.Origin;
 import github.visual4.aacweb.dictation.tools.Rset;
 
+@Repository
 public class SentenceDao {
 
+	@Autowired
+	SqlSession session;
 	
+	public List<Sentence> findBy(Sentence.Column col, Object value) {
+		return session.selectList(Dao.mapper(this, "findBy"),
+				TypeMap.with("col", col.name(), "val", value));
+	}
 	public static Sentence rsToSentence(Rset rs) {
 		Integer seq = rs.Int("seq");
 		String sentence = rs.str("sentence");

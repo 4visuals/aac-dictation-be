@@ -21,6 +21,7 @@
 	  	SELECT 
 			dep.exam_seq           as examRef,
 			dep.section_ref        as sectionRef,
+			dep.type               as type,
 			dep.start_time         as startTime,
 			#{student}             as studentRef,
 			dep.num_of_questions   as total,

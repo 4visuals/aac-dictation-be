@@ -81,4 +81,7 @@ public class License {
 		}
 		return Boolean.FALSE;
 	}
+	public boolean isAlreadyActivated() {
+		return activatedAt != null;
+	}
 }

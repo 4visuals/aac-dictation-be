@@ -24,7 +24,8 @@ public class User {
 
 	public enum Column {
 		user_seq,
-		user_email
+		user_email,
+		user_role
 	}
 	
 	@EqualsAndHashCode.Include

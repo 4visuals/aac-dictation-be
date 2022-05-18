@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation.domain.user;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,11 @@ public class UserDao {
 
 	public void insertUser(User user) {
 		session.insert(Dao.mapper(this, "insertUser"), user);
+	}
+
+	public List<User> searchUsers(String keyword, TypeMap search) {
+		search.put("keyword", keyword + "%");
+		return session.selectList(Dao.mapper(this, "searchUsers"), search);
 	}
 	
 	

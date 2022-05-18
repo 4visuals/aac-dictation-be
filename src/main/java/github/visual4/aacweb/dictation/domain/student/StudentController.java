@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.user.User;
+import github.visual4.aacweb.dictation.domain.user.UserService;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
 
 @RestController
@@ -16,11 +18,26 @@ import github.visual4.aacweb.dictation.web.aop.JwtProp;
 public class StudentController {
 	
 	@Autowired
+	UserService userService;
+	
+	@Autowired
 	StudentService studentService;
 
+	@Autowired
+	LicenseService licenseService;
 	@PostMapping
 	public Object registerStudent(@RequestBody TypeMap studentInfo, @JwtProp("useq") Integer teacherSeq) {
 		User student = studentService.regiserStudent(teacherSeq.longValue(), studentInfo);
-		return Res.success("student", student);
+		
+		String lcsUUID = studentInfo.getStr("license");
+		TypeMap lcs = null;
+		if (lcsUUID != null) {
+			lcs = licenseService.bindStudent(
+					teacherSeq.longValue(),
+					lcsUUID,
+					student.getSeq(),
+					userService);
+		}
+		return Res.success("student", student, "lcs", lcs);
 	}
 }

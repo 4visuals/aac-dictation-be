@@ -2,6 +2,7 @@ package github.visual4.aacweb.dictation.domain.stats;
 
 import java.time.Instant;
 
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,4 +21,6 @@ public class SectionStats {
 	Integer total;
 	Integer correct;
 	Integer failed;
+	
+	SentenceType type;
 }

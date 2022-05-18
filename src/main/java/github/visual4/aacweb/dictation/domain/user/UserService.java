@@ -162,7 +162,29 @@ public class UserService {
 			return null;
 		}
 	}
+	/**
+	 * 주어진 선생님의 학생 조회
+	 * @param teacherSeq
+	 * @return
+	 */
+	public List<User> findStudents(Long teacherSeq) {
+		User teacher = userDao.findBy(User.Column.user_seq, teacherSeq);
+		if(!teacher.isTeacher()) {
+			throw new AppException(ErrorCode.NOT_A_TEACHER, 400);
+		}
+		return studentDao.findStudentsByTeacher(teacherSeq);
+	}
 	public User findUser(Long userSeq) {
 		return studentDao.findBy(User.Column.user_seq, userSeq);
 	}
+	/**
+	 * 사용자 검색
+	 * @param keyword
+	 * @return
+	 */
+	public List<User> searchUsers(String keyword) {
+		return userDao.searchUsers(keyword, 
+				TypeMap.with(User.Column.user_role.name(), UserRole.TEACHER.getCode()));
+	}
+	
 }

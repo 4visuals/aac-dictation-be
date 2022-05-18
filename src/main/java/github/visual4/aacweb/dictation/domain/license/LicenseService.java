@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.license;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -75,6 +76,14 @@ public class LicenseService {
 	public License findBy(License.Column column, Object value) {
 		return findBy(column, value, false);
 	}
+	public TypeMap bindStudent(Long teacherSeq, String licenseUUID, Long studentSeq,
+			UserService userService) {
+		License lcs = this.findBy(License.Column.lcs_uuid, licenseUUID);
+		if (lcs == null) {
+			throw new AppException(ErrorCode.NOT_FOUND, 404, "no such license");	
+		}
+		return bindStudent(teacherSeq, lcs.getSeq(),studentSeq, userService);
+	}
 	/**
 	 * 수강권 등록 
 	 * @param teacherSeq 선생님
@@ -95,6 +104,13 @@ public class LicenseService {
 		}
 		// FIXME (수강권) 이미 등록된 학생이 있는 경우 처리 로직 필요함.
 		Long prevStudent = lcs.getStudentRef();
+		if (lcs.isAlreadyActivated()) {
+			throw new AppException(ErrorCode.LICENSE_ALREADY_ACTIVATED, 422, lcs.getStudentRef());
+		}
+		Instant current = Instant.now();
+		Instant exp = current.plus(lcs.getDurationInHours(), ChronoUnit.HOURS);
+		lcs.setActivatedAt(current);
+		lcs.setExpiredAt(exp);
 		licenseDao.bindStudent(lcs, student);
 		
 		return TypeMap.with(

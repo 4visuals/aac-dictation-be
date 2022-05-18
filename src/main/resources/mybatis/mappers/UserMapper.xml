@@ -37,4 +37,22 @@
 	  		#{name}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}
 	  	)  
   	</insert>
+  	
+  	<!-- search -->
+  	<!-- 이름 또는 이메일로 검색 -->
+  	<select id="searchUsers" parameterType="map" resultMap="usermap">
+  		(
+	  		SELECT
+		  		<include refid="usermap_cols" />
+		  	FROM dt_users u
+		  	WHERE user_email LIKE  #{keyword} AND
+	  	<if test="user_role">user_role = #{user_role}</if>
+	  	) UNION (
+	  		SELECT
+		  		<include refid="usermap_cols" />
+		  	FROM dt_users u
+		  	WHERE user_name LIKE  #{keyword} AND
+		  	<if test="user_role">user_role = #{user_role}</if>
+	  	)
+  	</select>
   </mapper>

@@ -44,13 +44,15 @@ class TtsDemo{
 //		sleep(500);
 //		voiceService.download("이야기 나누자.");
 //		sleep(500);
-		voiceService.download("라디오 뉴스");
+//		voiceService.download("테스트 문장입니다.");
 //		sleep(500);
 //		voiceService.download("비가 오려나?");
 //		sleep(500);
 //		voiceService.download("요요로 묘기 부리기");
 //		sleep(500);
 //		voiceService.download("여기서 기다려요.");
+		
+		
 	}
 
 	private void sleep(long t) {
