@@ -22,7 +22,7 @@ public class Level01 implements ILevel {
 
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L1, pattern, word);
+		return ctx.setMark(Difficulty.L01, pattern, word);
 	}
 
 }

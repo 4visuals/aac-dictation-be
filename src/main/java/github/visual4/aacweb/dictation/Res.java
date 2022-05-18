@@ -1,7 +1,6 @@
 package github.visual4.aacweb.dictation;
 
 /**
- * TODO Util.map(..), Util.success(..) 종류의 메서드 호출을 Res 클래스로 빼낼 예정
  */
 public class Res {
 

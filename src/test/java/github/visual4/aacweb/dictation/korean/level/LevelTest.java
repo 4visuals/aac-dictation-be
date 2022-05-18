@@ -45,27 +45,27 @@ class LevelTest {
 		Level01 lvl = new Level01(ctx);
 		Mark mk = lvl.eval("아기");
 		Pos posData;
-		assertTrue(mk.has(Difficulty.L1));
-		assertArrayEquals(new int[] {0, 2}, mk.pos(Difficulty.L1).rangeAt(0));
+		assertTrue(mk.has(Difficulty.L01));
+		assertArrayEquals(new int[] {0, 2}, mk.pos(Difficulty.L01).rangeAt(0));
 		
 		mk = lvl.eval("느티나무");
-		posData = mk.pos(Difficulty.L1);
+		posData = mk.pos(Difficulty.L01);
 		assertEquals(2, posData.size());
 		assertArrayEquals(new int[] {0, 1}, posData.rangeAt(0));
 		assertArrayEquals(new int[] {2, 4}, posData.rangeAt(1));
 		
 		mk = lvl.eval("호주머니");
-		posData = mk.pos(Difficulty.L1);
+		posData = mk.pos(Difficulty.L01);
 		assertEquals(1, posData.size());
 		assertArrayEquals(new int[] {1, 4}, posData.rangeAt(0));
 		
 		mk = lvl.eval("나비야나비야");
-		posData = mk.pos(Difficulty.L1);
+		posData = mk.pos(Difficulty.L01);
 		assertEquals(2, posData.size());
 		assertArrayEquals(new int[] {0, 2}, posData.rangeAt(0));
 		assertArrayEquals(new int[] {3, 5}, posData.rangeAt(1));
 		
-		existing(lvl, Difficulty.L1);
+		existing(lvl, Difficulty.L01);
 	}
 	
 	@Test
@@ -74,13 +74,13 @@ class LevelTest {
 		Mark mk;
 		
 		mk = lvl.eval("아기");
-		assertNull(mk.pos(Difficulty.L2));
+		assertNull(mk.pos(Difficulty.L02));
 		
 		mk = lvl.eval("우유 마셔요.");
-		Pos posData = mk.pos(Difficulty.L2);
+		Pos posData = mk.pos(Difficulty.L02);
 		assertEquals(2, posData.size());
 		
-		existing(lvl, Difficulty.L2);
+		existing(lvl, Difficulty.L02);
 		// FIXME "여분" - '여'는 Level2가 맞음. '분'은 받침이 있어서 실패해야 하는지...?
 		/*
 		assertEquals(Difficulty.NONE, lvl.evaludate("여분"));
@@ -96,32 +96,32 @@ class LevelTest {
 		Level03 lvl = new Level03(ctx);
 		
 		System.out.println(lvl);
-		assertNull(lvl.eval("아기").pos(Difficulty.L3));
-		assertNull(lvl.eval("우유").pos(Difficulty.L3));
+		assertNull(lvl.eval("아기").pos(Difficulty.L03));
+		assertNull(lvl.eval("우유").pos(Difficulty.L03));
 		// FIXME "휴먼" : 받침이 있으므로 Level 3에 해당하지 않는지...?
 //		assertNull(lvl.evaludate("휴먼").pos(Difficulty.L3));
 		// 받침이 있으므로 L3에 해당하지 않음
 //		assertNull(lvl.evaludate("하늘").pos(Difficulty.L3));
 		
 		assertArrayEquals(new int[] {0, 1}, lvl.eval("피아노")
-				.pos(Difficulty.L3)
+				.pos(Difficulty.L03)
 				.rangeAt(0));
-		assertArrayEquals(new int[] {1, 2}, lvl.eval("아파요").pos(Difficulty.L3).rangeAt(0));
-		assertArrayEquals(new int[] {1, 2}, lvl.eval("구토").pos(Difficulty.L3).rangeAt(0));
-		assertArrayEquals(new int[] {0, 1}, lvl.eval("하나").pos(Difficulty.L3).rangeAt(0));
+		assertArrayEquals(new int[] {1, 2}, lvl.eval("아파요").pos(Difficulty.L03).rangeAt(0));
+		assertArrayEquals(new int[] {1, 2}, lvl.eval("구토").pos(Difficulty.L03).rangeAt(0));
+		assertArrayEquals(new int[] {0, 1}, lvl.eval("하나").pos(Difficulty.L03).rangeAt(0));
 		
-		existing(lvl, Difficulty.L3);
+		existing(lvl, Difficulty.L03);
 	}
 	
 	@Test
 	public void test_level04() {
 		Level04 lvl = new Level04(ctx);
-		existing(lvl, Difficulty.L4);
+		existing(lvl, Difficulty.L04);
 	}
 	@Test
 	public void test_level05() {
 		Level05 lvl = new Level05(ctx);
-		existing(lvl, Difficulty.L5);	
+		existing(lvl, Difficulty.L05);	
 	}
 	/**
 	 * 6. ~다.
@@ -129,22 +129,22 @@ class LevelTest {
 	@Test
 	public void test_level06() {
 		Level06 lvl = new Level06(ctx);
-		existing(lvl, Difficulty.L6);
+		existing(lvl, Difficulty.L06);
 	}
 	@Test
 	public void test_level07() {
 		Level07 lvl = new Level07(ctx);
-		existing(lvl, Difficulty.L7);
+		existing(lvl, Difficulty.L07);
 	}
 	@Test
 	public void test_level08() {
 		Level08 lvl = new Level08(ctx);
-		existing(lvl, Difficulty.L8);
+		existing(lvl, Difficulty.L08);
 	}
 	@Test
 	public void test_level09() {
 		Level09 lvl = new Level09(ctx);
-		existing(lvl, Difficulty.L9);
+		existing(lvl, Difficulty.L09);
 	}
 	@Test
 	public void test_level10() {
@@ -240,6 +240,8 @@ class LevelTest {
 	@Test
 	public void test_level29() {
 		Level29 lvl = new Level29(ctx);
+		Mark mark = lvl.eval("살금살금 다가가 양말을 벗겨요.");
+		System.out.println(mark);
 		existing(lvl, Difficulty.L29);
 	}
 	@Test

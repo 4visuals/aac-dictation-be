@@ -18,7 +18,7 @@ public class Level03 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L3, pattern, word);
+		return ctx.setMark(Difficulty.L03, pattern, word);
 	}
 
 }

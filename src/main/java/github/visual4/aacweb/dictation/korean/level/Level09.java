@@ -19,6 +19,6 @@ public class Level09 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return this.ctx.setMark(Difficulty.L9, pattern, word);
+		return this.ctx.setMark(Difficulty.L09, pattern, word);
 	}
 }

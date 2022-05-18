@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
+import github.visual4.aacweb.dictation.TypeMap;
+
 public class Mark {
 
 	CharSequence word;
@@ -119,6 +121,21 @@ public class Mark {
 	public void each(BiConsumer<Difficulty, Pos> fn) {
 		_posMap.forEach(fn);
 		
+	}
+
+	public Map<String, Object> toMap() {
+		TypeMap map = new TypeMap();
+		this.each((df, pos) -> {
+			map.put(df.name(), pos.ranges);
+		});
+		return map;
+	}
+	public List<Object> toList() {
+		List<Object> arr = new ArrayList<>();
+		this.each((df, pos) -> {
+			arr.add(TypeMap.with("name", df.name(), "ranges", pos.ranges));
+		});
+		return arr;
 	}
 
 }

@@ -23,7 +23,7 @@ public class Level08 implements ILevel {
 		Mark mk = ctx.findMark(word);
 		int [] pos = Levels.findSuffixPos(word, pattern, "니다");
 		if (pos.length == 2) {
-			mk.addRange(Difficulty.L8, pos[0] , pos[1]);
+			mk.addRange(Difficulty.L08, pos[0] , pos[1]);
 		}
 		return mk;
 	}
