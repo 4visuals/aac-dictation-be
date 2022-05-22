@@ -25,12 +25,14 @@ public class User {
 	public enum Column {
 		user_seq,
 		user_email,
-		user_role
+		user_role, 
+		user_id
 	}
 	
 	@EqualsAndHashCode.Include
 	Long seq;
 	String email;
+	String userId;
 	String pass;
 	String name;
 	Vendor vendor;
@@ -38,6 +40,7 @@ public class User {
 	UserRole role;
 	LocalDate birth;
 	Long teacherRef;
+	User teacher;
 	List<User> students;
 	
 	public boolean isTeacher() {

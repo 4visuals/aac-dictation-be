@@ -14,7 +14,7 @@ import org.springframework.test.context.BootstrapWith;
 
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.config.AacDictationConfig;
-import github.visual4.aacweb.dictation.service.codec.RsaCodec;
+import github.visual4.aacweb.dictation.domain.user.UserRole;
 
 
 
@@ -31,7 +31,7 @@ class TokenServiceTest {
 	@Test
 	void test() {
 		TypeMap props = TypeMap.with("email", "hello@gmail.com");
-		String jwt = tokenService.generateJwt(props);
+		String jwt = tokenService.generateJwt(props, UserRole.TEACHER);
 		System.out.println("[jwt]" + jwt);
 		
 		TypeMap data = tokenService.parseJwt(jwt);

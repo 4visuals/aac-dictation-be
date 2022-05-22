@@ -14,6 +14,7 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.Util;
+import github.visual4.aacweb.dictation.domain.user.UserRole;
 import github.visual4.aacweb.dictation.service.codec.ICodec;
 import github.visual4.aacweb.dictation.service.codec.RsaCodec;
 import io.jsonwebtoken.Claims;
@@ -52,10 +53,12 @@ public class TokenService {
      * @param props
      * @return
      */
-    public String generateJwt(TypeMap props) {
+    public String generateJwt(TypeMap props, UserRole role) {
 //        String secret = SECRET_KEY;
         Date current = new Date();
         TypeMap headers = TypeMap.with("typ", "JWT");
+        
+        props.put("role", role);
         TypeMap claim = TypeMap.copy(props);
         JwtBuilder builder = Jwts.builder()
             .setHeader(headers)
@@ -86,7 +89,10 @@ public class TokenService {
             		.parseClaimsJws(jwtToken);
             log.debug("[JWT' {}", res);
             Claims claim = res.getBody();
-            return new TypeMap(claim);
+            TypeMap body =  new TypeMap(claim);
+            UserRole role =  UserRole.valueOf(body.getStr("role"));
+            body.put("role", role); // convert "TEACHER" -> UserRole.TEACHER
+            return body;
         } catch (ExpiredJwtException e) {
             String details = e.getMessage();
             throw new AppException(ErrorCode.TOKEN_EXIPRED, 410, details);

@@ -176,4 +176,11 @@ public class TypeMap extends HashMap<String, Object> {
 			throw new AppException(ErrorCode.INVALID_VALUE, 400);
 		}
 	}
+	public Boolean getBoolean(String prop) {
+		Object v = this.get(prop);
+		if (v.getClass() == Boolean.class) {
+			return Boolean.class.cast(v);
+		}
+		return null;
+	}
 }

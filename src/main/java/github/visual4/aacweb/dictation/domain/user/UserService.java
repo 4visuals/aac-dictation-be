@@ -82,6 +82,7 @@ public class UserService {
 		}
 		user.setStudents(studentDao.findStudentsByTeacher(user.getSeq()));
 		profile.put("useq", user.getSeq());
+		profile.put("aac_id", user.getSeq());
 		// 만료되지 않은 라이선스만 반환
 		Instant now = Instant.now();
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());

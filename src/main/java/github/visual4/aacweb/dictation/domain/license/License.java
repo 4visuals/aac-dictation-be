@@ -2,6 +2,7 @@ package github.visual4.aacweb.dictation.domain.license;
 
 import java.time.Instant;
 
+import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,8 @@ public class License {
 	public enum Column {
 		lcs_seq,
 		receiver_ref,
-		lcs_uuid
+		lcs_uuid,
+		student_ref
 	}
 
 	@EqualsAndHashCode.Include
@@ -83,5 +85,13 @@ public class License {
 	}
 	public boolean isAlreadyActivated() {
 		return activatedAt != null;
+	}
+	/**
+	 * 주어진 선생님의 수강증인지 확인
+	 * @param teacher
+	 * @return
+	 */
+	public boolean isValidReceiver(User teacher) {
+		return teacher.getSeq().equals(this.receiverRef);
 	}
 }

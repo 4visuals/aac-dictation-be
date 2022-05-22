@@ -51,9 +51,13 @@ public enum ErrorCode {
     APP_BUG("application bug. %s"),
     LICENSE_EXPIRED("expired license: %s"),
     LICENSE_IS_FULL("license is full: %s"), 
+    LICENSE_PROBLEM("this license has problem. %s"),
+    LICENSE_ALREADY_ACTIVATED("This license already activated: student [%d]"),
     NOT_A_LICENSE_OWNER("not a license owner"), 
-    VOICE_ERROR("fail to speak: voice: [%s], text[%s]"),
-    LICENSE_ALREADY_ACTIVATED("This license already activated: student [%d]");
+    VOICE_ERROR("fail to speak: voice: [%s], text[%s]"), 
+    STUDENT_NOT_ENROLLED("no license found for student [%s]"),
+    STUDENT_LOGIN_FAILED("id or password mismatch"), 
+    ;
     
 
     private String format;

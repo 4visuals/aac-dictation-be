@@ -7,7 +7,10 @@
   	<sql id="studmap_cols">
   		 std.user_seq
   		,std.user_name
+  		,std.user_id
   		,std.user_email
+  		,std.user_birth
+  		,std.user_pass
   		,std.vendor
   		,std.created_at
   		,std.user_role
@@ -16,8 +19,10 @@
   	<resultMap type="User" id="studmap">
   		<id column="user_seq" property="seq"/>
   		<result column="user_name" property="name"/>
+  		<result column="user_id" property="userId"/>
   		<result column="user_email" property="email"/>
   		<result column="user_birth" property="birth"/>
+  		<result column="user_pass" property="pass"/>
   		<result column="vendor" property="vendor"/>
   		<result column="created_at" property="creationTime"/>
   		<result column="user_role" property="role"/>
