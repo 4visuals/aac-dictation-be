@@ -33,4 +33,8 @@ public class StudentDao {
 		return session.selectOne(Dao.mapper(this, "findBy"),
 				TypeMap.with("colname", column.name(), "value", value));
 	}
+
+	public void updateStudent(User student) {
+		session.update(Dao.mapper(this, "updateStudent"), student);
+	}
 }

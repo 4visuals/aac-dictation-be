@@ -169,6 +169,9 @@ public class TypeMap extends HashMap<String, Object> {
 	}
 	public LocalDate getLocalDate(String prop) {
 		String value = this.getStr(prop);
+		if (value.length() > 10) {
+			value = value.substring(0, 10);
+		}
 		try {
 			return LocalDate.parse(value);
 			

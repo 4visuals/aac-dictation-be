@@ -2,6 +2,7 @@ package github.visual4.aacweb.dictation.domain.student;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,5 +63,11 @@ public class StudentController {
 				UserRole.STUDENT);
 		res.put("jwt", jwtToken);
 		return Res.success(res);
+	}
+	
+	@PutMapping("/{studentSeq}")
+	public Object updateStudent(@JwtProp("useq") Integer teacherSeq, @RequestBody User studentForm) {	
+		User student = studentService.update(teacherSeq.longValue(), studentForm);
+		return Res.success("student", student);
 	}
 }

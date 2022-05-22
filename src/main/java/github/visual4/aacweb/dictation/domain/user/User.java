@@ -98,5 +98,13 @@ public class User {
 	public Boolean isLicenseOwner(License license) {
 		return license.getReceiverRef().equals(this.seq);
 	}
+	/**
+	 * userId가 같은지
+	 * @param form
+	 * @return
+	 */
+	public boolean isSameUserId(User other) {
+		return other != null && this.userId != null && this.userId.equals(other.userId);
+	}
 	
 }

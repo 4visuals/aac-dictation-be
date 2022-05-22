@@ -48,16 +48,24 @@ public class StudentService {
 		if (name == null || name.trim().length() == 0 ) {
 			throw new AppException(ErrorCode.INVALID_VALUE, 400);
 		}
-		String password = studentInfo.getStr("password");
+		String userId = studentInfo.getStr("userId");
+		if (userId == null || userId.trim().length() == 0 ) {
+			throw new AppException(ErrorCode.INVALID_VALUE, 400);
+		}
+		if (userService.exist(User.Column.user_id, userId)) {
+			throw new AppException(ErrorCode.DUP_RESOURCE, 400, "userId: " + userId);
+		}
+		String password = studentInfo.getStr("pass");
 		if (password == null || password.trim().length() == 0) {
-			password = UUID.randomUUID().toString(); 
+			throw new AppException(ErrorCode.INVALID_VALUE, 400); 
 		}
 		LocalDate birth = studentInfo.getLocalDate("birth");
 		User student = new User();
 		student.setName(name);
+		student.setUserId(userId);
 		student.setBirth(birth);
 		student.setTeacherRef(teacher.getSeq());
-		student.setEmail("");
+		student.setEmail(userId+"@aacdict");
 		student.setCreationTime(Instant.now());
 		student.setPass(password);
 		student.setVendor(Vendor.MANUAL);
@@ -114,5 +122,27 @@ public class StudentService {
 				"aac_id", student.getUserId());
 		Membership membership = new Membership(student, studentProfile, Vendor.MANUAL.name());
 		return TypeMap.with("membership", membership, "licenses", Arrays.asList(license));
+	}
+	/**
+	 * 학생 정보 수정
+	 * @param teacherSeq 
+	 * @param form
+	 * @return
+	 */
+	public User update(Long teacherSeq, User form) {
+		User student = studentDao.findBy(User.Column.user_seq, form.getSeq());
+		User teacher = userService.findTeacher(teacherSeq);
+		if (!student.isStudentOf(teacher)) {
+			throw new AppException(ErrorCode.NOT_YOUR_STUDENT, 403);
+		}
+		if (!student.isSameUserId(form) && userService.exist(User.Column.user_id, form.getUserId())) {
+			throw new AppException(ErrorCode.DUP_RESOURCE, 409, "duplcated user id");
+		}
+		student.setName(form.getName());
+		student.setBirth(form.getBirth());
+		student.setUserId(form.getUserId());
+		student.setPass(form.getPass());
+		studentDao.updateStudent(student);
+		return student;
 	}
 }

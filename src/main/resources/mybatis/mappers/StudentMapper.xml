@@ -49,10 +49,19 @@
   		keyProperty="seq"
   		keyColumn="user_seq">
   		INSERT INTO dt_users(
-	  		user_name, user_email, user_pass, vendor, created_at, user_role, teacher_ref 
+	  		user_name, user_id, user_email, user_birth, user_pass, vendor, created_at, user_role, teacher_ref 
 	  	) VALUES (
-	  		#{name}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}, #{teacherRef}
+	  		#{name}, #{userId}, #{email}, #{birth}, #{pass}, #{vendor}, #{creationTime}, #{role}, #{teacherRef}
 	  	)
   	</insert>
-  	
+  	<update id="updateStudent" parameterType="User">
+	  	UPDATE dt_users 
+	  	SET
+	  	    user_name = #{name},
+	  	    user_id = #{userId},
+	  	    user_birth = #{birth},
+	  	    user_pass = #{pass}
+	  	WHERE
+	  	    user_seq = #{seq}
+  	</update>
   </mapper>

@@ -1,7 +1,6 @@
 package github.visual4.aacweb.dictation.domain.user;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +24,7 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.student.StudentDao;
+import github.visual4.aacweb.dictation.domain.user.User.Column;
 
 @Service
 @Transactional
@@ -187,5 +187,14 @@ public class UserService {
 		return userDao.searchUsers(keyword, 
 				TypeMap.with(User.Column.user_role.name(), UserRole.TEACHER.getCode()));
 	}
-	
+	/**
+	 * 존재하는지 확인함 
+	 * @param col
+	 * @param value
+	 * @return
+	 */
+	public boolean exist(User.Column col, Object value) {
+		User any = userDao.findBy(col, value);
+		return any != null;
+	}
 }

@@ -17,7 +17,7 @@ public enum ErrorCode {
     /**
      * 이미 존재하는 리소스
      */
-    DUP_RESOURCE("duplicated resource %s"),
+    DUP_RESOURCE("duplicated resource: %s"),
     /**
      * 없는 리소스
      */
@@ -57,6 +57,7 @@ public enum ErrorCode {
     VOICE_ERROR("fail to speak: voice: [%s], text[%s]"), 
     STUDENT_NOT_ENROLLED("no license found for student [%s]"),
     STUDENT_LOGIN_FAILED("id or password mismatch"), 
+    NOT_YOUR_STUDENT("not your student"), 
     ;
     
 
