@@ -49,5 +49,10 @@ public class SentenceDao {
 				picUrl);
 		return elem;
 	}
+	
+	public List<String> findAllText(int seq) {
+		
+		return session.selectList(Dao.mapper(this, "findAllText"), seq);
+	}
 
 }

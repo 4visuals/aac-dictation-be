@@ -54,4 +54,11 @@
 		WHERE sen.${col} = #{val}
 	</select>
 	
+	<select id="findAllText" resultType="string" parameterType="int">
+	SELECT
+		sentence
+	FROM wr_sentence sen
+	WHERE seq >= #{seq}
+	</select>
+	
 </mapper>

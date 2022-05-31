@@ -18,6 +18,9 @@
   	</resultMap>
   	<select id="" parameterType="" resultMap="*">
   	</select> -->
+  	<select id="selectHashes" resultType="string">
+  		SELECT text_hash from dt_voices
+  	</select>
   	<insert id="insertVoice" parameterType="Voice"
   		useGeneratedKeys="true" keyColumn="vseq" keyProperty="seq">
   	INSERT INTO dt_voices (

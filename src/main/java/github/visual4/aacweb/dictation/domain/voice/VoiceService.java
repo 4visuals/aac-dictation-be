@@ -34,8 +34,7 @@ public class VoiceService {
 		StreamSourceFile meta = new StreamSourceFile(textHash + ".mp3", tts.getStream());
 //		meta.getBytes(); // prefetch
 		Voice voice = meta.toVoice(textHash, text);
-		voiceDao.insertVoice(voice);
-		storageService.store(meta);
+		voiceDao.insertVoice(voice);			storageService.store(meta);
 	}
 
 	public Voice findVoice(String textHash) {
