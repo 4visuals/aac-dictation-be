@@ -4,16 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.polly.AmazonPollyClient;
-import com.amazonaws.services.polly.model.SynthesizeSpeechRequest;
-import com.amazonaws.services.polly.model.SynthesizeSpeechResult;
-
-import github.visual4.aacweb.dictation.AppException;
-import github.visual4.aacweb.dictation.ErrorCode;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.polly.PollyClient;
+import software.amazon.awssdk.services.polly.model.SynthesizeSpeechRequest;
+import software.amazon.awssdk.services.polly.model.SynthesizeSpeechResponse;
 /**
  * Amazon Polly 한국어 음성(ID: Seoyeon, file: mp3)
  * 
@@ -24,26 +22,29 @@ public class PollyTtsHandler implements ITtsHandler {
 	
 	private final static String DEFAULT_VOICE_ID = "Seoyeon";
 	private final static String DEFAULT_VOICE_FORMAT = "mp3";
-	
-	private AmazonPollyClient client;
+	private PollyClient client;
 	
 	public PollyTtsHandler(String accessKey, String secretKey) {
-		AmazonPollyClient client = new AmazonPollyClient(
-				new BasicAWSCredentials(accessKey, secretKey), 
-				new ClientConfiguration());
-		client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
-		this.client = client;
+		AwsCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+		PollyClient polly = PollyClient.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .build();
+		
+		this.client = polly;
 	}
 	
 	@Override
 	public ITts speak(String text) {
-		SynthesizeSpeechRequest req = new SynthesizeSpeechRequest();
-		req.withText(text)
-			.withSampleRate("8000")
-			.withVoiceId(DEFAULT_VOICE_ID)
-			.withOutputFormat(DEFAULT_VOICE_FORMAT);
+		SynthesizeSpeechRequest req = SynthesizeSpeechRequest.builder()
+				.text(text)
+				.voiceId(DEFAULT_VOICE_ID)
+				.engine("neural")
+				.sampleRate("8000")
+				.outputFormat(DEFAULT_VOICE_FORMAT).build();
 		
-		SynthesizeSpeechResult res = client.synthesizeSpeech(req);
+		ResponseInputStream<SynthesizeSpeechResponse> res = client.synthesizeSpeech(req);
+		
 		return new PollyTts(req, res, text);
 	}
 }
