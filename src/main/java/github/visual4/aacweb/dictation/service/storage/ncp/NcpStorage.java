@@ -63,7 +63,7 @@ public class NcpStorage implements IFileStorage {
 					.withCannedAcl(CannedAccessControlList.PublicRead);
 			
 			PutObjectResult res = s3.putObject(req); 
-			log.info("#SUCCESS " + res.toString());
+			log.info("#SUCCESS " + file.getFileName());
 		} catch (AmazonS3Exception e) {
 			e.printStackTrace();
 		    throw new AppException(ErrorCode.SERVER_ERROR, 500, "FAIL_TO_UPLOAD");

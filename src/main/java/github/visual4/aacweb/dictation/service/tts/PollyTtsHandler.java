@@ -40,7 +40,7 @@ public class PollyTtsHandler implements ITtsHandler {
 				.text(text)
 				.voiceId(DEFAULT_VOICE_ID)
 				.engine("neural")
-				.sampleRate("8000")
+				.sampleRate("24000")
 				.outputFormat(DEFAULT_VOICE_FORMAT).build();
 		
 		ResponseInputStream<SynthesizeSpeechResponse> res = client.synthesizeSpeech(req);

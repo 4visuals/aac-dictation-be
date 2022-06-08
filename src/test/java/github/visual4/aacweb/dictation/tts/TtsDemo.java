@@ -75,13 +75,13 @@ class TtsDemo{
 		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
 		
 //		String _text = "삼촌/물병/창문/낮/젖/보물찾기/낮잠/우리 모여서 윷놀이하자./윷놀이하자./옆집/쏟아지다/주의/계절/의지/예매/낚시/손바닥/학습장/맛살/물난리/본래/단련/신랑/난로/천천히/우연히/즐거이/높이";
-		String _text = "점잖다/배앓이/꿇다/종이접기/달력/종이접기 달력";
+		String _text = "언니가 사진을 찍습니다.";
 		List<String> words = Arrays.asList(_text.split("/"));
 		for (String word : words) {
 			word  = word.trim();
 			// System.out.println("[" + word + "]");
 			String hash = Util.Hash.md5(word).toLowerCase();
-			String url = "https://kr.object.ncloudstorage.com/aac-dict-bucket/voices2/@hash.mp3".replace("@hash", hash);
+			String url = "https://kr.object.ncloudstorage.com/aac-dict-bucket/voices3/@hash.mp3".replace("@hash", hash);
 			if (hashing.contains(hash)) {
 				System.out.printf("[>>>] skip: %s, %s\n", word, url);
 			}
@@ -111,58 +111,66 @@ class TtsDemo{
 	@Rollback(false)
 	void pushSentence() {
 		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
-		List<String> text = sentenceDao.findAllText(1618);
+		List<String> text = sentenceDao.findAllText(0);
 	
 		List<String> dup = new ArrayList<>();
 		int seq = 1;
 		for(String txt : text) {
+		    txt = txt.trim();
 			String hash = Util.Hash.md5(txt).toLowerCase();
 			if (hashing.contains(hash)) {
 				dup.add(hash + ":"+ txt );
 			}
 			else {
-				System.out.printf("[%4d] %s\n", seq, txt);
+				System.out.printf("[%4d] %s\n", seq++, txt);
 				voiceService.download(txt);
 				hashing.add(hash);
 				sleep(50);
-				
 			}
 		}
 		System.out.println("[dup]");
-		dup.forEach(System.out::println);
+		System.out.println(dup.size());
 	}
 	
+	@Test
+	void listSentences() {
+	    List<String> text = sentenceDao.findAllText(1618);
+	    System.out.println(text.size());
+	}
 	@Test
 	@Rollback(false)
 	void pushEojeols() throws SQLException {
 		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
-		List<String> text = new ArrayList<>();//sentenceDao.findAllText(1885);
 		
 		Connection con = DriverManager.getConnection("jdbc:mariadb://localhost:3306/aacdictdb", "root", "1111");
-		PreparedStatement stmt = con.prepareStatement("select text from wr_eojeol");
+		PreparedStatement stmt = con.prepareStatement("select seq, text from wr_eojeol");
 		
+		List<Object[]> eojeols = new ArrayList<>();//sentenceDao.findAllText(1885);
 		ResultSet rs = stmt.executeQuery();
 		while(rs.next()) {
-			text.add(rs.getString("text"));
+		    eojeols.add(new Object[] { rs.getInt("seq"), rs.getString("text").trim()});
+			
 		}
 		con.close();
 		List<String> dup = new ArrayList<>();
 		int seq = 1;
-		for(String txt : text) {
-			String hash = Util.Hash.md5(txt).toLowerCase();
+		for(Object [] ej : eojeols) {
+		    Integer ejSeq = (Integer) ej[0];
+		    String text = (String) ej[1];
+			String hash = Util.Hash.md5(text).toLowerCase();
 			if (hashing.contains(hash)) {
-				dup.add(hash + ":"+ txt );
+				dup.add(hash + ":"+ text + ":" + ejSeq );
 			}
 			else {
-				System.out.printf("[%4d] %s\n", seq, txt);
-				voiceService.download(txt);
+				System.out.printf("[%4d] %s(%d)\n", seq++, text, ejSeq);
+				voiceService.download(text);
 				hashing.add(hash);
 				sleep(50);
 				
 			}
 		}
 		System.out.println("[dup]");
-		dup.forEach(System.out::println);
+		System.out.println(dup.size());
 	}
 	
 

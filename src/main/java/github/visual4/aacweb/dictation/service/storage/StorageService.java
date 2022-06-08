@@ -16,6 +16,6 @@ public class StorageService {
 	}
 
 	public void store(IUpfile meta) {
-		this.storage.upload(meta, (file) -> "voices2/" + file.getFileName());
+		this.storage.upload(meta, (file) -> "voices3/" + file.getFileName());
 	}
 }
