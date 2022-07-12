@@ -86,12 +86,12 @@ public class UserService {
 		// 만료되지 않은 라이선스만 반환
 		Instant now = Instant.now();
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
-		List<License> activeLicenses = licenses
-				.stream()
-				.filter(lcs -> lcs.isAlive(now))
-				.collect(Collectors.toList());
+//		List<License> activeLicenses = licenses
+//				.stream()
+//				.filter(lcs -> lcs.isAlive(now))
+//				.collect(Collectors.toList());
 		Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
-		return TypeMap.with("membership", membership,  "licenses", activeLicenses);
+		return TypeMap.with("membership", membership,  "licenses", licenses);
 	}
 	/**
 	 * 회원가입

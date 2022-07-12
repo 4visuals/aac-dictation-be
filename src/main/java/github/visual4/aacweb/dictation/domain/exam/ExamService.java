@@ -64,13 +64,11 @@ public class ExamService {
 			throw new AppException(ErrorCode.NOT_A_LICENSE_OWNER, 422);
 		}
 		Section section = sectionService.findBy(Section.Column.seq, examPaper.getSectionRef());
-		long numOfQuestions = section
-				.getSentences()
-				.stream()
-				.filter(sen -> sen.getType() == examPaper.getType()).count();
+		if (section== null) {
+			throw new AppException(ErrorCode.NOT_FOUND, 400, "section: " + examPaper.getSectionRef());	
+		}
 		examPaper.setStudentRef(student.getSeq());
 		examPaper.setAgeInMonth(student.getAgeInMonth(Instant.now()));
-		examPaper.setNumOfQuestions((int)numOfQuestions);
 	
 		examPaperDao.insertExamPaper(examPaper);
 		

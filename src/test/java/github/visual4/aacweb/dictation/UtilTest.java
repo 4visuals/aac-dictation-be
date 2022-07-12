@@ -18,7 +18,9 @@ class UtilTest {
 	}
 	@Test
 	void md5() {
-		String hash = Util.Hash.md5("모두 여기로 모여. ");
+		String hash = Util.Hash.md5("아침에 일어나").toLowerCase();
+		System.out.println(hash);
+		hash = Util.Hash.md5("공부를 했다.").toLowerCase();
 		System.out.println(hash);
 	}
 

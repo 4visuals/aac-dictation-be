@@ -27,6 +27,7 @@ public class ExamPaper {
 	String license;
 	
 	Integer sectionRef;
+	
 	Long studentRef; // Fk to User.seq
 	Integer ageInMonth;
 	
