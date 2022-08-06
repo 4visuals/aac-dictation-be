@@ -1,6 +1,8 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -8,7 +10,6 @@ import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 /**
  * 시험에 대한 제출 답안
  * @author chminseo
@@ -34,6 +35,7 @@ public class ExamPaper {
 	SentenceType type;
 	Instant startTime;
 	Instant endTime;
+	Integer questionOffset;
 	/**
 	 * 문항 수
 	 * db에는 풀지 않은 문제는 기록되지 않음(맞거나 틀린 문항만 기록함)
@@ -65,6 +67,12 @@ public class ExamPaper {
 		for (ExamAnswer examAnswer : submissions) {
 			consumer.accept(examAnswer);
 		}
+	}
+
+	public String getYMD() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+	            .withZone(ZoneId.systemDefault());
+		return formatter.format(this.startTime);
 	}
 	
 }

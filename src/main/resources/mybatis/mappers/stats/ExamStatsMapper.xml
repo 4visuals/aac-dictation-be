@@ -5,7 +5,15 @@
   <mapper namespace="ExamStatsMapper">
   	
   	<sql id="_cols">
-  		 
+	 	dep.exam_seq           as examRef,
+		dep.section_ref        as sectionRef,
+		dep.type               as type,
+		dep.start_time         as startTime,
+		#{student}             as studentRef,
+		dep.question_offset    as questionOffset,
+		dep.num_of_questions   as total,
+		SUM(ans.correct = 'Y') as correct,
+		SUM(ans.correct = 'N') as failed
   	</sql>
   	<!-- <resultMap type="" id="*">
   		<id column="" property=""/>
@@ -19,18 +27,23 @@
   	</resultMap> -->
   	<select id="findSectionStatsByStudent" parameterType="long" resultType="SectionStats">
 	  	SELECT 
-			dep.exam_seq           as examRef,
-			dep.section_ref        as sectionRef,
-			dep.type               as type,
-			dep.start_time         as startTime,
-			#{student}             as studentRef,
-			dep.num_of_questions   as total,
-			SUM(ans.correct = 'Y') as correct,
-			SUM(ans.correct = 'N') as failed
+			<include refid="_cols"></include>
 		FROM dt_exam_papers dep 
 		JOIN dt_exam_answers ans
 		  ON dep.exam_seq = ans.exam_ref
 		WHERE dep.student_ref = #{student}
+		GROUP BY dep.exam_seq;
+  	</select>
+  	
+  	<select id="findStatsBySectionAndStudent" parameterType="map" resultType="SectionStats">
+	  	SELECT 
+			<include refid="_cols"></include>
+		FROM dt_exam_papers  dep 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref
+		WHERE dep.student_ref = #{student}
+		      AND
+		      dep.section_ref = #{section}
 		GROUP BY dep.exam_seq;
   	</select>
   	

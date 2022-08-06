@@ -4,21 +4,22 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="ExamAnswerMapper">
   	
-  	<sql id="*_cols">
-  		 
+  	<sql id="ans_full_cols">
+  		 ans.exam_ref
+		, ans.sentence_ref
+		, ans.correct
+		, ans.trial
+		, ans.elapsed_time
   	</sql>
-  	<!-- 
-  	<resultMap type="" id="*">
-  		<id column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
-  		<result column="" property=""/>
+  	
+  	<resultMap type="ExamAnswer" id="ans_map">
+  		<id column="exam_ref" property="examRef"/>
+  		<id column="sentence_ref" property="sentenceRef"/>
+  		<result column="correct" property="correct"/>
+  		<result column="trial" property="value"/>
+  		<result column="elapsed_time" property="elapsedTimeMillis"/>
   	</resultMap>
-  	 -->
+  	
   	<!-- <select id="" parameterType="" resultMap="*">
   	</select> -->
   	<insert id="insertExamAnswer" parameterType="ExamAnswer">

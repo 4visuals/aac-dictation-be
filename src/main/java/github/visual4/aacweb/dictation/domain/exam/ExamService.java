@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.section.Section;
 import github.visual4.aacweb.dictation.domain.section.SectionService;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserService;
 
@@ -48,17 +50,8 @@ public class ExamService {
 	 */
 	public void insertExamPaper(ExamPaper examPaper) {
 		String licenseUuid = examPaper.getLicense();
-		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid);
-		//FIXME  not null license
-		if (!license.isAlive(Instant.now())) {
-			throw new AppException(ErrorCode.LICENSE_EXPIRED, 410, licenseUuid);
-		}
-		
-		User student = userService.findUser(license.getStudentRef());
-		// FIXME  not null student
-		if (!student.isStudent()) {
-			throw new AppException(ErrorCode.NOT_A_STUDENT, 422);
-		}
+		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
+		User student = licenseToStudent(license);
 		User teacher = userService.findTeacher(student.getTeacherRef());
 		if (!teacher.isLicenseOwner(license)) {
 			throw new AppException(ErrorCode.NOT_A_LICENSE_OWNER, 422);
@@ -85,10 +78,7 @@ public class ExamService {
 	public void insertEojeolPaper(EojeolPaper eojeolPaper) {
 		String uuid = eojeolPaper.getLicense();
 		License license = licenseService.findBy(License.Column.lcs_uuid, uuid, true);
-		User student = userService.findUser(license.getStudentRef());
-		if (!student.isStudent()) {
-			throw new AppException(ErrorCode.NOT_A_STUDENT, 422);
-		}
+		User student = licenseToStudent(license);
 		User teacher = userService.findTeacher(student.getTeacherRef());
 		if (!teacher.isLicenseOwner(license)) {
 			throw new AppException(ErrorCode.NOT_A_LICENSE_OWNER, 422);
@@ -99,5 +89,29 @@ public class ExamService {
 			answer.setStudentRef(student.getSeq());
 		});
 		eojeolAnswerDao.insertAnswer(eojeolPaper.getSubmissions());
+	}
+	/**
+	 * 라이선스에 연결된 학생이 제출한 section의 답안지 상세 정보(문제 및 정오답 모두 포함)
+	 * @param sectionSeq
+	 * @param type
+	 * @para licenseUuid
+	 * @return
+	 */
+	public List<ExamPaper> findExamofSectionByLicense(Integer sectionSeq, SentenceType type, String licenseUuid) {
+		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
+		User student = licenseToStudent(license);
+		List<ExamPaper> papers = examPaperDao.findExamBySectionAndStudent(
+				sectionSeq,
+				type,
+				student.getSeq());
+		return papers;
+	}
+	
+	private User licenseToStudent (License license) {
+		User student = userService.findUser(license.getStudentRef());
+		if (!student.isStudent()) {
+			throw new AppException(ErrorCode.NOT_A_STUDENT, 422);
+		}
+		return student;
 	}
 }

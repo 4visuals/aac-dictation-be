@@ -4,8 +4,16 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="ExamPaperMapper">
   	
-  	<sql id="*_cols">
-  		 
+  	<sql id="exam_full_cols">
+  		   dep.exam_seq
+  			,dep.section_ref
+ 			, dep.student_ref
+ 			, dep.student_age_month
+ 			, dep.`type`
+ 			, dep.question_offset
+ 			, dep.num_of_questions
+ 			, dep.start_time
+ 			, dep.end_time
   	</sql>
   	<resultMap type="ExamPaper" id="exam_map">
   		<id column="exam_seq" property="seq"/>
@@ -13,12 +21,28 @@
   		<result column="student_ref" property="studentRef"/>
   		<result column="student_age_month" property="ageInMonth"/>
   		<result column="type" property="type"/>
+  		<result column="question_offset" property="questionOffset"/>
   		<result column="num_of_questions" property="numOfQuestions"/>
   		<result column="start_time" property="startTime"/>
-  		<result column="endTime" property="endTime"/>
+  		<result column="end_time" property="endTime"/>
+  		<collection property="submissions"  javaType="list"
+  			resultMap="ExamAnswerMapper.ans_map" ofType="ExamAnswer"></collection>
   	</resultMap>
   	<!-- <select id="" parameterType="" resultMap="*">
   	</select> -->
+  	<select id="findExamBySectionAndStudent" parameterType="map" resultMap="exam_map">
+	  	SELECT 
+	  		<include refid="exam_full_cols"></include>
+	  		, <include refid="ExamAnswerMapper.ans_full_cols"></include>
+		FROM dt_exam_papers  dep 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref 
+		WHERE dep.student_ref = #{student}
+		      AND
+		      dep.section_ref = #{section}
+		      AND
+		      dep.type = #{type};
+  	</select>
   	<insert id="insertExamPaper" parameterType="ExamPaper"
   		useGeneratedKeys="true"
   		keyColumn="exam_seq"
@@ -28,6 +52,7 @@
  			, student_ref
  			, student_age_month
  			, `type`
+ 			, question_offset
  			, num_of_questions
  			, start_time
  			, end_time
@@ -36,6 +61,7 @@
 			, #{studentRef}
 			, #{ageInMonth}
 			, #{type}
+			, #{questionOffset}
 			, #{numOfQuestions}
 			, #{startTime}
 			, #{endTime} 

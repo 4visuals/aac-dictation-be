@@ -34,4 +34,11 @@ public class ExamStatsService {
 		User student = userSerivce.findStudent(license.getStudentRef(), (stud) -> true);
 		return findSectionStatsByStudent(student.getSeq());
 	}
+
+	public List<SectionStats> findSectionStats(Integer sectionSeq, String licenseUuid) {
+		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
+		User student = userSerivce.findStudent(license.getStudentRef(), (stud) -> true);
+		
+		return statsDao.findStatsBySectionAndStudent(student.getSeq(), sectionSeq);
+	}
 }

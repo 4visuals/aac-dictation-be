@@ -1,12 +1,18 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 
 @RestController
 @RequestMapping("/api")
@@ -19,7 +25,21 @@ public class ExamController {
 		this.examService = examService;
 	}
 	/**
-	 * 시험 결과 - 화면에서 문장퀴즈, 낱말퀴즈, 종합에 해당. 문장에 대한 입력값으로 처리함.
+	 * 주어진 section의 시험결과(quiz) 조회. section별 정답, 오답 입력까지 모두 반환함
+	 * @param sectionSeq
+	 * @param license
+	 * @return
+	 */
+	@GetMapping("/exam/quiz/section/{sectionSeq}")
+	public Object findExamofSectionByLicense(
+			@PathVariable Integer sectionSeq,
+			@RequestParam SentenceType sentenceType,
+			@RequestParam String license) {
+		List<ExamPaper> papers = examService.findExamofSectionByLicense(sectionSeq, sentenceType, license);
+		return Res.success("papers", papers);
+	}
+	/**
+	 * 시험 결과 입력 - 화면에서 문장퀴즈, 낱말퀴즈, 종합에 해당. 문장에 대한 입력값으로 처리함.
 	 * @param exam
 	 * @return
 	 */

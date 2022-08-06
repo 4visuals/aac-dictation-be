@@ -18,6 +18,7 @@ public class SectionStats {
 	
 	Instant startTime;
 	
+	Integer questionOffset;
 	Integer total;
 	Integer correct;
 	Integer failed;
