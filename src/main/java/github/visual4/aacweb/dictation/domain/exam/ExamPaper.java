@@ -33,13 +33,12 @@ public class ExamPaper {
 	Integer ageInMonth;
 	
 	SentenceType type;
+	ExamMode mode;
 	Instant startTime;
 	Instant endTime;
 	Integer questionOffset;
 	/**
 	 * 문항 수
-	 * db에는 풀지 않은 문제는 기록되지 않음(맞거나 틀린 문항만 기록함)
-	 * 문항 수가 0이면 모든 문제를 풀었다는 뜻.
 	 */
 	Integer numOfQuestions;
 	
@@ -50,15 +49,26 @@ public class ExamPaper {
 		StringBuilder sb = new StringBuilder();
 		sb.append("licesnse: ");
 		sb.append(license);
-		sb.append("sectionRef: ");
+		sb.append(", SEQ: ");
+		sb.append(seq);
+		sb.append(", sectionRef: ");
 		sb.append(sectionRef);
+		sb.append(", offset: ");
+		sb.append(questionOffset);
+		sb.append(", start: ");
+		sb.append(startTime);
 		sb.append(", student: ");
 		sb.append(studentRef);
 		sb.append(", type: ");
 		sb.append(type);
+		sb.append(", mode: ");
+		sb.append(mode);
 		sb.append('\n');
 		for (int i = 0; i < submissions.size(); i++) {
+			sb.append('>');
+			sb.append(' ');
 			sb.append(submissions.get(i));
+			sb.append('\n');
 		}
 		return sb.toString();
 	}
@@ -70,6 +80,10 @@ public class ExamPaper {
 	}
 
 	public String getYMD() {
+		/*
+		 * FIXME 서버의 시간대가 UTC 이면 9시간을 더하지 못한다.
+		 *  
+		 */
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 	            .withZone(ZoneId.systemDefault());
 		return formatter.format(this.startTime);

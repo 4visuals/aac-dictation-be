@@ -34,4 +34,6 @@ public class Section {
 	List<Note> notes;
 	
 	List<Sentence> sentences;
+	
+	Integer chapterRef;
 }

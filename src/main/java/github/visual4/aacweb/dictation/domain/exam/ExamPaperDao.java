@@ -26,5 +26,21 @@ public class ExamPaperDao {
 	public void insertExamPaper(ExamPaper examPaper) {
 		session.insert(Dao.mapper(this, "insertExamPaper"), examPaper);
 	}
+	/**
+	 * 단계별학습 퀴즈 이력(보고쓰기x, 학습x, 퀴즈o)
+	 * @param studentSeq
+	 * @return
+	 */
+	public List<ExamPaper> findExamsByStudent(Long studentSeq) {
+		return session.selectList(Dao.mapper(this, "findExamsByStudent"), studentSeq);
+	}
+	/**
+	 * 주어진 학생의 각 section chunk별 최종 시험 점수 조회. 5단계의 경우 60문제이므로 6개의 chunk로 구성됨.
+	 * @param studentSeq
+	 */
+	public List<ExamPaper> findRecentExamsPerSegment(long studentSeq) {
+		return session.selectList(Dao.mapper(this, "findRecentExamsPerSegment"), studentSeq);
+		
+	}
 
 }

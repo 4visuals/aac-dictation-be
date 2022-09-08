@@ -82,7 +82,7 @@ public class UserService {
 		}
 		user.setStudents(studentDao.findStudentsByTeacher(user.getSeq()));
 		profile.put("useq", user.getSeq());
-		profile.put("aac_id", user.getSeq());
+		profile.put("aac_id", email);
 		// 만료되지 않은 라이선스만 반환
 		Instant now = Instant.now();
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
@@ -179,6 +179,10 @@ public class UserService {
 	public User findUser(Long userSeq) {
 		return studentDao.findBy(User.Column.user_seq, userSeq);
 	}
+	
+	public User findTeacher(String teacherId) {
+		return userDao.findBy(User.Column.user_id, teacherId);
+	}
 	/**
 	 * 사용자 검색
 	 * @param keyword
@@ -198,4 +202,6 @@ public class UserService {
 		User any = userDao.findBy(col, value);
 		return any != null;
 	}
+
+	
 }

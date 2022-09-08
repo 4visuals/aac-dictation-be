@@ -34,7 +34,7 @@ public enum ErrorCode {
     /**
      * 시간 만료됨
      */
-    TOKEN_EXIPRED("token expired: %s"),
+    TOKEN_EXPIRED("token expired: %s"),
     OAUTH_EXCEPTION("[%s] oauth request faield."), 
     EXISTING_USER("user exists"),
     /**

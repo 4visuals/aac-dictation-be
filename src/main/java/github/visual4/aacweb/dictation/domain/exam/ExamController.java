@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
+import github.visual4.aacweb.dictation.domain.user.UserRole;
+import github.visual4.aacweb.dictation.web.aop.JwtProp;
 
 @RestController
 @RequestMapping("/api")
@@ -44,7 +47,7 @@ public class ExamController {
 	 * @return
 	 */
 	@PostMapping("/exam/quiz")
-	public Object submit(@RequestBody ExamPaper exam) {
+	public Object submit(@JwtProp("useq") Integer studentSeq, @RequestBody ExamPaper exam) {
 		/*
 		 * {license=lcs-5ef9b51e-f501-4df3-aa88-f5bbbfce6e5a,
 		 *   submissions=[
@@ -66,8 +69,37 @@ public class ExamController {
 	 * @return
 	 */
 	@PostMapping("/exam/learning")
-	public Object submitLearning(@RequestBody EojeolPaper eojelPaper) {
-		examService.insertEojeolPaper(eojelPaper);
+	public Object submitLearning(@RequestBody LearningPaper eojelPaper) {
+		examService.insertLearningPaper(eojelPaper);
 		return Res.success(true);
+	}
+	/**
+	 * 학생의 단계별 학습 이력(보고쓰기, 학습, 퀴즈 구분없이 전부 반환)
+	 * @return
+	 */
+	@GetMapping("/exams")
+	public Object queryStudentExams(
+			@JwtProp("aac_id") String userId,
+			@JwtProp("role") UserRole role,
+			@RequestParam Map<String, Object> params) {
+		String license = (String) params.get("license");
+		System.out.println(userId + " role: " + role);
+		System.out.println(params);
+		TypeMap exams = null;
+		if (role == UserRole.STUDENT) {
+			exams = examService.findExamsByLicense(userId, license );
+		} else {
+			exams = examService.findExamsByStudentLicense(userId, license);
+		}
+		return Res.success(exams);
+	}
+	@GetMapping("/exams/segments")
+	public Object queryBySectionChunk(
+			@JwtProp("aac_id") String userId,
+			@JwtProp("role") UserRole role,
+			@RequestParam Map<String, Object> params) {
+		String license = (String) params.get("license");
+		TypeMap res = examService.queryBySectionChunk(license);
+		return Res.success(res);
 	}
 }

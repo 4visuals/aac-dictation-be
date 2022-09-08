@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,11 +18,21 @@ import lombok.ToString;
 @Setter
 @ToString
 public class EojeolAnswer {
-
+	@EqualsAndHashCode.Include
+	Long examRef;
+	@EqualsAndHashCode.Include
+	Integer sentenceRef;
+	@EqualsAndHashCode.Include
 	Integer eojeolRef;
+	
 	Long studentRef;
 	Integer ageInMonth;
 	String value;
 	Boolean correct;
 	long elapsedTimeMillis; //입력 시간(millis)
+	
+	/**
+	 * @transient
+	 */
+	String mode;
 }

@@ -10,6 +10,7 @@
  			, dep.student_ref
  			, dep.student_age_month
  			, dep.`type`
+ 			, dep.mode
  			, dep.question_offset
  			, dep.num_of_questions
  			, dep.start_time
@@ -21,6 +22,7 @@
   		<result column="student_ref" property="studentRef"/>
   		<result column="student_age_month" property="ageInMonth"/>
   		<result column="type" property="type"/>
+  		<result column="mode" property="mode"/>
   		<result column="question_offset" property="questionOffset"/>
   		<result column="num_of_questions" property="numOfQuestions"/>
   		<result column="start_time" property="startTime"/>
@@ -43,6 +45,40 @@
 		      AND
 		      dep.type = #{type};
   	</select>
+  	<!-- 
+  	 // 주어진 학생의 시험 결과 조회
+  	 // 입력한 정답 및 오답 내역까지 모두 반환함
+  	 -->
+  	<select id="findExamsByStudent" parameterType="long" resultMap="exam_map">
+	  	SELECT 
+	  		<include refid="exam_full_cols"></include>
+	  		, <include refid="ExamAnswerMapper.ans_full_cols"></include>
+		FROM dt_exam_papers  dep 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref 
+		WHERE dep.student_ref = #{userSeq}
+  	</select>
+  	<select id="findRecentExamsPerSegment" parameterType="long" resultMap="exam_map">
+  		SELECT
+			<include refid="exam_full_cols"></include>
+			, <include refid="ExamAnswerMapper.ans_full_cols"></include>
+		FROM (
+			SELECT
+				MAX(ep.exam_seq) as last_exam_seq 
+			FROM dt_exam_papers ep
+			WHERE ep.student_ref = #{studentSeq}
+			GROUP BY
+				ep.section_ref,
+				ep.question_offset,
+				ep.`type`
+		    )_let
+		JOIN dt_exam_papers dep
+		  ON _let.last_exam_seq = dep.exam_seq
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref 
+		ORDER
+		  BY dep.section_ref, dep.question_offset  
+  	</select>
   	<insert id="insertExamPaper" parameterType="ExamPaper"
   		useGeneratedKeys="true"
   		keyColumn="exam_seq"
@@ -52,6 +88,7 @@
  			, student_ref
  			, student_age_month
  			, `type`
+ 			, mode
  			, question_offset
  			, num_of_questions
  			, start_time
@@ -61,6 +98,7 @@
 			, #{studentRef}
 			, #{ageInMonth}
 			, #{type}
+			, #{mode}
 			, #{questionOffset}
 			, #{numOfQuestions}
 			, #{startTime}

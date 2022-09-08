@@ -40,6 +40,7 @@
 	
 	<!-- section의 문장들까지 모두 로드할때 사용함 -->
 	<resultMap type="Section" id="full_section" extends="section_with_desc_map">
+		<result column="chapter" property="chapterRef" />
 		<collection property="sentences" ofType="Sentence" resultMap="SentenceMapper.sen"></collection>
 	</resultMap>
 	

@@ -95,7 +95,7 @@ public class TokenService {
             return body;
         } catch (ExpiredJwtException e) {
             String details = e.getMessage();
-            throw new AppException(ErrorCode.TOKEN_EXIPRED, 410, details);
+            throw new AppException(ErrorCode.TOKEN_EXPIRED, 410, details);
         } catch (SignatureException e) {
         	String details = e.getMessage();
         	throw new AppException(ErrorCode.BAD_TOKEN_SIGNITURE, 410, details);

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LearningPaperMapper">
+
+	<sql id="learning_full_cols">
+	   lp.ln_seq
+		,lp.section_ref
+		, lp.student_ref
+		, lp.student_age_month
+		, lp.`type`
+		, lp.mode
+		, lp.question_offset
+		, lp.num_of_questions
+		, lp.start_time
+		, lp.end_time
+  	</sql>
+  	<resultMap type="LearningPaper" id="learning_map">
+  		<id column="ln_seq" property="seq"/>
+  		<result column="section_ref" property="sectionRef"/>
+  		<result column="student_ref" property="studentRef"/>
+  		<result column="student_age_month" property="ageInMonth"/>
+  		<result column="type" property="type"/>
+  		<result column="mode" property="mode"/>
+  		<result column="question_offset" property="questionOffset"/>
+  		<result column="num_of_questions" property="numOfQuestions"/>
+  		<result column="start_time" property="startTime"/>
+  		<result column="end_time" property="endTime"/>
+  		<collection property="submissions"  javaType="list"
+  			resultMap="EojeolAnswerMapper.ej_map" ofType="EojeolAnswer"></collection>
+  	</resultMap>
+  	
+	<select id="findLearninsByStudent" parameterType="long" resultMap="learning_map">
+		SELECT
+			<include refid="learning_full_cols"></include>
+			, <include refid="EojeolAnswerMapper.ej_full_cols"></include>
+		FROM dt_learning_papers lp
+		JOIN dt_eojeol_answers ej
+		  ON lp.ln_seq = ej.exam_ref
+		WHERE
+			lp.student_ref = #{seq}
+			
+	</select>
+	<insert id="insertLearningPaper" parameterType="LearningPaper"
+	  		useGeneratedKeys="true"
+	  		keyColumn="ln_seq"
+	  		keyProperty="seq">
+  		INSERT INTO dt_learning_papers (
+ 			  section_ref
+ 			, student_ref
+ 			, student_age_month
+ 			, `type`
+ 			, mode
+ 			, question_offset
+ 			, num_of_questions
+ 			, start_time
+ 			, end_time
+		) VALUES (
+			  #{sectionRef}
+			, #{studentRef}
+			, #{ageInMonth}
+			, #{type}
+			, #{mode}
+			, #{questionOffset}
+			, #{numOfQuestions}
+			, #{startTime}
+			, #{endTime} 
+		);
+  	</insert>
+  	
+</mapper>

@@ -13,8 +13,8 @@
   	</sql>
   	
   	<resultMap type="ExamAnswer" id="ans_map">
-  		<id column="exam_ref" property="examRef"/>
-  		<id column="sentence_ref" property="sentenceRef"/>
+  		<result column="exam_ref" property="examRef"/>
+  		<result column="sentence_ref" property="sentenceRef"/>
   		<result column="correct" property="correct"/>
   		<result column="trial" property="value"/>
   		<result column="elapsed_time" property="elapsedTimeMillis"/>
