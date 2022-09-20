@@ -91,6 +91,8 @@ public class ExamController {
 		} else {
 			exams = examService.findExamsByStudentLicense(userId, license);
 		}
+		TypeMap segment = examService.queryBySectionChunk(license);
+		exams.put("segments", segment.get("quiz"));
 		return Res.success(exams);
 	}
 	@GetMapping("/exams/segments")

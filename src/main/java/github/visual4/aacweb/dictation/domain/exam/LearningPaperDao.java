@@ -15,12 +15,31 @@ public class LearningPaperDao {
 	public LearningPaperDao(SqlSession session) {
 		this.session = session;
 	}
-	
+	/**
+	 * 어절 보고쓰기, 학습 이력 추가
+	 * 
+	 * .....+........+.....+.....
+	 *      | 보고쓰기 | 학습 | 퀴즈
+	 * .....+........+.....+.....
+	 *  낱말     x       x     x
+	 *  문장     o       o     x
+	 * .....+........+.....+.....
+	 * 
+	 * @param paper
+	 */
 	public void insertLearningPaper(LearningPaper paper) {
 		session.insert(Dao.mapper(this, "insertLearningPaper"), paper);
 	}
 	/**
-	 * 어절 학습 이력(보고쓰기x, 학습o, 퀴즈x) - 낱말학습, 문장학습 데이터
+	 * 어절 보고쓰기, 학습 이력 조회
+	 * 
+	 * .....+........+.....+.....
+	 *      | 보고쓰기 | 학습 | 퀴즈
+	 * .....+........+.....+.....
+	 *  낱말     x       x     x
+	 *  문장     o       o     x
+	 * .....+........+.....+.....
+	 * 
 	 * @param studentSeq
 	 * @return
 	 */

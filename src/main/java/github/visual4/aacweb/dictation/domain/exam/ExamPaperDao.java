@@ -27,7 +27,15 @@ public class ExamPaperDao {
 		session.insert(Dao.mapper(this, "insertExamPaper"), examPaper);
 	}
 	/**
-	 * 단계별학습 퀴즈 이력(보고쓰기x, 학습x, 퀴즈o)
+	 * 문장, 낱말 시험 결과 조회
+	 * 
+	 * .....+........+.....+.....
+	 *      | 보고쓰기 | 학습 | 퀴즈
+	 * .....+........+.....+.....
+	 *  낱말     o       o     o
+	 *  문장     x       x     o
+	 * .....+........+.....+.....
+	 * 
 	 * @param studentSeq
 	 * @return
 	 */

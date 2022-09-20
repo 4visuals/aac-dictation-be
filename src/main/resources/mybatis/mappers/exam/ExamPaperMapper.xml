@@ -58,6 +58,10 @@
 		  ON dep.exam_seq = ans.exam_ref 
 		WHERE dep.student_ref = #{userSeq}
   	</select>
+  	<!--
+  	 // 주어진 학생에 대해서 segment마다 가장 최근 "퀴즈" 답안 1건씩 조회
+  	 // (차트에서 사용됨)
+  	 -->
   	<select id="findRecentExamsPerSegment" parameterType="long" resultMap="exam_map">
   		SELECT
 			<include refid="exam_full_cols"></include>
@@ -66,7 +70,8 @@
 			SELECT
 				MAX(ep.exam_seq) as last_exam_seq 
 			FROM dt_exam_papers ep
-			WHERE ep.student_ref = #{studentSeq}
+			WHERE ep.student_ref = #{studentSeq} 
+			  AND ep.mode = 'Q'
 			GROUP BY
 				ep.section_ref,
 				ep.question_offset,
