@@ -106,12 +106,26 @@ public class ExamService {
 	 * @para licenseUuid
 	 * @return
 	 */
-	public List<ExamPaper> findExamofSectionByLicense(Integer sectionSeq, SentenceType type, String licenseUuid) {
+	public List<ExamPaper> findExamPapersBySection(
+			Integer sectionSeq,
+			SentenceType type,
+			String licenseUuid) {
 		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
 		User student = licenseToStudent(license);
 		List<ExamPaper> papers = examPaperDao.findExamBySectionAndStudent(
 				sectionSeq,
 				type,
+				student.getSeq());
+		return papers;
+	}
+	
+	public List<LearningPaper> findLearningPapersBySection(
+			Integer sectionSeq,
+			String licenseUuid) {
+		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
+		User student = licenseToStudent(license);
+		List<LearningPaper> papers = learningPaperDao.findLearningPapersBySection(
+				sectionSeq,
 				student.getSeq());
 		return papers;
 	}

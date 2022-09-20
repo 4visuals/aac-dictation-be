@@ -28,17 +28,33 @@ public class ExamController {
 		this.examService = examService;
 	}
 	/**
-	 * 주어진 section의 시험결과(quiz) 조회. section별 정답, 오답 입력까지 모두 반환함
-	 * @param sectionSeq
+	 * 주어진 section의 제출 답안 조회. section별 정답, 오답 입력까지 모두 반환함
+	 * @param sectionSeq - section pk
+	 * @param mode - R:보고쓰기, L:학습, Q:퀴즈
+	 * @param type - W:낱말, S:문장
 	 * @param license
 	 * @return
 	 */
-	@GetMapping("/exam/quiz/section/{sectionSeq}")
+	@GetMapping("/answer/section/{sectionSeq}/{mode}/{type}")
 	public Object findExamofSectionByLicense(
 			@PathVariable Integer sectionSeq,
-			@RequestParam SentenceType sentenceType,
+			@PathVariable ExamMode mode,
+			@PathVariable SentenceType type,
 			@RequestParam String license) {
-		List<ExamPaper> papers = examService.findExamofSectionByLicense(sectionSeq, sentenceType, license);
+		Object papers = null;
+		/* -----+--------+-------+-------+
+		 *      | 보고쓰기 |  학습  |  퀴즈  |
+		 * -----+--------+-------+-------+
+		 *  낱말 |   EP   |   EP  |   EP  |
+		 * -----+--------+-------+-------+
+		 *  문장 |   LP   |   LP  |   EP  |
+		 * -----+--------+-------+-------+
+		 */
+		if (mode == ExamMode.Q || type == SentenceType.W) {
+			papers = examService.findExamPapersBySection(sectionSeq, type, license);
+		} else {
+			papers = examService.findLearningPapersBySection(sectionSeq, license);
+		}
 		return Res.success("papers", papers);
 	}
 	/**

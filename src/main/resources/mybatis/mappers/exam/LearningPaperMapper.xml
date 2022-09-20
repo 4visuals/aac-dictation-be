@@ -42,6 +42,17 @@
 			lp.student_ref = #{seq}
 			
 	</select>
+	<select id="findLearningPapersBySection" parameterType="map" resultMap="learning_map">
+		SELECT
+			<include refid="learning_full_cols"></include>
+			, <include refid="EojeolAnswerMapper.ej_full_cols"></include>
+		FROM dt_learning_papers lp
+		JOIN dt_eojeol_answers ej
+		  ON lp.ln_seq = ej.exam_ref
+		WHERE lp.student_ref = #{student}
+		  AND lp.section_ref = #{section}
+			
+	</select>
 	<insert id="insertLearningPaper" parameterType="LearningPaper"
 	  		useGeneratedKeys="true"
 	  		keyColumn="ln_seq"

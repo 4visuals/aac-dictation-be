@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import github.visual4.aacweb.dictation.Dao;
+import github.visual4.aacweb.dictation.TypeMap;
 
 @Repository
 public class LearningPaperDao {
@@ -45,6 +46,17 @@ public class LearningPaperDao {
 	 */
 	public List<LearningPaper> findLearninsByStudent(Long studentSeq) {
 		return session.selectList(Dao.mapper(this, "findLearninsByStudent"), studentSeq);
+	}
+	/**
+	 * 주어진 학생의 어절 시험 답안지
+	 * @param sectionSeq
+	 * @param studentSeq
+	 * @return
+	 */
+	public List<LearningPaper> findLearningPapersBySection(Integer sectionSeq, Long studentSeq) {
+		return session.selectList(Dao.mapper(this, "findLearningPapersBySection"), TypeMap.with(
+				"section", sectionSeq,
+				"student", studentSeq));
 	}
 	
 }
