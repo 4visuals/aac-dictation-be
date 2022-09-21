@@ -125,7 +125,7 @@ public class UserService {
 		List<License> licenses = licenseService.createLicenses(product, cnt, null, (lcs) -> {
 			lcs.setIssuerRef(adminAccount.getSeq());
 			lcs.setReceiverRef(user.getSeq());
-			lcs.setDurationInHours(24*365*10);
+			lcs.setDurationInHours(License.UNLIMITED);
 		});
 		
 		user.setPass(null);

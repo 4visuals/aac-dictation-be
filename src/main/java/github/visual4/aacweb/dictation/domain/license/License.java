@@ -19,6 +19,8 @@ public class License {
 		lcs_uuid,
 		student_ref
 	}
+	
+	final public static int UNLIMITED = 24*365*10;
 
 	@EqualsAndHashCode.Include
 	Long seq;
