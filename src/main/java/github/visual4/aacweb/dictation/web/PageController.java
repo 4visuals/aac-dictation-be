@@ -10,9 +10,15 @@ public class PageController {
 	public String pageIndex() {
 		return "index";
 	}
-	
+	/*
 	@GetMapping("/level")
 	public String pageLevel() {
 		return "index";
 	}
+	
+	@GetMapping("/book") 
+	public String pageBook (){
+		return "index";
+	}
+	*/
 }

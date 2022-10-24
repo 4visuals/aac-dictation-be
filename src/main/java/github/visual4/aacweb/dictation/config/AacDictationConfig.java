@@ -22,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import github.visual4.aacweb.dictation.AppException;
@@ -64,6 +65,7 @@ public class AacDictationConfig implements WebMvcConfigurer{
 		ObjectMapper om = new ObjectMapper();
 		om.registerModule(new JavaTimeModule())
 			.configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+			.setDateFormat(new StdDateFormat())
 			;
 		om.setSerializationInclusion(Include.NON_NULL);
 		return om;

@@ -19,6 +19,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.domain.policy.Policy.PolicyType;
 import github.visual4.aacweb.dictation.domain.user.UserRole;
 import github.visual4.aacweb.dictation.domain.user.Vendor;
 
@@ -41,7 +42,8 @@ public class AacDaoConfig {
 		fBean.setTypeHandlers(
 				new VendorTypeHanlder(),
 				new UserRoleTypeHanlder(),
-				new BooleanToYNTypeHanlder());
+				new BooleanToYNTypeHanlder(),
+				new PolicyTypeHandler());
 		return fBean;
 	}
 	
@@ -66,6 +68,33 @@ public class AacDaoConfig {
 		public Vendor getResult(CallableStatement cs, int columnIndex) throws SQLException {
 			throw new AppException(ErrorCode.SERVER_ERROR, 500, "CallableStatement for enum Vendor not allowed for column " + columnIndex);
 		}
+	}
+	@MappedTypes(PolicyType.class)
+	static class PolicyTypeHandler implements TypeHandler<PolicyType> {
+
+		@Override
+		public void setParameter(PreparedStatement ps, int i, PolicyType parameter, JdbcType jdbcType)
+				throws SQLException {
+			ps.setString(i, parameter.name());;
+		}
+
+		@Override
+		public PolicyType getResult(ResultSet rs, String columnName) throws SQLException {
+			String type = rs.getString(columnName);
+			return PolicyType.valueOf(type);
+		}
+
+		@Override
+		public PolicyType getResult(ResultSet rs, int columnIndex) throws SQLException {
+			String type = rs.getString(columnIndex);
+			return PolicyType.valueOf(type);
+		}
+
+		@Override
+		public PolicyType getResult(CallableStatement cs, int columnIndex) throws SQLException {
+			throw new AppException(ErrorCode.APP_BUG, 500, "callable statement not supported");
+		}
+		
 	}
 	
 	@MappedTypes(UserRole.class)

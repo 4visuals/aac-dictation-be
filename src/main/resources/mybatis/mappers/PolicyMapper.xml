@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="PolicyMapper">
+  	
+  	<sql id="policy_cols">
+  		 pol.seq
+  		 ,pol.policy_type
+  		 ,pol.creation_time
+  		 ,pol.detail
+  		 ,pol.activated_at
+  	</sql>
+  	<resultMap type="Policy" id="policymap">
+  		<id column="seq" property="seq"/>
+  		<result column="policy_type" property="policyType"/>
+  		<result column="creation_time" property="creationTime"/>
+  		<result column="detail" property="detail"/>
+  		<result column="activated_at" property="activatedAt"/>
+  	</resultMap>
+  	<!--
+  	정책 종류별 최신 약관 정보
+  	policyType: TM(이용약관), PV(개인정보 보호 정책)
+  	-->
+  	<select id="findLatestPolicyBy" parameterType="string" resultMap="policymap">
+	  	SELECT
+	  		<include refid="policy_cols"/>
+		FROM (
+			SELECT
+				MAX(_tmp.seq) AS seq
+			FROM dt_policies _tmp
+			WHERE  _tmp.policy_type = #{type}
+			GROUP BY _tmp.policy_type
+			) _latest
+		JOIN dt_policies pol
+		  ON pol.seq  = _latest.seq
+  	</select>
+  	
+  	<select id="findLatestPolicies" resultMap="policymap">
+	  	SELECT
+	  		<include refid="policy_cols"/>
+		FROM (
+			SELECT
+				MAX(_tmp.seq) AS seq
+			FROM dt_policies _tmp
+			GROUP BY _tmp.policy_type
+			) _latest
+		JOIN dt_policies pol
+		  ON pol.seq  = _latest.seq
+  	</select>
+  	
+  </mapper>

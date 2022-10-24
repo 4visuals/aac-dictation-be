@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation;
 
+import java.util.Map;
+
 /**
  */
 public class Res {
@@ -23,6 +25,15 @@ public class Res {
     public static TypeMap success(TypeMap res) {
         res.put("success", true);
         return res;
+    }
+    public static <K, V> TypeMap success(Map<K, V> map) {
+    	TypeMap m = new TypeMap(map.size()+1);
+    	m.put("success", true);
+    	for (K key : map.keySet()) {
+			V value = map.get(key);
+			m.put(key.toString(), value);
+		}
+    	return m;
     }
     public static TypeMap fail(Object ... args) {
         TypeMap m = new TypeMap(1 + args.length/2);
