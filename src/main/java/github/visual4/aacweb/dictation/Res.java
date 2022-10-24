@@ -39,9 +39,9 @@ public class Res {
             Object v = args[i+1];
             if(k.getClass() != String.class) {
                 throw new AppException(
-                        "SERVER_ERROR",
-                        500
-                        );
+                        ErrorCode.SERVER_ERROR,
+                        500,
+                        "property name in response should be type of String but " + k.getClass().getName());
             }
             m.put((String)k, v);
         }

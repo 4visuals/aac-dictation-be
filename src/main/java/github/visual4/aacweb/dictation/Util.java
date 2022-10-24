@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -110,5 +112,20 @@ public class Util {
 			byte [] hashed = md.digest(text.getBytes());
 			return Util.toHexString(hashed);
 		}
+	}
+
+	public static <T> void forEach(List<T> list, Consumer<T> fn) {
+		for (T obj : list) {
+			fn.accept(obj);
+		}
+	}
+
+	public static void sleep(int secs) {
+		try {
+			Thread.sleep(3*1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

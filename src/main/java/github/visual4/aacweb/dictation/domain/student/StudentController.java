@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation.domain.student;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.exam.ExamService;
+import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.user.Membership;
 import github.visual4.aacweb.dictation.domain.user.User;
@@ -32,6 +36,9 @@ public class StudentController {
 	
 	@Autowired
 	TokenService tokenService;
+	
+	@Autowired
+	ExamService examService;
 	
 	@PostMapping
 	public Object registerStudent(@RequestBody TypeMap studentInfo, @JwtProp("useq") Integer teacherSeq) {
@@ -62,6 +69,14 @@ public class StudentController {
 				res.<Membership>get("membership").getProfile(),
 				UserRole.STUDENT);
 		res.put("jwt", jwtToken);
+		
+		/*
+		 * 학생인 경우 segment별 최근 시험 이력을 같이 보냄
+		 * 성취도 표시에 사용됨
+		 */
+		List<License> licenses = res.get("licenses");
+		TypeMap exams = examService.queryBySectionChunk(licenses.get(0).getUuid());
+		res.put("segments", exams.get("quiz"));
 		return Res.success(res);
 	}
 	

@@ -58,6 +58,22 @@ public enum ErrorCode {
     STUDENT_NOT_ENROLLED("no license found for student [%s]"),
     STUDENT_LOGIN_FAILED("id or password mismatch"), 
     NOT_YOUR_STUDENT("not your student"), 
+    
+    DUP_USER_ID("duplicated userId"),
+    NULL_USER_NAME("empty user name"),
+    PASSWORD_LENGTH("empty password"),
+    
+    OUT_OF_LENGTH("check the size [%s]"), 
+    PASSWORD_FORMAT("number and character is required."), 
+    USER_ID_LENGTH("length should be between 6 and 16."), 
+    USER_ID_FORMAT("character  is required"),
+    USER_NAME_LENGTH("check the name size(1 ~ 12)"),
+    
+    NOT_ALLOWED("this is not allowed"), 
+    
+    ORDER_INVALID_QTT("valid quantity required"), 
+    ORDER_INVALID_PROD("no such product: %s"), 
+    ORDER_INVALID_PRICE("null or negative price"), 
     ;
     
 

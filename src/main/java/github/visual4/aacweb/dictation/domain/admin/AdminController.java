@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.license.License;
+import github.visual4.aacweb.dictation.domain.order.Order;
+import github.visual4.aacweb.dictation.domain.order.OrderService;
 import github.visual4.aacweb.dictation.domain.section.Section;
 import github.visual4.aacweb.dictation.domain.section.SectionService;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
@@ -31,6 +33,8 @@ public class AdminController {
 	SectionService sectionService;
 	@Autowired
 	AdminService adminService;
+	@Autowired
+	OrderService orderService;
 	
 	/**
 	 * 주어진 문장의 level 정보 분석
@@ -64,5 +68,11 @@ public class AdminController {
 		Integer qtt = param.getInt("qtt"); // 갯수
 		List<License> licenses = adminService.issueLicenses(userSeq, qtt);
 		return Res.success("licenses", licenses);
+	}
+	
+	@GetMapping("/orders")
+	public Object listOrders() {
+		List<Order> orders = orderService.findOrdersWithProduct();
+		return Res.success("orders", orders);
 	}
 }
