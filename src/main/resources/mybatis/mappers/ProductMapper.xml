@@ -5,24 +5,87 @@
   <mapper namespace="ProductMapper">
   	
   	<sql id="prodmap_cols">
-  		 prod_seq
-  		,prod_name
-  		,prod_code
-  		,prod_price_ko
-  		,prod_desc
+  		 prod.prod_seq
+  		,prod.prod_name
+  		,prod.prod_code
+  		,prod.prod_price_ko
+  		,prod.prod_discount_ko
+  		,prod.prod_desc
+  		,prod.prod_type
+  		,prod.prod_duration_hours
+  		,prod_activated_at
+  		,prod_expired_at
+  		,prod_created_by
   	</sql>
   	<resultMap type="Product" id="prodmap">
   		<id column="prod_seq" property="seq"/>
   		<result column="prod_name" property="name"/>
   		<result column="prod_code" property="code"/>
   		<result column="prod_price_ko" property="priceKrWon"/>
+  		<result column="prod_discount_ko" property="discountKrWon"/>
   		<result column="prod_desc" property="description"/>
+  		<result column="prod_type" property="type"/>
+  		<result column="prod_duration_hours" property="durationInHours"/>
   	</resultMap>
+  	
+  	<!-- 관리자용 -->
+  	<resultMap type="Product" id="ext_prodmap" extends="prodmap">
+  	<result column="prod_activated_at" property="activatedAt"/>
+  		<result column="prod_expired_at" property="expiredAt"/>
+  		<result column="prod_created_by" property="createdBy"/>
+  	</resultMap>
+  	
   	<select id="findBy" parameterType="map" resultMap="prodmap">
   		SELECT
 	  		<include refid="prodmap_cols" />
 	  	FROM dt_products prod
 	  	WHERE prod.${colname} = #{value}
   	</select>
+  	<select id="findAllProducts" resultMap="ext_prodmap">
+  		SELECT
+	  		<include refid="prodmap_cols" />
+	  	FROM dt_products prod
+  	</select>
+  	<select id="findProducts" parameterType="string" resultMap="prodmap">
+  		SELECT
+	  		<include refid="prodmap_cols" />
+	  	FROM dt_products prod
+	  	<![CDATA[
+	  	WHERE
+	  		prod.prod_type = #{type}
+	  		AND
+	  		prod.prod_activated_at <= CURRENT_TIMESTAMP()
+	  		AND
+	  		prod.prod_expired_at IS NULL
+		]]>
+  	</select>
   	
+  	<insert id="insertProduct" parameterType="Product"
+  		useGeneratedKeys="true"
+  		keyColumn="prod_seq"
+  		keyProperty="seq">
+	  	INSERT INTO dt_products(
+			prod_name,
+			prod_code,
+			prod_price_ko,
+			prod_discount_ko,
+			prod_price_en,
+			prod_desc,
+			prod_type,
+			prod_duration_hours,
+			prod_activated_at,
+			prod_created_by
+		) VALUES (
+			#{name},
+			#{code},
+			#{priceKrWon},
+			#{discountKrWon},
+			NULL, -- price in dollar null
+			#{description},
+			#{type},
+			#{durationInHours},
+			#{activatedAt},
+			#{createdBy}
+		)
+  	</insert>
   </mapper>

@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.user;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.student.StudentDao;
 import github.visual4.aacweb.dictation.domain.user.User.Column;
+import github.visual4.aacweb.dictation.service.rule.Rules;
 
 @Service
 @Transactional
@@ -61,9 +63,38 @@ public class UserService {
 	public void loadAdminAccount() {
 		adminAccount = userDao.findBy(User.Column.user_seq, adminSeq);
 	}
+	
+
+	public User loadAdmin(Long adminSeq) {
+		User user = this.findUser(adminSeq);
+		if (!configService.isAdmin(user)) {
+			throw new AppException(ErrorCode.NOT_A_ADMIN, 403);
+		}
+		return user;
+	}
+
+
 
 	public TypeMap getMembership(String vendor, String accessToken) {
 		TypeMap profile = googleAuthService.getUserProfile(accessToken);
+		String email = profile.getStr("email");
+		User user = userDao.findBy(User.Column.user_email, email);
+		if (user == null) {
+			Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
+			return TypeMap.with("membership", membership,  "licenses", Collections.EMPTY_LIST);			
+		} else {
+			return login(profile);
+		}
+	}
+	/**
+	 * id_token을 통한 로그인
+	 * @param vendor
+	 * @param accessToken
+	 * @return
+	 */
+	public TypeMap getMembershipFromIdToken(String vendor, String idToken) {
+		TypeMap param = TypeMap.with("token", idToken);
+		TypeMap profile = googleAuthService.getUserProfile(param);
 		String email = profile.getStr("email");
 		User user = userDao.findBy(User.Column.user_email, email);
 		if (user == null) {
@@ -120,13 +151,15 @@ public class UserService {
 		AppConfiguration config = configService.getConfiguration();
 		Product product = productService.findBy(Product.Column.prod_seq, 1);
 		Util.notNull(product, ErrorCode.SERVER_ERROR, 500, "no such product seq(" + 1 + ")");
-		
+		/*
 		int cnt = config.getFreeCertsPerUser();
 		List<License> licenses = licenseService.createLicenses(product, cnt, null, (lcs) -> {
 			lcs.setIssuerRef(adminAccount.getSeq());
 			lcs.setReceiverRef(user.getSeq());
 			lcs.setDurationInHours(License.UNLIMITED);
 		});
+		*/
+		List<License> licenses = Collections.emptyList();
 		
 		user.setPass(null);
 		System.out.println(user.getSeq() + ", " + user.getEmail());
@@ -203,5 +236,34 @@ public class UserService {
 		return any != null;
 	}
 
+	public Object isValidateProperty(String column, Object value) {
+		if ("userId".equals(column)) {
+			// 중복 아이디 확인
+			String userId = value.toString();
+			User existingUser = userDao.findBy(Column.user_id, userId);
+			if (existingUser != null) {
+				throw new AppException(ErrorCode.DUP_USER_ID, 409);
+			}
+			Rules.checkUserId(userId);
+			return userId;
+		} else if ("name".equals(column)) {
+			if (value == null || value.toString().trim().length() == 0) {
+				throw new AppException(ErrorCode.NULL_USER_NAME, 422);
+			}
+			return Rules.checkUserName(value.toString());
+		} else if ("pass".equals(column)) {
+			String pass = value.toString();
+			Rules.checkPassword(pass);
+			return pass;
+		} else if ("birth".equals(column)) {
+			System.out.println(value);
+			LocalDate time = LocalDate.parse(value.toString());
+			return time;
+		}
+		else {
+			throw new AppException(ErrorCode.INVALID_VALUE, 422);
+		}
+		
+	}
 	
 }

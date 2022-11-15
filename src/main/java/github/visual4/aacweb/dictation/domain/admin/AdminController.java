@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,4 +76,5 @@ public class AdminController {
 		List<Order> orders = orderService.findOrdersWithProduct();
 		return Res.success("orders", orders);
 	}
+
 }

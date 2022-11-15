@@ -84,7 +84,21 @@ public class GoogleAuthService {
 
 
 	/**
-	 * 구글 계정으로 로그인 후 얻어낸 id_token 으로 사용자 정보 확인 
+	 * 구글 계정으로 로그인 후 얻어낸 id_token 으로 사용자 정보 확인.
+	 * 
+	 * 새로운 로그인 방식인 (Sign In with Google)을 통해 얻어낸 id_token을 검증함
+	 * 
+	 * ref: https://developers.google.com/identity/gsi/web/guides/overview
+	 * 
+	 * 여기서 언급하는 id_token은 브라우저에서 구글 로그인 성공 후 얻어낸 응답의 "credential" 속성값입니다(포맷은 jwt token)  
+	 * 
+	 * 응답의 상세 구조는 아래 문서를 참고하세요.
+	 * 
+	 * https://developers.google.com/identity/gsi/web/reference/js-reference#CredentialResponse
+	 * 
+	 * 브라우저에서 로그인 후 응답을 처리하는 코드는 아래 문서에 나와있음.
+	 * 
+	 * https://developers.google.com/identity/gsi/web/guides/handle-credential-responses-js-functions
 	 * 
 	 * @param params - {"token": id_token to verify user}
 	 * @return - {vendor: 'GOOGLE', 'name': 사용자 이름, 'email': 사용자 이메일, 'verified': boolean, 'picture': picture url}

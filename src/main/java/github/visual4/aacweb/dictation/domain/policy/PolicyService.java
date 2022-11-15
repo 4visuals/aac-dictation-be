@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.policy;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,5 +29,19 @@ public class PolicyService {
 			map.put(policy.getPolicyType(), policy);
 		}
 		return map;
+	}
+
+	public List<Policy> findPolicyHistoriesBy(PolicyType type) {
+		return policyDao.findPolicyHistoriesBy(type);
+	}
+	/**
+	 * 새로운 정책 추가
+	 * @param policy
+	 * @return
+	 */
+	public Policy insertPolicy(Policy policy) {
+		policy.setCreationTime(Instant.now());
+		policy.assertNew();
+		return policyDao.insertPolicy(policy);
 	}
 }

@@ -46,6 +46,10 @@ public enum ErrorCode {
      */
     NOT_A_STUDENT("not a student"),
     /**
+     * 관리자 아님
+     */
+    NOT_A_ADMIN("not a admin account"),
+    /**
      * 애플리케이션 버그 발생
      */
     APP_BUG("application bug. %s"),
@@ -73,7 +77,10 @@ public enum ErrorCode {
     
     ORDER_INVALID_QTT("valid quantity required"), 
     ORDER_INVALID_PROD("no such product: %s"), 
-    ORDER_INVALID_PRICE("null or negative price"), 
+    ORDER_INVALID_PRICE("null or negative price"),
+    ORDER_ALREADY_ACTIVATED("already activated"),
+    
+    PRODUCT_ERROR("product problem: %s")
     ;
     
 

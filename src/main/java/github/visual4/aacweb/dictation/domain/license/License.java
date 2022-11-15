@@ -22,6 +22,8 @@ public class License {
 	
 	final public static int UNLIMITED = 24*365*10;
 
+	public static final Integer BETA_DURATION = 24 * 3 * 30; // 90일
+
 	@EqualsAndHashCode.Include
 	Long seq;
 	

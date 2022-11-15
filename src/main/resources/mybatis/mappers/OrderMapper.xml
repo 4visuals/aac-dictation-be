@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="OrderMapper">
+  	
+  	<sql id="order_cols">
+  		odr.odr_seq
+  		, odr.product_ref
+  		, odr.order_time
+  		, odr.payment_due_time
+  		, odr.paid_time
+  		, odr.total_amount
+  		, odr.customer_ref
+  		, odr.confirmer_ref
+  		, odr.order_uuid
+  	</sql>
+  	<resultMap type="Order" id="ordermap">
+  		<id column="odr_seq" property="seq"/>
+  		<result column="product_ref" property="productRef"/>
+  		<result column="order_time" property="orderTime"/>
+  		<result column="payment_due_time" property="paymentDueTime"/>
+  		<result column="paid_time" property="paidTime"/>
+  		<result column="total_amount" property="totalAmount"/>
+  		<result column="customer_ref" property="customerRef"/>
+  		<result column="confirmer_ref" property="confirmerRef"/>
+  		<result column="order_uuid" property="orderUuid"/>
+  		<association property="product" resultMap="ProductMapper.prodmap"/>
+  		<association property="customer" resultMap="UserMapper.usermap"/>
+  	</resultMap>
+  	
+  	<resultMap type="Order" id="orderWithItemCount" extends="ordermap">
+  		<result column="item_count" property="itemCount" />
+  	</resultMap>
+  	
+  	<select id="findBy" parameterType="map" resultMap="ordermap">
+  		SELECT
+	  		<include refid="order_cols" />
+	  	FROM dt_orders odr
+	  	WHERE odr.${colname} = #{value}
+  	</select>
+  	
+  	<select id="findOrders" resultMap="orderWithItemCount">
+  		SELECT
+	  		<include refid="order_cols" />
+	  		,
+	  		<include refid="ProductMapper.prodmap_cols"/>
+	  		,
+	  		<include refid="UserMapper.usermap_cols"/>
+	  		,_cnt.item_count
+	  		
+	  	FROM (
+	  		SELECT
+				odr.odr_seq ,
+				COUNT(odr.odr_seq) as item_count
+			FROM
+				dt_orders odr
+			LEFT JOIN dt_licenses lcs ON
+				odr.odr_seq = lcs.order_ref
+			GROUP BY
+				odr.odr_seq) _cnt
+	  	JOIN dt_orders odr
+  		  ON _cnt.odr_seq = odr.odr_seq
+  		JOIN dt_users u
+  		  ON odr.customer_ref = u.user_seq
+  		LEFT
+  		JOIN dt_products prod
+  		  ON odr.product_ref = prod.prod_seq
+  		ORDER BY odr.odr_seq DESC
+  	</select>
+  	
+  	<insert id="insertOrder" parameterType="Order"
+  		useGeneratedKeys="true"
+  		keyColumn="odr_seq"
+  		keyProperty="seq">
+  	INSERT INTO dt_orders(
+  		product_ref
+  		, order_time
+  		, payment_due_time
+  		, paid_time
+  		, total_amount
+  		, customer_ref
+  		, confirmer_ref
+  		, order_uuid
+  	) values (
+  		#{productRef}
+  		, #{orderTime}
+  		, #{paymentDueTime}
+  		, null
+  		, #{totalAmount}
+  		, #{customerRef}
+  		, null
+  		, #{orderUuid}
+  		
+  	)
+  	</insert>
+  	<!-- 결제 승인 처리: 승인날짜와 승인자 seq를 기록함 -->
+  	<update id="activateOrder" parameterType="Order">
+  		UPDATE dt_orders
+  		SET
+  			paid_time = #{paidTime} ,
+  			confirmer_ref = #{confirmerRef}
+  		WHERE
+  			odr_seq = #{seq}
+  			AND
+  			paid_time IS NULL
+  			AND
+  			confirmer_ref IS NULL
+  	</update>
+  </mapper>

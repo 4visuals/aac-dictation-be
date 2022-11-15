@@ -49,4 +49,30 @@
 		  ON pol.seq  = _latest.seq
   	</select>
   	
+  	<select id="findPolicyHistoriesBy" parameterType="string" resultMap="policymap">
+	  	SELECT
+	  		<include refid="policy_cols"/>
+		FROM dt_policies pol
+		WHERE pol.policy_type = #{type}
+		ORDER BY pol.seq DESC
+  	</select>
+  	<!-- 정책 추가 -->
+  	<insert id="insertPolicy" parameterType="Policy" 
+  		useGeneratedKeys="true"
+  		keyColumn="seq"
+  		keyProperty="seq">
+  		INSERT INTO dt_policies(
+  			policy_type,
+  			creation_time,
+  			detail,
+			activated_at
+		) VALUES (
+			#{policyType},
+			#{creationTime},
+			#{detail},
+			#{activatedAt}
+		);
+ 
+  	</insert>
+  	
   </mapper>

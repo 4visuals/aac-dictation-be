@@ -24,4 +24,17 @@ public class PolicyDao {
 		return session.selectList(Dao.mapper(this, "findLatestPolicies"));
 	}
 
+	public List<Policy> findPolicyHistoriesBy(PolicyType type) {
+		return session.selectList(Dao.mapper(this, "findPolicyHistoriesBy"), type.name());
+	}
+	/**
+	 * 새로운 정책 추가
+	 * @param policy
+	 * @return
+	 */
+	public Policy insertPolicy(Policy policy) {
+		session.insert(Dao.mapper(this, "insertPolicy"), policy);
+		return policy;
+	}
+
 }
