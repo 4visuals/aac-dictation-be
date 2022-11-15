@@ -20,6 +20,7 @@ import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserRole;
 import github.visual4.aacweb.dictation.domain.user.UserService;
 import github.visual4.aacweb.dictation.domain.user.Vendor;
+import github.visual4.aacweb.dictation.service.rule.Rules;
 
 @Service
 @Transactional
@@ -136,13 +137,50 @@ public class StudentService {
 			throw new AppException(ErrorCode.NOT_YOUR_STUDENT, 403);
 		}
 		if (!student.isSameUserId(form) && userService.exist(User.Column.user_id, form.getUserId())) {
-			throw new AppException(ErrorCode.DUP_RESOURCE, 409, "duplcated user id");
+			throw new AppException(ErrorCode.DUP_USER_ID, 409, "duplcated user id");
 		}
+		String userId = form.getUserId().trim();
+		if (userId.length() < 6 || userId.length() > 16) {
+			throw new AppException(ErrorCode.OUT_OF_LENGTH, 409, "6~16");
+		}
+		userService.isValidateProperty("name", form.getName());
+		userService.isValidateProperty("pass", form.getPass());
 		student.setName(form.getName());
 		student.setBirth(form.getBirth());
 		student.setUserId(form.getUserId());
 		student.setPass(form.getPass());
 		studentDao.updateStudent(student);
 		return student;
+	}
+	public User updateStudent(Long teacherSeq, Long studentSeq, String prop, Object value) {
+		User student = studentDao.findBy(User.Column.user_seq, studentSeq);
+		User teacher = userService.findTeacher(teacherSeq);
+		if (!student.isStudentOf(teacher)) {
+			throw new AppException(ErrorCode.NOT_YOUR_STUDENT, 403);
+		}
+		Object val = value;
+		if ("userId".equals(prop)) {
+			String userId = value.toString();
+			if (!student.getUserId().equals(userId) && userService.exist(User.Column.user_id, userId)) {
+				throw new AppException(ErrorCode.DUP_USER_ID, 409, "duplcated user id");
+			}
+			Rules.checkUserId(userId);
+			student.setUserId(userId.trim());
+		} else if ("name".equals(prop)) {
+			val = userService.isValidateProperty("name", value.toString());
+			student.setName(val.toString());
+		} else if("pass".equals(prop)) {
+			val = userService.isValidateProperty("pass", value);
+			student.setPass(val.toString());
+		} else if ("birth".equals(prop)) {
+			val = userService.isValidateProperty("birth", value);
+			System.out.println("birth");
+			student.setBirth((LocalDate)val);
+		} else {
+			throw new AppException(ErrorCode.NOT_ALLOWED, 422);
+		}
+		studentDao.updateStudent(student);
+		return student;
+		
 	}
 }

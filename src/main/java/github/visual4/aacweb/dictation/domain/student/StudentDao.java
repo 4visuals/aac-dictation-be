@@ -37,4 +37,14 @@ public class StudentDao {
 	public void updateStudent(User student) {
 		session.update(Dao.mapper(this, "updateStudent"), student);
 	}
+
+	public void updateStudentProp(User student, String prop, Object value) {
+		session.update(
+			Dao.mapper(this, "updateStudentProp"),
+			TypeMap.with(
+				"student", student.getSeq(),
+				"column", prop,
+				"value", value));
+		
+	}
 }

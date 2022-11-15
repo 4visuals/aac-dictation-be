@@ -80,9 +80,18 @@ public class StudentController {
 		return Res.success(res);
 	}
 	
+//	@PutMapping("/{studentSeq}")
+//	public Object updateStudent(@JwtProp("useq") Integer teacherSeq, @RequestBody User studentForm) {	
+//		User student = studentService.update(teacherSeq.longValue(), studentForm);
+//		return Res.success("student", student);
+//	}
+	
 	@PutMapping("/{studentSeq}")
-	public Object updateStudent(@JwtProp("useq") Integer teacherSeq, @RequestBody User studentForm) {	
-		User student = studentService.update(teacherSeq.longValue(), studentForm);
-		return Res.success("student", student);
+	public Object updateStudent(@JwtProp("useq") Integer teacherSeq, @RequestBody TypeMap param) {
+		Long studentSeq = param.asLong("studentSeq");
+		String prop = param.getStr("prop");
+		Object value = param.get("value");
+		User student = studentService.updateStudent(teacherSeq.longValue(), studentSeq, prop, value);
+		return Res.success("student",student);
 	}
 }
