@@ -26,6 +26,14 @@
 	  	FROM dt_users u
 	  	WHERE ${colname} = #{value}
   	</select>
+  	<!-- 카드 결제 심사를 위해 추가함 -->
+  	<select id="loginManually" parameterType="map" resultMap="usermap">
+  		SELECT
+	  		<include refid="usermap_cols" />
+	  	FROM dt_users u
+	  	WHERE user_id = #{id} AND user_pass = #{pass} AND user_role = 'T'
+  	</select>
+  	
   	
   	<insert id="insertUser"
   		parameterType="User"

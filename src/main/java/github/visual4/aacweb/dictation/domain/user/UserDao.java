@@ -28,6 +28,17 @@ public class UserDao {
 		search.put("keyword", keyword + "%");
 		return session.selectList(Dao.mapper(this, "searchUsers"), search);
 	}
+	/**
+	 * 카드 결제 심사를 위해 추가함
+	 * @param id
+	 * @param pass
+	 * @return
+	 */
+	public User loginManually(String id, String pass) {
+		return session.selectOne(
+				Dao.mapper(this, "loginManually"),
+				TypeMap.with("id", id, "pass", pass));
+	}
 	
 	
 }

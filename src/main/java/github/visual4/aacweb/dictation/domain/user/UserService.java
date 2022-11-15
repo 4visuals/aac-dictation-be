@@ -111,17 +111,33 @@ public class UserService {
 		if (user == null) {
 			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
 		}
+		return buildLoginResponse(profile, user, Vendor.GOOGLE);
+	}
+
+	/**
+	 * 카드 결제 심사용 계정을 위해서 추가함 - id, password를 입력받아서 테스트 계정을 조회함
+	 * @param id
+	 * @param pass
+	 * @return 
+	 */
+	public TypeMap loginManually(TypeMap payload) {
+		String id = payload.getStr("id");
+		String pass = payload.getStr("password");
+		User user = userDao.loginManually(id, pass);
+		if (user == null) {
+			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
+		}
+		TypeMap profile = TypeMap.with("email", user.getEmail(), "name", user.getName());
+		return buildLoginResponse(profile, user, Vendor.MANUAL);
+	}
+
+	private TypeMap buildLoginResponse(TypeMap profile, User user, Vendor vendor) {
 		user.setStudents(studentDao.findStudentsByTeacher(user.getSeq()));
 		profile.put("useq", user.getSeq());
-		profile.put("aac_id", email);
-		// 만료되지 않은 라이선스만 반환
-		Instant now = Instant.now();
+		profile.put("aac_id", user.getEmail());
+		
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
-//		List<License> activeLicenses = licenses
-//				.stream()
-//				.filter(lcs -> lcs.isAlive(now))
-//				.collect(Collectors.toList());
-		Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
+		Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
 		return TypeMap.with("membership", membership,  "licenses", licenses);
 	}
 	/**
