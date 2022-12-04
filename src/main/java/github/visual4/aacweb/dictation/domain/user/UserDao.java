@@ -40,5 +40,30 @@ public class UserDao {
 				TypeMap.with("id", id, "pass", pass));
 	}
 	
+	public String findPassword(Long userSeq) {
+		return session.selectOne(Dao.mapper(this, "findPassword"), userSeq);
+	}
+	/**
+	 * 비밀번호 변경
+	 * @param userSeq 
+	 * @param newPass - 새로운 비번
+	 * @param curPass - 현재 비번
+	 * @return
+	 */
+	public boolean updatePassword(Long userSeq, String newPass, String curPass) {
+		TypeMap param = TypeMap.with(
+				"userSeq", userSeq,
+				"newPass", newPass,
+				"curPass", curPass);
+		return session.update(Dao.mapper(this, "updatePassword"), param) == 1;
+	}
+	/**
+	 * 회원 삭제
+	 * @param seq
+	 */
+	public void deleteUser(Long teacherSeq) {
+		session.delete(Dao.mapper(this, "deleteUser"), teacherSeq);
+	}
+	
 	
 }

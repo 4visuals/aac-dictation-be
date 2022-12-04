@@ -183,4 +183,14 @@ public class StudentService {
 		return student;
 		
 	}
+	/**
+	 * 학생 삭제
+	 * @param students
+	 */
+	public void deleteStudents(List<User> students, User teacher) {
+		for (User student : students) {
+			studentDao.deleteStudent(student.getSeq(), teacher.getSeq());
+		}
+		
+	}
 }

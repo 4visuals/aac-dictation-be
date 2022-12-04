@@ -164,10 +164,10 @@ public class UserService {
 		userDao.insertUser(user);
 		profile.put("useq", user.getSeq());
 		
+		/*
 		AppConfiguration config = configService.getConfiguration();
 		Product product = productService.findBy(Product.Column.prod_seq, 1);
 		Util.notNull(product, ErrorCode.SERVER_ERROR, 500, "no such product seq(" + 1 + ")");
-		/*
 		int cnt = config.getFreeCertsPerUser();
 		List<License> licenses = licenseService.createLicenses(product, cnt, null, (lcs) -> {
 			lcs.setIssuerRef(adminAccount.getSeq());
@@ -185,6 +185,37 @@ public class UserService {
 				"membership", membership, 
 				"licenses", licenses,
 				"students", Collections.<User>emptyList());
+	}
+	/**
+	 * 회원 가입 - 직접 입력
+	 * PG사 심사를 위해서 추가함(toss)
+	 * 
+	 * @param joinForm
+	 * @return
+	 */
+	public User joinManually(JoinDto joinForm) {
+		isValidateProperty("email", joinForm.getEmail());
+		isValidateProperty("pass", joinForm.getPassword());
+		
+		Instant currentTime = Instant.now();
+		User user = new User();
+		user.setName(joinForm.getUserId());
+		user.setUserId(joinForm.getUserId());
+		user.setEmail(joinForm.getEmail());
+		user.setPass(joinForm.getPassword());
+		user.setCreationTime(currentTime);
+		user.setVendor(Vendor.MANUAL);
+		user.setRole(UserRole.TEACHER);
+		user.setStudents(Collections.emptyList());
+		
+		userDao.insertUser(user);
+		
+		user.setPass(null);
+		System.out.println(user.getSeq() + ", " + user.getEmail());
+		// Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
+	
+		
+		return user;
 	}
 	/**
 	 * 교사 조회(교사가 아니면 예외 던짐)
@@ -262,7 +293,17 @@ public class UserService {
 			}
 			Rules.checkUserId(userId);
 			return userId;
-		} else if ("name".equals(column)) {
+		} else if ("email".equals(column)) {
+			String email = value == null ? null : value.toString().trim();
+			if (email == null || email.length() == 0) {
+				throw new AppException(ErrorCode.NULL_USER_EMAIL, 422);
+			}
+			User existingUser = userDao.findBy(User.Column.user_email, email);
+			if (existingUser != null) {
+				throw new AppException(ErrorCode.DUP_USER_EMAIL, 409);
+			}
+			return Rules.checkUserEmail(value.toString());
+		}  else if ("name".equals(column)) {
 			if (value == null || value.toString().trim().length() == 0) {
 				throw new AppException(ErrorCode.NULL_USER_NAME, 422);
 			}
@@ -280,6 +321,20 @@ public class UserService {
 			throw new AppException(ErrorCode.INVALID_VALUE, 422);
 		}
 		
+	}
+
+	public String findPassword(Long teacherSeq) {
+		return userDao.findPassword(teacherSeq);
+	}
+
+	public boolean updatePassword(Long teacherSeq, String newPass, String curPass) {
+		isValidateProperty("pass", newPass);
+		return userDao.updatePassword(teacherSeq, newPass, curPass);
+		
+	}
+
+	public void deleteUser(User teacher) {
+		userDao.deleteUser(teacher.getSeq());
 	}
 	
 }

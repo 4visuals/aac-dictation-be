@@ -122,6 +122,25 @@ public class UserControlller {
 		res.put("jwt", jwtToken);
 		return Res.success(res);
 	}
+	@PostMapping("/join/manual")
+	public Object joinManually(@RequestBody JoinDto joinForm) {
+		User user = userService.joinManually(joinForm);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Res.success("user", user);
+	}
+	@PostMapping("/join/prop")
+	public Object checkPropertyForJoin(@RequestBody TypeMap param) {
+		String column = param.getStr("prop");
+		Object value = param.get("value");
+		Object val = userService.isValidateProperty(column, value);
+		return Res.success("value", val);
+	}
+	
 	@PostMapping("/prop")
 	public Object checkUserProperty(
 			@JwtProp TypeMap profile, @RequestBody TypeMap param) {

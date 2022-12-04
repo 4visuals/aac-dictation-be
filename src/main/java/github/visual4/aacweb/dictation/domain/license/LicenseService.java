@@ -48,7 +48,9 @@ public class LicenseService {
 			lcs.setOrderRef(orderRef);
 			lcs.setUuid("lcs-" + UUID.randomUUID().toString());
 			lcs.setCreatedAt(current);
+			
 			setter.accept(lcs);
+			
 			licenseDao.insertLicense(lcs);
 			licenses.add(lcs);
 		}
@@ -117,5 +119,11 @@ public class LicenseService {
 				"prevStud", prevStudent,
 				"curStud", student.getSeq(),
 				"license", lcs.getSeq());
+	}
+
+	public void deleteLicenses(List<License> licenses) {
+		for (License license : licenses) {
+			licenseDao.deleteLicense(license);
+		}
 	}
 }

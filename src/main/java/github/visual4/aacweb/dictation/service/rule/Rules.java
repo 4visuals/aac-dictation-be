@@ -8,6 +8,7 @@ public class Rules {
 	private final static String RULE_PASSWORD = "PASSWORD";
 	private static final String RULE_USER_ID = "USER_ID";
 	private static final String RULE_USER_NAME = "USER_NAME";
+	private static final String RULE_USER_EMAIL = "USER_EMAIL";
 	
 	private final static Map<String, IRule> rules = new HashMap<>();
 	
@@ -15,6 +16,7 @@ public class Rules {
 		rules.put(RULE_PASSWORD, new PasswordRule());
 		rules.put(RULE_USER_ID, new UserIdRule());
 		rules.put(RULE_USER_NAME, new UserNameRule());
+		rules.put(RULE_USER_EMAIL, new UserEmailRule());
 	}
 	
 	public static String checkPassword(String password) {
@@ -28,5 +30,9 @@ public class Rules {
 	public static String checkUserName(String name) {
 		IRule rule = rules.get(RULE_USER_NAME);
 		return rule.checkRule(name);
+	}
+	public static String checkUserEmail(String email) {
+		IRule rule = rules.get(RULE_USER_EMAIL);
+		return rule.checkRule(email);
 	}
 }

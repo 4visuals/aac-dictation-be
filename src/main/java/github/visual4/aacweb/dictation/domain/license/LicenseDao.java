@@ -54,4 +54,11 @@ public class LicenseDao {
 			TypeMap.with("license", lcs, "student", student));
 		
 	}
+	/**
+	 * 수강권 삭제
+	 * @param license
+	 */
+	public void deleteLicense(License license) {
+		session.delete(Dao.mapper(this, "deleteLicense"), license);
+	}
 }

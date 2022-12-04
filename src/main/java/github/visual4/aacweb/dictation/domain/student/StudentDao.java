@@ -47,4 +47,17 @@ public class StudentDao {
 				"value", value));
 		
 	}
+	/**
+	 * 학생 삭제
+	 * @param studentSeq
+	 * @param teacherSeq
+	 */
+	public void deleteStudent(Long studentSeq, Long teacherSeq) {
+		
+		session.delete(
+			Dao.mapper(this, "deleteStudent"),
+			TypeMap.with(
+				"student", studentSeq,
+				"teacher", teacherSeq));
+	}
 }

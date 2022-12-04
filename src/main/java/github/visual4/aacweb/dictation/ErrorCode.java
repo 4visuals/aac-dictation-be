@@ -63,8 +63,10 @@ public enum ErrorCode {
     STUDENT_LOGIN_FAILED("id or password mismatch"), 
     NOT_YOUR_STUDENT("not your student"), 
     
-    DUP_USER_ID("duplicated userId"),
+    DUP_USER_ID("duplicated user id"),
     NULL_USER_NAME("empty user name"),
+    DUP_USER_EMAIL("duplicated user email"),
+    NULL_USER_EMAIL("empty user email"),
     PASSWORD_LENGTH("empty password"),
     
     OUT_OF_LENGTH("check the size [%s]"), 
@@ -72,6 +74,7 @@ public enum ErrorCode {
     USER_ID_LENGTH("length should be between 6 and 16."), 
     USER_ID_FORMAT("character  is required"),
     USER_NAME_LENGTH("check the name size(1 ~ 12)"),
+    USER_EMAIL_FORMAT("check email format"),
     
     NOT_ALLOWED("this is not allowed"), 
     
@@ -80,7 +83,8 @@ public enum ErrorCode {
     ORDER_INVALID_PRICE("null or negative price"),
     ORDER_ALREADY_ACTIVATED("already activated"),
     
-    PRODUCT_ERROR("product problem: %s")
+    PRODUCT_ERROR("product problem: %s"),
+    SETTING_UNLOCK_FAILED("password mismatch")
     ;
     
 

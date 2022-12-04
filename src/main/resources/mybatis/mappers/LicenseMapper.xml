@@ -59,5 +59,11 @@
 	  	WHERE
 	  		lcs_seq = #{license.seq}
   	</update>
+  	<delete id="deleteLicense" parameterType="License">
+  	DELETE
+  	FROM dt_licenses
+  	WHERE
+  		lcs_uuid = #{uuid}
   	
+  	</delete>
   </mapper>

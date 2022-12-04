@@ -7,6 +7,7 @@
   	<sql id="usermap_cols">
   		 u.user_seq
   		,u.user_name
+  		,u.user_id
   		,u.user_email
   		,vendor
   		,created_at
@@ -15,6 +16,7 @@
   	<resultMap type="User" id="usermap">
   		<id column="user_seq" property="seq"/>
   		<result column="user_name" property="name"/>
+  		<result column="user_id" property="userId"/>
   		<result column="user_email" property="email"/>
   		<result column="vendor" property="vendor"/>
   		<result column="created_at" property="creationTime"/>
@@ -26,6 +28,22 @@
 	  	FROM dt_users u
 	  	WHERE ${colname} = #{value}
   	</select>
+  	<!-- password -->
+  	<select id="findPassword" parameterType="long" resultType="string">
+	  	SELECT user_pass
+	  	FROM dt_users u
+	  	WHERE u.user_seq = #{seq}
+  	</select>
+  	<update id="updatePassword" parameterType="map">
+  		UPDATE dt_users
+  		SET
+  			user_pass = #{newPass}
+  		WHERE
+  			user_seq = #{userSeq}
+  			AND
+  			user_pass = #{curPass}
+  	</update>
+  	
   	<!-- 카드 결제 심사를 위해 추가함 -->
   	<select id="loginManually" parameterType="map" resultMap="usermap">
   		SELECT
@@ -34,18 +52,21 @@
 	  	WHERE user_id = #{id} AND user_pass = #{pass} AND user_role = 'T'
   	</select>
   	
-  	
   	<insert id="insertUser"
   		parameterType="User"
   		useGeneratedKeys="true"
   		keyProperty="seq" keyColumn="user_seq">
 	  	INSERT INTO dt_users(
-	  		user_name, user_email, user_pass, vendor, created_at, user_role 
+	  		user_name, user_id, user_email, user_pass, vendor, created_at, user_role 
 	  	) VALUES (
-	  		#{name}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}
+	  		#{name}, #{userId}, #{email}, #{pass}, #{vendor}, #{creationTime}, #{role}
 	  	)  
   	</insert>
-  	
+  	<delete id="deleteUser" parameterType="long">
+  		DELETE
+  		FROM dt_users
+  		WHERE user_seq = #{seq}
+  	</delete>
   	<!-- search -->
   	<!-- 이름 또는 이메일로 검색 -->
   	<select id="searchUsers" parameterType="map" resultMap="usermap">
