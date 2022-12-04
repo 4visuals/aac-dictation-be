@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import github.visual4.aacweb.dictation.domain.appconfig.AppConfigService;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfiguration;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
+import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.user.User;
@@ -86,13 +88,14 @@ public class OrderService {
 		return order;
 	}
 	/**
-	 * 주문 등록
+	 * 새로운 주문 생성. 생성한 주문은 결제가 이루어지기 전까지 READY상태로 남아있음.
 	 * @param teacherSeq
 	 * @param productCode
-	 * @param qtt - 갯수
+	 * @param qttProduct - 상품 갯수(보통 1개)
+	 * @param qttLicenses - 수강증 갯수
 	 * @return
 	 */
-	public Order createOrder(Long teacherSeq, String productCode, Integer qtt) {
+	public Order createOrder(Long teacherSeq, String productCode, Integer qttProduct, Integer qttLicenses) {
 		User teacher = userService.findTeacher(teacherSeq);
 		
 		Product product = productService.findBy(Product.Column.prod_code, productCode);
@@ -105,7 +108,7 @@ public class OrderService {
 		Order order = new Order();
 		/* 상품 관련*/
 		order.setProductRef(product.getSeq());
-		order.setTotalAmount(product.calculateUnitPrice() * qtt);
+		order.setTotalAmount(product.calculateUnitPrice() * qttProduct);
 		
 		/* times */
 		Instant cur = Instant.now();
@@ -118,14 +121,17 @@ public class OrderService {
 		order.setConfirmerRef(null); // 관리자가 결제 승인할때 설정됨
 		order.setOrderUuid("odr-" + UUID.randomUUID().toString());
 		
+		order.setOrderState(OrderState.RDY);
+		order.setPaygateVendor("im_port");
 		System.out.println(order.getTotalAmount());
 		orderDao.insertOrder(order);
 		
 		/* licenses */
-		List<License> items = licenseService.createLicenses(product, qtt, order, (lcs) -> {
+		List<License> items = licenseService.createLicenses(product, qttLicenses, order, (lcs) -> {
 			lcs.setIssuerRef(config.getAdminAccountSeq());
 			lcs.setReceiverRef(teacher.getSeq());
 			lcs.setCreatedAt(cur);
+			lcs.setActivatedAt(cur); // 구매 후 바로 활성화시킴
 			lcs.setDurationInHours(product.getDurationInHours());
 		});
 		order.setItems(items);
@@ -141,22 +147,37 @@ public class OrderService {
 		Product trialProduct = productService.findBy(
 				Product.Column.prod_seq,
 				TRIAL_PRODUCT_SEQ);
-		Order order = createOrder(user.getSeq(), trialProduct.getCode(), 1);
-		activateOrder(order.getOrderUuid(), 1L);
+		Order order = createOrder(user.getSeq(), trialProduct.getCode(), 1, 1);
+		activateOrder(order.getOrderUuid(), 1L, null);
 		return order;
 	}
 	/**
 	 * 주문을 승인함
 	 * @param order
 	 * @param adminSeq
+	 * @return 
 	 */
-	public void activateOrder(String orderCode, Long adminSeq) {
+	public Order activateOrder(String orderCode, Long adminSeq, UnaryOperator<Order> fn) {
 		Order order = orderDao.findBy(Order.Column.order_uuid, orderCode);
 		order.markAsActivated(Instant.now(), adminSeq);
+		order.setOrderState(OrderState.ATV);
+		if (fn != null) {
+			fn.apply(order);
+		}
 		orderDao.activateOrder(order);
+		return order;
 	}
 	public List<Order> findOrdersWithProduct() {
 		List<Order> orders = orderDao.findOrders();
 		return orders;
 	}
+	/**
+	 * 대기 중인 주문을 조회함(생성 후 결제 완료 및 취소 처리되지 않은 주문)
+	 * @param orderUuid
+	 * @return
+	 */
+	public Order findOrder(String orderUuid) {
+		return orderDao.findBy(Order.Column.order_uuid, orderUuid);
+	}
+
 }

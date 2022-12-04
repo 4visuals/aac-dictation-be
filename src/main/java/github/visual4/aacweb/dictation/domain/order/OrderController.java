@@ -24,9 +24,23 @@ public class OrderController {
 		Integer qtt = form.getInt("quantity");
 		Order order = orderSerivce.createBetaOrder(teacherSeq.longValue(), code, qtt);
 		
-		orderSerivce.activateOrder(order.getOrderUuid(), 1L);
+		orderSerivce.activateOrder(order.getOrderUuid(), 1L, null);
 		return Res.success("order", order);
 		
+	}
+	
+	@PostMapping("/order")
+	public Object prepareOrder(
+			@JwtProp("useq") Integer teacherSeq,
+			@RequestBody TypeMap form) {
+		String code = form.getStr("productCode");
+		final Integer numOfProduct = 1;
+		final Integer numOfLicenses = 2;
+		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
+				code,
+				numOfProduct,
+				numOfLicenses);
+		return Res.success("order", order);
 	}
 	
 }

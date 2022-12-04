@@ -15,6 +15,24 @@ import lombok.Setter;
 @Setter
 public class Order {
 	
+	public enum OrderState {
+		/**
+		 * READY - 주문 생성 후 결제 전 대기 상태
+		 */
+		RDY,
+		/**
+		 * ACTIVE - 생성된 주문에 대해 결제가 완료됨, mid_trx_uid, end_trx_uid, trx_detail, pg_vendor등에 유의미한 값이 존재함
+		 */
+		ATV,
+		/**
+		 * CANCEL BY USER - 사용자가 결제를 취소함
+		 */
+		CNU,
+		/**
+		 * CANCEL BY ERROR - 결제 중 오류 발생으로 취소됨
+		 */
+		CNE
+	}
 	public enum Column {
 		order_uuid
 	}
@@ -55,6 +73,27 @@ public class Order {
 	 * 주문 식별 코드
 	 */
 	String orderUuid;
+	/**
+	 * 주문 상태
+	 */
+	OrderState orderState;
+	/**
+	 * 결제 대행 업체 정보
+	 */
+	String paygateVendor;
+	/**
+	 * 결제 후 생성된 상세 로그
+	 */
+	String transactionDetail;
+	/**
+	 * 거래 식별 코드 1치 (아임포트에서 발행한 거래 식별 코드) 
+	 */
+	String midTransactionUid;
+	/**
+	 * 거래 식별 코드 2차(실제로 거래를 승인한 pg사에서 발행한 식별 코드)
+	 */
+	String endTransactionUid;
+	
 	
 	public void setTotalAmount(Integer amount) {
 		if (amount == null || amount < 0) {
@@ -69,5 +108,12 @@ public class Order {
 		}
 		this.paidTime = activationTime;
 		this.confirmerRef = adminSeq;
+	}
+	/**
+	 * 대기중인 주문인지
+	 * @return
+	 */
+	public boolean isPending() {
+		return this.orderState == OrderState.RDY;
 	}
 }

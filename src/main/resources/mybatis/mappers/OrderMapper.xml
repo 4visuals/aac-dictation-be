@@ -14,6 +14,12 @@
   		, odr.customer_ref
   		, odr.confirmer_ref
   		, odr.order_uuid
+  		
+  		, odr.order_state
+  		, odr.pg_vendor
+  		, odr.trx_detail
+  		, odr.mid_trx_uid
+  		, odr.end_trx_uid
   	</sql>
   	<resultMap type="Order" id="ordermap">
   		<id column="odr_seq" property="seq"/>
@@ -25,6 +31,11 @@
   		<result column="customer_ref" property="customerRef"/>
   		<result column="confirmer_ref" property="confirmerRef"/>
   		<result column="order_uuid" property="orderUuid"/>
+  		<result column="order_state" property="orderState"/>
+  		<result column="pg_vendor" property="paygateVendor"/>
+  		<result column="trx_detail" property="transactionDetail"/>
+  		<result column="mid_trx_uid" property="midTransactionUid"/>
+  		<result column="end_trx_uid" property="endTransactionUid"/>
   		<association property="product" resultMap="ProductMapper.prodmap"/>
   		<association property="customer" resultMap="UserMapper.usermap"/>
   	</resultMap>
@@ -82,6 +93,8 @@
   		, customer_ref
   		, confirmer_ref
   		, order_uuid
+  		, order_state
+  		, pg_vendor
   	) values (
   		#{productRef}
   		, #{orderTime}
@@ -91,15 +104,21 @@
   		, #{customerRef}
   		, null
   		, #{orderUuid}
-  		
+  		, #{orderState}
+  		, #{paygateVendor}
   	)
   	</insert>
   	<!-- 결제 승인 처리: 승인날짜와 승인자 seq를 기록함 -->
   	<update id="activateOrder" parameterType="Order">
   		UPDATE dt_orders
   		SET
-  			paid_time = #{paidTime} ,
-  			confirmer_ref = #{confirmerRef}
+  			paid_time = #{paidTime}
+  		  , confirmer_ref = #{confirmerRef}
+  		  , order_state = #{orderState}
+  		  , pg_vendor = #{paygateVendor}
+  		  , trx_detail = #{transactionDetail}
+  		  , mid_trx_uid = #{midTransactionUid}
+  		  , end_trx_uid = #{endTransactionUid}
   		WHERE
   			odr_seq = #{seq}
   			AND
