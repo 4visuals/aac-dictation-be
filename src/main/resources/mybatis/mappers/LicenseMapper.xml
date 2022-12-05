@@ -42,9 +42,9 @@
   		keyColumn="lcs_seq"
   		keyProperty="seq">
   	INSERT INTO dt_licenses (
-  		lcs_uuid, order_ref,  created_at, duration_hours,  receiver_ref,    issuer_ref
+  		lcs_uuid, order_ref,  created_at, duration_hours, activated_at, expired_at,  receiver_ref,    issuer_ref
   	) VALUES (
-  		#{uuid}, #{orderRef}, #{createdAt}, #{durationInHours}, #{receiverRef}, #{issuerRef}
+  		#{uuid}, #{orderRef}, #{createdAt}, #{durationInHours}, #{activatedAt}, #{expiredAt}, #{receiverRef}, #{issuerRef}
   	)
   	</insert>
   	<!--
@@ -53,9 +53,7 @@
   	<update id="bindStudent" parameterType="map">
 	  	UPDATE dt_licenses
 	  	SET
-	  	    student_ref = #{student.seq},
-	  	    activated_at = #{license.activatedAt},
-	  	    expired_at = #{license.expiredAt}
+	  	    student_ref = #{student.seq}
 	  	WHERE
 	  		lcs_seq = #{license.seq}
   	</update>

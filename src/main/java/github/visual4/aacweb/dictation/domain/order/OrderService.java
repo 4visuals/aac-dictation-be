@@ -3,6 +3,7 @@ package github.visual4.aacweb.dictation.domain.order;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
@@ -77,7 +78,7 @@ public class OrderService {
 		orderDao.insertOrder(order);
 		
 		/* licenses */
-		List<License> items = licenseService.createLicenses(product, qtt, order, (lcs) -> {
+		List<License> items = licenseService.createLicenses( qtt, order, (lcs) -> {
 			lcs.setIssuerRef(config.getAdminAccountSeq());
 			lcs.setReceiverRef(teacher.getSeq());
 			lcs.setCreatedAt(cur);
@@ -87,6 +88,7 @@ public class OrderService {
 		
 		return order;
 	}
+	
 	/**
 	 * 새로운 주문 생성. 생성한 주문은 결제가 이루어지기 전까지 READY상태로 남아있음.
 	 * @param teacherSeq
@@ -123,19 +125,13 @@ public class OrderService {
 		
 		order.setOrderState(OrderState.RDY);
 		order.setPaygateVendor("im_port");
-		System.out.println(order.getTotalAmount());
+//		System.out.println(order.getTotalAmount());
 		orderDao.insertOrder(order);
 		
-		/* licenses */
-		List<License> items = licenseService.createLicenses(product, qttLicenses, order, (lcs) -> {
-			lcs.setIssuerRef(config.getAdminAccountSeq());
-			lcs.setReceiverRef(teacher.getSeq());
-			lcs.setCreatedAt(cur);
-			lcs.setActivatedAt(cur); // 구매 후 바로 활성화시킴
-			lcs.setDurationInHours(product.getDurationInHours());
-		});
-		order.setItems(items);
-		
+		/* licenses
+		 * 주문을 확인한 후에 수강증을 발급함  
+		 */
+		order.setItems(Collections.emptyList());
 		return order;
 	}
 	/**
@@ -148,23 +144,44 @@ public class OrderService {
 				Product.Column.prod_seq,
 				TRIAL_PRODUCT_SEQ);
 		Order order = createOrder(user.getSeq(), trialProduct.getCode(), 1, 1);
-		activateOrder(order.getOrderUuid(), 1L, null);
-		return order;
+		return activateOrder(order.getOrderUuid(), 1L, 1, null);
 	}
 	/**
-	 * 주문을 승인함
-	 * @param order
-	 * @param adminSeq
-	 * @return 
+	 * 주문을 승인함. 수강증 생성
+	 * @param orderCode
+	 * @param confirmerSeq
+	 * @param qttLicenses
+	 * @param fn
+	 * @return
 	 */
-	public Order activateOrder(String orderCode, Long adminSeq, UnaryOperator<Order> fn) {
+	public Order activateOrder(
+			String orderCode,
+			Long confirmerSeq,
+			final Integer qttLicenses,
+			UnaryOperator<Order> fn) {
 		Order order = orderDao.findBy(Order.Column.order_uuid, orderCode);
-		order.markAsActivated(Instant.now(), adminSeq);
+		order.markAsActivated(Instant.now(), confirmerSeq);
 		order.setOrderState(OrderState.ATV);
 		if (fn != null) {
 			fn.apply(order);
 		}
 		orderDao.activateOrder(order);
+		
+		/* licenses 발급 */
+		AppConfiguration config = configService.getConfiguration();
+		User teacher = userService.findTeacher(order.getCustomerRef());
+		Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
+		
+		Instant cur = Instant.now();
+		List<License> items = licenseService.createLicenses( qttLicenses, order, (lcs) -> {
+			lcs.setIssuerRef(config.getAdminAccountSeq());
+			lcs.setReceiverRef(teacher.getSeq());
+			lcs.setCreatedAt(cur);
+			// 등록된 학생 상관없이 구매 후 바로 활성화시킴
+			lcs.markAsActive(cur, product.getDurationInHours());
+		});
+		order.setItems(items);
+		
 		return order;
 	}
 	public List<Order> findOrdersWithProduct() {

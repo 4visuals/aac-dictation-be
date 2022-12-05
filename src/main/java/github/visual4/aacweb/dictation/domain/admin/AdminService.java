@@ -43,14 +43,11 @@ public class AdminService {
 	 */
 	public List<License> issueLicenses(Long userSeq, Integer qtt) {
 		User adminAccount = userService.findUser(adminSeq);
-		Product product = productService.findBy(Product.Column.prod_seq, 1);
-		Util.notNull(product, ErrorCode.SERVER_ERROR, 500, "no such product seq(" + 1 + ")");
-		
-		// Instant expiredAt = Instant.now().plus(28, ChronoUnit.DAYS);
-		List<License> licenses = licenseService.createLicenses(product, qtt, null, (lcs)-> {
+		Instant now = Instant.now();
+		List<License> licenses = licenseService.createLicenses(qtt, null, (lcs)-> {
 			lcs.setIssuerRef(adminAccount.getSeq());
 			lcs.setReceiverRef(userSeq);
-			lcs.setDurationInHours(24*28); // 28일로 설정
+			lcs.markAsActive(now, 24*28); // 28일
 		});
 		return licenses;
 	}

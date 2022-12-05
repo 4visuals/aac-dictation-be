@@ -24,7 +24,7 @@ public class OrderController {
 		Integer qtt = form.getInt("quantity");
 		Order order = orderSerivce.createBetaOrder(teacherSeq.longValue(), code, qtt);
 		
-		orderSerivce.activateOrder(order.getOrderUuid(), 1L, null);
+		orderSerivce.activateOrder(order.getOrderUuid(), 1L, 1, null);
 		return Res.success("order", order);
 		
 	}

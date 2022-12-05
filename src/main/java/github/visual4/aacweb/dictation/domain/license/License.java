@@ -1,7 +1,10 @@
 package github.visual4.aacweb.dictation.domain.license;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
+import github.visual4.aacweb.dictation.AppException;
+import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -97,5 +100,20 @@ public class License {
 	 */
 	public boolean isValidReceiver(User teacher) {
 		return teacher.getSeq().equals(this.receiverRef);
+	}
+	
+	public void markAsActive(Instant activeTime, Integer durationInHours) {
+		/*
+		 * 수강증 활성화 조건이 변경됨
+		 * (활성화 = activeAt과 expiredAt 값이 존재함)
+		 * 이전에는 학생을 연결할때 활성화되었으나, 구매 후 바로 활성화되므로 등록된 학생이 없을 수 있다.
+		 * 
+		 */
+		if (this.activatedAt != null || this.expiredAt != null) {
+			throw new AppException(ErrorCode.LICENSE_ALREADY_ACTIVATED, 400, "no student");
+		}
+		this.activatedAt = activeTime;
+		this.durationInHours = durationInHours;
+		this.expiredAt = activeTime.plus(durationInHours, ChronoUnit.HOURS);
 	}
 }

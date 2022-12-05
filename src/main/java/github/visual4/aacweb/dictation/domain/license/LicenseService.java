@@ -39,7 +39,7 @@ public class LicenseService {
 	 * @return
 	 */
 	public List<License> createLicenses(
-			Product product, int cnt, Order order, Consumer<License> setter) {
+			int cnt, Order order, Consumer<License> setter) {
 		Instant current = Instant.now();
 		Integer orderRef = order == null ? null : order.getSeq();
 		List<License> licenses  = new ArrayList<>();
@@ -106,13 +106,7 @@ public class LicenseService {
 		}
 		// FIXME (수강권) 이미 등록된 학생이 있는 경우 처리 로직 필요함.
 		Long prevStudent = lcs.getStudentRef();
-		if (lcs.isAlreadyActivated()) {
-			throw new AppException(ErrorCode.LICENSE_ALREADY_ACTIVATED, 422, lcs.getStudentRef());
-		}
-		Instant current = Instant.now();
-		Instant exp = current.plus(lcs.getDurationInHours(), ChronoUnit.HOURS);
-		lcs.setActivatedAt(current);
-		lcs.setExpiredAt(exp);
+//		
 		licenseDao.bindStudent(lcs, student);
 		
 		return TypeMap.with(

@@ -21,7 +21,7 @@ class LicenseServiceTest extends BaseDao {
 	void test_발급() {
 		Product prod = new Product();
 		prod.setSeq(1);
-		List<License> licenses = lcsService.createLicenses(prod, 2, null, (lcs) -> {
+		List<License> licenses = lcsService.createLicenses(2, null, (lcs) -> {
 			lcs.setIssuerRef(1L);
 			lcs.setReceiverRef(2L);
 		});
