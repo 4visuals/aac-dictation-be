@@ -6,9 +6,11 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class Product {
 
 	public final static Integer DUR_YEARL       = 24 * 30 * 12 + 5;

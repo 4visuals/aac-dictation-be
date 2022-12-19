@@ -47,5 +47,15 @@ public class ProductService {
 		productDao.insertProduct(product);
 		return product;
 	}
+	/**
+	 * 상품 정보 수정 - 상품명과 상세 내용만 수정 가능함
+	 * @param product
+	 * @return 
+	 */
+	public Product updateBasicInfo(Product product) {
+		productDao.updateBasicInfo(product);
+		return productDao.findBy(Product.Column.prod_seq, product.seq);
+		
+	}
 	
 }

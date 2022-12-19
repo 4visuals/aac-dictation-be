@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,12 @@ public class AdminProductController {
 		User admin = userService.loadAdmin(userSeq.longValue());
 		productService.createProduct(admin, product);
 		return Res.success("product", product);
-		
+	}
+	@PutMapping("/product")
+	public Object updateProduct(
+			@JwtProp("useq") Integer userSeq,
+			@RequestBody Product product) {
+		var prod = productService.updateBasicInfo(product);
+		return Res.success("product", prod);
 	}
 }

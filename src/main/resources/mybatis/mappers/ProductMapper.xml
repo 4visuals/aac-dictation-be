@@ -88,4 +88,13 @@
 			#{createdBy}
 		)
   	</insert>
+  	
+  	<update id="updateBasicInfo" parameterType="Product">
+  		UPDATE dt_products
+  		SET
+  			prod_name = #{name},
+  			prod_desc = #{description}
+  		WHERE
+  			prod_seq = #{seq}
+  	</update>
   </mapper>

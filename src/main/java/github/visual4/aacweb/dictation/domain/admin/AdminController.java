@@ -20,8 +20,11 @@ import github.visual4.aacweb.dictation.domain.section.Section;
 import github.visual4.aacweb.dictation.domain.section.SectionService;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
 import github.visual4.aacweb.dictation.domain.sentence.SentenceService;
+import github.visual4.aacweb.dictation.domain.user.User;
+import github.visual4.aacweb.dictation.domain.user.UserService;
 import github.visual4.aacweb.dictation.korean.Mark;
 import github.visual4.aacweb.dictation.service.analysis.AnalysisService;
+import github.visual4.aacweb.dictation.web.aop.JwtProp;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -36,6 +39,15 @@ public class AdminController {
 	AdminService adminService;
 	@Autowired
 	OrderService orderService;
+	
+	@Autowired
+	UserService userService;
+	
+	@PostMapping("/auth")
+	public Object checkAuthority(@JwtProp("useq") Integer userSeq) {
+		User admin = userService.loadAdmin(userSeq.longValue());
+		return Res.success("admin", admin);
+	}
 	
 	/**
 	 * 주어진 문장의 level 정보 분석
