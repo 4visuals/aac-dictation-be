@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,8 +40,12 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Slf4j
 public class AimPortService {
-	String importAPIKey = "2544322837434222";
-	String immportAPISecret = "zIQg9U2Pt0Mm3zBRTEPL4PNsajz3EhI0xrLfOV7lQH867fjynyyZCLB34EJdTYXFBRk3OUy36HQhpgHw";
+	@Value("${aimport.api-key}")
+	String importAPIKey;
+	
+	@Value("${aimport.secret-key}")
+	String importAPISecret;
+	
 	final private String HOST = "https://api.iamport.kr";
 	private AccessToken token;
 	
@@ -48,6 +55,11 @@ public class AimPortService {
 	public AimPortService(OrderService orderService, ObjectMapper om) {
 		this.orderService = orderService;
 		this.om = om;
+	}
+	@PostConstruct
+	public void printKey() {
+		System.out.println(this.importAPIKey);
+		System.out.println(this.importAPISecret);
 	}
 	/**
 	 * 결제 확인
@@ -69,28 +81,7 @@ public class AimPortService {
 		 *  amount=6900,
 		 *  paid_at=1668495090,
 		 *  pg_provider=danal_tpay,
-		 *  pg_tid=202211151548057524183400,
-		 *  
-		 *		cancelled_at=0,
-		 *		customer_uid=null,
-		 *		channel=pc,
-		 *		buyer_name=YN Seo, emb_pg_provider=null,
-		 *		receipt_url=...,
-		 *		cash_receipt_issued=false,
-		 *		vbank_code=null, cancel_history=[], vbank_date=0, bank_name=null,
-		 *		
-		 *		escrow=false, currency=KRW, 
-		 *		
-		 *		card_quota=0, vbank_issued_at=0,
-		 *		
-		 *		user_agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36, bank_code=null,
-		 *		buyer_email=yeori.seo@gmail.com, card_code=371,
-		 *		amount=6900,
-		 *		buyer_postcode=null, card_number=485480******5777, buyer_addr=null, customer_uid_usage=null, vbank_holder=null, vbank_name=null, pay_method=card, card_type=1, ,
-		 *		
-		 *		cancel_amount=0, cancel_reason=null, buyer_tel=null, cancel_receipt_urls=[], card_name=NH채움, name=1개월 이용권, apply_num=70929184,
-		 *		pg_id=9810030929,
-		 *		started_at=1668494885, vbank_num=null, failed_at=0, fail_reason=null, custom_data=null}
+		 *  pg_tid=202....400,
 		 */
 		String aimportUuid = res.body.getStr("imp_uid");
 		String orderUuid = res.body.getStr("merchant_uid");
@@ -101,24 +92,24 @@ public class AimPortService {
 		String endTxUid = res.body.getStr("pg_tid");
 		
 		if (!hook.checkUuid(aimportUuid, orderUuid)) {
-			log.warn(String.format("[PAYMENT] uuid mismatch, hook(a:%s, o:%s) vs real(a:%s, o:%s)",
+			log.error(String.format("[PAYMENT] uuid mismatch, hook(a:%s, o:%s) vs real(a:%s, o:%s)",
 					hook.aimportUuid, hook.orderUuid,
 					aimportUuid, orderUuid));
-			return;
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, "uuid mismatch");
 		}
-//		if (status != "paid") {
-//			log.warn(String.format("[[PAYMENT] status is %s (order: %s)", status, orderUuid));
-//			return;
-//		}
 		if (!hook.checkStatus(PayStatus.valueOf(status))) {
-			log.warn(String.format("[PAYMENT] status mismatch hook(%s) vs real(%s)", hook.status, status));
-			return;
+			log.error(String.format("[PAYMENT] status mismatch hook(%s) vs real(%s)", hook.status, status));
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, 
+					String.format(
+							"payment status mismatch. [%s] from requst, but [%s] from rest api",
+							hook.getStatus(), status));
 		}
 		
 		Order order = orderService.findOrder(orderUuid);
+		log.info("[detail]", order.getTransactionDetail());
 		if (!order.isPending()) {
-			log.warn(String.format("[PAYMENT] not a RDY order, order state : %s", order.getOrderState()));
-			return;
+			log.error(String.format("[PAYMENT] not a RDY order, order state : %s", order.getOrderState()));
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, "not a pending payment");
 		}
 		Integer price = order.getTotalAmount();
 		if (!price.equals(amount)) {
@@ -126,18 +117,26 @@ public class AimPortService {
 			 * 청구 금액과 실제 결제 금액이 다름
 			 * 결제를 취소시킴
 			 */
-			return;
+			log.error(String.format("[PAYMENT] amount mismatch: order: " + orderUuid));
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409,
+					String.format("amount mismatch. expected: %d, but %d", price, amount));
 		}
-		order.setMidTransactionUid(aimportUuid);
-		order.setEndTransactionUid(endTxUid);
-		order.setOrderState(OrderState.ATV);
-//		order.setConfirmerRef(1L);
-//		order.setPaidTime(Instant.ofEpochSecond(paidTime));
-		order.setPaygateVendor(pgVendor);
 		
-		String detail = Util.stringify(om, res.body);
-		order.setTransactionDetail(detail);
-		order = orderService.activateOrder(order.getOrderUuid(), 1L, null);
+		
+		final String detail = Util.stringify(om, res.body);
+		
+		/*
+		 * 1주문당 1개의 수강증 발급으로 다시 변경(원래 2장이었음)
+		 */
+		final Integer numOfLicenses = 1;
+		
+		orderService.activateOrder(order.getOrderUuid(), 1L, numOfLicenses, (odr) -> {
+			odr.setMidTransactionUid(aimportUuid);
+			odr.setEndTransactionUid(endTxUid);
+			odr.setOrderState(OrderState.ATV);
+			odr.setPaygateVendor(pgVendor);
+			odr.setTransactionDetail(detail);
+		});
 	}
 	
 	private AimportResponse get(String endPoint) {
@@ -190,7 +189,7 @@ public class AimPortService {
 		AimportResponse res = connect(
 			"post",
 			endPoint,
-			TypeMap.with("imp_key", importAPIKey, "imp_secret", immportAPISecret));
+			TypeMap.with("imp_key", importAPIKey, "imp_secret", importAPISecret));
 		
 		/* 
 		 * {

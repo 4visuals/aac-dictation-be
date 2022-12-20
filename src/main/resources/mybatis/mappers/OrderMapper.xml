@@ -126,4 +126,11 @@
   			AND
   			confirmer_ref IS NULL
   	</update>
+  	<update id="updateState" parameterType="Order">
+  		UPDATE dt_orders
+  		SET
+  			order_state = #{orderState}
+  		WHERE
+  			order_uuid = #{orderUuid} 
+  	</update>
   </mapper>

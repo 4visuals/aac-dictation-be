@@ -20,7 +20,8 @@ public class License {
 		lcs_seq,
 		receiver_ref,
 		lcs_uuid,
-		student_ref
+		student_ref,
+		order_ref
 	}
 	
 	final public static int UNLIMITED = 24*365*10;

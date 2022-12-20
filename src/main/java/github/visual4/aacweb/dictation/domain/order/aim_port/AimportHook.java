@@ -21,7 +21,7 @@ public class AimportHook {
 		ready,
 		paid,
 		failed,
-		canclled
+		cancelled
 	}
 	String aimportUuid;
 	String orderUuid;
@@ -33,7 +33,7 @@ public class AimportHook {
 		String imp_uid;
 		String merchant_uid;
 		String status; // 'paid', 'ready', etc
-		final Set<String> validIPs = Set.of("52.78.100.19", "52.78.48.223");
+		final Set<String> validIPs = Set.of("52.78.100.19", "52.78.48.223", "52.78.5.241");
 		
 		public Builder clientIP(String clientIp, String xff) {
 			if (!validIPs.contains(xff)) {

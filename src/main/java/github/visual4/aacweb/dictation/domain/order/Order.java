@@ -110,10 +110,35 @@ public class Order {
 		this.confirmerRef = adminSeq;
 	}
 	/**
-	 * 대기중인 주문인지
+	 * 대기중인 주문인지(결제 진행을 위해) 나타냄 
 	 * @return
 	 */
 	public boolean isPending() {
 		return this.orderState == OrderState.RDY;
+	}
+	public boolean isActive() {
+		return this.orderState == OrderState.ATV;
+	}
+	public boolean isError() {
+		return this.orderState == OrderState.CNE;
+	}
+	/**
+	 * 사용자가 결제 도중에 취소함
+	 */
+	public void cancelByUser() {
+		if (this.orderState == OrderState.RDY) {
+			this.orderState = OrderState.CNU;
+		}
+	}
+
+	public void bindProduct(Product product) {
+		this.product = product;
+		this.productRef = null;
+		
+	}
+
+	public void bindItems(List<License> licenses) {
+		this.items = licenses;
+		this.itemCount = null;
 	}
 }

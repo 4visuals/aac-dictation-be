@@ -1,7 +1,10 @@
 package github.visual4.aacweb.dictation.domain.order;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,18 +31,46 @@ public class OrderController {
 		return Res.success("order", order);
 		
 	}
-	
+	/**
+	 * 새로운 주문 준비 - 결제 진행을 위해 주문 인스턴스를 생성함
+	 * @param teacherSeq
+	 * @param form
+	 * @return
+	 */
 	@PostMapping("/order")
 	public Object prepareOrder(
 			@JwtProp("useq") Integer teacherSeq,
 			@RequestBody TypeMap form) {
 		String code = form.getStr("productCode");
 		final Integer numOfProduct = 1;
-		final Integer numOfLicenses = 2;
+		final Integer numOfLicenses = 1;
 		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
 				code,
 				numOfProduct,
 				numOfLicenses);
+		return Res.success("order", order);
+	}
+	/**
+	 * 주문 취소 - 주문 진행중에 취소됨
+	 * @return
+	 */
+	@PutMapping("/order")
+	public Object cancelOrder(
+			@JwtProp("useq") Integer teacherSeq,
+			@RequestBody TypeMap form) {
+		String orderUuid = form.getStr("orderUuid");
+		Order order = orderSerivce.cancelOrder(orderUuid);
+		return Res.success("order", order);
+	}
+	/**
+	 * 주문 상세 정보
+	 * @return
+	 */
+	@GetMapping("/order/{orderUuid}")
+	public Object orderDetail(@JwtProp("useq") Integer teacherSeq,
+			@PathVariable String orderUuid) {
+		Order order = orderSerivce.findOrderDetail(orderUuid,
+				TypeMap.with("product", true, "license", true));
 		return Res.success("order", order);
 	}
 	

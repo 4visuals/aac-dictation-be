@@ -36,10 +36,10 @@ public class OrderHookController {
 	 */
 	@PostMapping("/hooks/import")
 	public Object hookFromIm_port(HttpServletRequest req, @RequestBody TypeMap info) {
-		System.out.println("[HookFrom I'm port]" + info);
+		log.info("[PaymentHook] I'm port: " + info);
 		String clientIp = req.getRemoteAddr();
 		String xff = req.getHeader("X-Forwarded-For");
-		log.info("[client ip]" + clientIp);
+		log.info("[PaymentHook] client ip" + clientIp);
 		log.info("[XFF      ]" + xff);
 		AimportHook hook = AimportHook
 				.newBuilder()

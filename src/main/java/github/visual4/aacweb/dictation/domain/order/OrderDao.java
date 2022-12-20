@@ -37,5 +37,12 @@ public class OrderDao {
 		session.update(Dao.mapper(this, "activateOrder"), order);
 		
 	}
+	/**
+	 * 주문 상태 갱신
+	 * @param order
+	 */
+	public void updateState(Order order) {
+		session.update(Dao.mapper(this, "updateState"), order);
+	}
 
 }

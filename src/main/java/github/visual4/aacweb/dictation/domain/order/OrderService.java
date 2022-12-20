@@ -6,13 +6,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.UnaryOperator;
+import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfigService;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfiguration;
 import github.visual4.aacweb.dictation.domain.license.License;
@@ -158,12 +159,12 @@ public class OrderService {
 			String orderCode,
 			Long confirmerSeq,
 			final Integer qttLicenses,
-			UnaryOperator<Order> fn) {
+			Consumer<Order> fn) {
 		Order order = orderDao.findBy(Order.Column.order_uuid, orderCode);
 		order.markAsActivated(Instant.now(), confirmerSeq);
 		order.setOrderState(OrderState.ATV);
 		if (fn != null) {
-			fn.apply(order);
+			fn.accept(order);
 		}
 		orderDao.activateOrder(order);
 		
@@ -195,6 +196,40 @@ public class OrderService {
 	 */
 	public Order findOrder(String orderUuid) {
 		return orderDao.findBy(Order.Column.order_uuid, orderUuid);
+	}
+	/**
+	 * 주문 상세 정보
+	 * @param orderUuid
+	 * @param option - {"product": boolean, license: boolean} 
+	 * @return
+	 */
+	public Order findOrderDetail(String orderUuid, TypeMap option) {
+		Boolean loadProduct = option.getBoolean("product");
+		Boolean loadLicense = option.getBoolean("license");
+		Order order = orderDao.findBy(Order.Column.order_uuid, orderUuid);
+		if (loadProduct) {
+			Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
+			order.bindProduct(product);
+		}
+		if (loadLicense) {
+			List<License> licenses = licenseService.findsBy(License.Column.order_ref, order.getSeq());
+			order.bindItems(licenses);
+		}
+		return order;
+	}
+	/**
+	 * 진행중인 주문을 취소함(결제 완료된 주문을 취소하는 기능 아님). 주문이 READY상태일때만 가능
+	 * @param orderUuid
+	 * @return
+	 */
+	public Order cancelOrder(String orderUuid) {
+		Order order = orderDao.findBy(Order.Column.order_uuid, orderUuid);
+		if (!order.isPending()) {
+			throw new AppException(ErrorCode.ORDER_ALREADY_ACTIVATED, 400);
+		}
+		order.cancelByUser();
+		orderDao.updateState(order);
+		return order;
 	}
 
 }

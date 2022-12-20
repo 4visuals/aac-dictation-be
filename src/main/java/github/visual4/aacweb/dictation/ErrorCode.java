@@ -81,10 +81,12 @@ public enum ErrorCode {
     ORDER_INVALID_QTT("valid quantity required"), 
     ORDER_INVALID_PROD("no such product: %s"), 
     ORDER_INVALID_PRICE("null or negative price"),
-    ORDER_ALREADY_ACTIVATED("already activated"),
+    ORDER_ALREADY_ACTIVATED("order is already activated"),
+    
+    PAYMENT_VALIDATION_ERROR("payment error: %s"),
     
     PRODUCT_ERROR("product problem: %s"),
-    SETTING_UNLOCK_FAILED("password mismatch")
+    SETTING_UNLOCK_FAILED("password mismatch"),
     ;
     
 
