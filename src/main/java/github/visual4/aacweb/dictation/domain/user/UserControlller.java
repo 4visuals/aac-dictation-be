@@ -90,7 +90,7 @@ public class UserControlller {
 		return Res.success(res);
 	}
 	/**
-	 * id, password로 로그인. 결제 대행 업체 테스트용 로그인 처리를 위해서 부득이하게 추가함
+	 * id, password로 로그인. 결제 대행 업체 테스트용 로그인 처리를 위해서 추가함
 	 * @param payload
 	 * @return
 	 */
@@ -125,12 +125,6 @@ public class UserControlller {
 	@PostMapping("/join/manual")
 	public Object joinManually(@RequestBody JoinDto joinForm) {
 		User user = userService.joinManually(joinForm);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return Res.success("user", user);
 	}
 	@PostMapping("/join/prop")

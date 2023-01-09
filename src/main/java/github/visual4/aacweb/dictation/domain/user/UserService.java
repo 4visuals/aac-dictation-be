@@ -178,7 +178,7 @@ public class UserService {
 		List<License> licenses = Collections.emptyList();
 		
 		user.setPass(null);
-		System.out.println(user.getSeq() + ", " + user.getEmail());
+//		System.out.println(user.getSeq() + ", " + user.getEmail());
 		Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
 	
 		return TypeMap.with(
