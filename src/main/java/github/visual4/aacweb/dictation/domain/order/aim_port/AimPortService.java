@@ -27,6 +27,7 @@ import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
+import github.visual4.aacweb.dictation.domain.order.PG;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportHook.PayStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,11 +56,6 @@ public class AimPortService {
 	public AimPortService(OrderService orderService, ObjectMapper om) {
 		this.orderService = orderService;
 		this.om = om;
-	}
-	@PostConstruct
-	public void printKey() {
-		System.out.println(this.importAPIKey);
-		System.out.println(this.importAPISecret);
 	}
 	/**
 	 * 결제 확인
@@ -90,6 +86,8 @@ public class AimPortService {
 		Integer paidTime = res.body.asInt("paid_at"); // 결제 시간(초단위)
 		String pgVendor = res.body.getStr("pg_provider");
 		String endTxUid = res.body.getStr("pg_tid");
+		
+		log.info("[paygate id] {}", pgVendor);
 		
 		if (!hook.checkUuid(aimportUuid, orderUuid)) {
 			log.error(String.format("[PAYMENT] uuid mismatch, hook(a:%s, o:%s) vs real(a:%s, o:%s)",
@@ -134,7 +132,7 @@ public class AimPortService {
 			odr.setMidTransactionUid(aimportUuid);
 			odr.setEndTransactionUid(endTxUid);
 			odr.setOrderState(OrderState.ATV);
-			odr.setPaygateVendor(pgVendor);
+			odr.setPaygateVendor(PG.valueOf(pgVendor));
 			odr.setTransactionDetail(detail);
 		});
 	}

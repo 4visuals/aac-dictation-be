@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="GroupPaperMapper">
+  	
+  	<sql id="group_paper_cols">
+  		dop.form_ref
+  	   ,dop.paper_type
+  	   ,dop.desc
+  	</sql>
+  	<resultMap type="OrderPaper" id="orderPaperMap">
+  		<!-- <id column="" property=""/> -->
+  		<result column="form_ref" property="formRef"/>
+  		<result column="paper_type" property="paperType"/>
+  		<result column="desc" property="desc"/>
+  	</resultMap>
+  	
+  	<insert id="insertOrderPaper" parameterType="map">
+	  	INSERT INTO dt_order_papers (
+	  		form_ref
+	  	  , paper_type
+	  	  , `desc`
+	  	) VALUES (
+	  		#{formSeq},
+	  		#{paper.paperType},
+	  		#{paper.desc}
+	  	)
+  	</insert>
+  </mapper>

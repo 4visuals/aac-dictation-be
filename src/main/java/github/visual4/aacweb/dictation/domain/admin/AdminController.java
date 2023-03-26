@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +16,11 @@ import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.order.Order;
+import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
+import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm;
+import github.visual4.aacweb.dictation.domain.order.group.GroupOrderService;
+import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm.OrderFormState;
 import github.visual4.aacweb.dictation.domain.section.Section;
 import github.visual4.aacweb.dictation.domain.section.SectionService;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
@@ -42,6 +47,9 @@ public class AdminController {
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	GroupOrderService groupOrderService;
 	
 	@PostMapping("/auth")
 	public Object checkAuthority(@JwtProp("useq") Integer userSeq) {
@@ -87,6 +95,35 @@ public class AdminController {
 	public Object listOrders() {
 		List<Order> orders = orderService.findOrdersWithProduct();
 		return Res.success("orders", orders);
+	}
+	
+	@GetMapping("/group-orders")
+	public Object listGroupOrders() {
+		List<GroupOrderForm> orders = groupOrderService.findOrdersByState(null);
+		return Res.success("orders", orders);
+	}
+	/**
+	 * 관리자가 단체 주문을 취소시킴(연락 없음. 단순 문의 등의 이유)
+	 * @param adminSeq
+	 * @param orderSeq
+	 * @return
+	 */
+	@PutMapping("/group-orders/{orderSeq}/CBS")
+	public Object cancelOrderBySystem(
+			@JwtProp("useq") Integer adminSeq,
+			@PathVariable Integer orderSeq) {
+		System.out.println("orderSeq" + orderSeq);
+		GroupOrderForm order = groupOrderService.cancelGroupOrder(orderSeq, OrderFormState.CBS);
+		return Res.success("order", order);
+	}
+	/**
+	 * 단체 주문에 이용권을 발급함.(입금을 확인함)
+	 * @return
+	 */
+	@PostMapping("/group-orders")
+	public Object commitGroupOrders(@JwtProp("useq") Integer adminSeq, @RequestBody OrderCommitDto dto) {
+		Order order = groupOrderService.commitOrder(adminSeq.longValue(), dto);
+		return Res.success("order", order);
 	}
 
 }

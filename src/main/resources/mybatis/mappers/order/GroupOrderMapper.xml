@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="GroupOrderMapper">
+  	
+  	<sql id="group_order_cols">
+  		gor.seq      as gor_seq 
+  	  , gor.org_name
+  	  , gor.sender_name
+  	  , gor.sender_contact_info
+  	  , gor.sender_email
+  	  , gor.org_email
+  	  , gor.content
+  	  , gor.group_order_uuid
+  	  , gor.creation_time
+  	  , gor.group_order_state
+  	  , gor.sender_ref
+  	</sql>
+  	<resultMap type="GroupOrderForm" id="groupOrderMap">
+  		<id column="gor_seq" property="seq"/>
+  		<result column="org_name" property="orgName"/>
+  		<result column="sender_name" property="senderName"/>
+  		<result column="sender_contact_info" property="senderContactInfo"/>
+  		<result column="sender_email" property="senderEmail"/>
+  		<result column="org_email" property="orgEmail"/>
+  		<result column="content" property="content"/>
+  		<result column="group_order_uuid" property="orderUuid"/>
+  		<result column="creation_time" property="creationTime"/>
+  		<result column="group_order_state" property="state"/>
+  		<result column="sender_ref" property="senderRef"/>
+  		<association property="sender" resultMap="UserMapper.usermap"/>
+  		<collection property="papers" resultMap="GroupPaperMapper.orderPaperMap"/>
+  	</resultMap>
+  	<!-- <select id="" parameterType="" resultMap="*">
+  	</select> -->
+  	<select id="findOrders" resultMap="groupOrderMap">
+	  	SELECT
+		  	<include refid="group_order_cols"/>
+		  	,
+		  	<include refid="UserMapper.usermap_cols"/>
+		  	,
+		  	<include refid="GroupPaperMapper.group_paper_cols"/>
+		FROM dt_order_forms gor
+		JOIN dt_users u
+  		  ON gor.sender_ref = u.user_seq
+  		LEFT
+		JOIN dt_order_papers dop 
+		  ON gor.seq = dop.form_ref ;
+  	</select>
+  	<insert id="createGroupOrderForm" parameterType="GroupOrderForm"
+  		useGeneratedKeys="true"
+  		keyColumn="seq"
+  		keyProperty="seq">
+  	INSERT INTO  dt_order_forms (
+  		org_name
+  	  , sender_name
+  	  , sender_contact_info
+  	  , sender_email
+  	  , org_email
+  	  , content
+  	  , group_order_uuid
+  	  , creation_time
+  	  , group_order_state
+  	  , sender_ref
+  	) VALUES (
+  		#{orgName}
+  	  , #{senderName}
+  	  , #{senderContactInfo}
+  	  , #{senderEmail}
+  	  , #{orgEmail}
+  	  , #{content}
+  	  , #{orderUuid}
+  	  , #{creationTime}
+  	  , #{state}
+  	  , #{senderRef}
+  	)
+  	</insert>
+  </mapper>

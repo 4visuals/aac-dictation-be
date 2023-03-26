@@ -43,6 +43,9 @@ public class Product {
 	public boolean isBeta() {
 		return "B".equals(this.type); 
 	}
+	public boolean isTrialProduct() {
+		return isBeta();
+	}
 	/**
 	 * 상품 최종 단가 반환
 	 * @return 원가에서 할인액을 뺀 최종 금액
@@ -59,6 +62,18 @@ public class Product {
 							discountKrWon) );
 		}
 		return price;
+	}
+	/**
+	 * 기간 확인. 만료된 상품이면 true 반환함
+	 * @param now
+	 * @return
+	 */
+	public boolean checkExpiration(Instant time) {
+		if (expiredAt == null) {
+			// 민료 기간이 없음.
+			return false;
+		}
+		return this.expiredAt.isAfter(time);
 	}
 	
 }
