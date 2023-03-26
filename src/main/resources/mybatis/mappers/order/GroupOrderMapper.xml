@@ -34,7 +34,7 @@
   	</resultMap>
   	<!-- <select id="" parameterType="" resultMap="*">
   	</select> -->
-  	<select id="findOrders" resultMap="groupOrderMap">
+  	<select id="findBy" parameterType="map" resultMap="groupOrderMap">
 	  	SELECT
 		  	<include refid="group_order_cols"/>
 		  	,
@@ -46,7 +46,28 @@
   		  ON gor.sender_ref = u.user_seq
   		LEFT
 		JOIN dt_order_papers dop 
-		  ON gor.seq = dop.form_ref ;
+		  ON gor.seq = dop.form_ref 
+		WHERE
+			${col} = #{value};
+  	</select>
+  	<select id="findOrders" parameterType="map" resultMap="groupOrderMap">
+	  	SELECT
+		  	<include refid="group_order_cols"/>
+		  	,
+		  	<include refid="UserMapper.usermap_cols"/>
+		  	,
+		  	<include refid="GroupPaperMapper.group_paper_cols"/>
+		FROM dt_order_forms gor
+		JOIN dt_users u
+  		  ON gor.sender_ref = u.user_seq
+  		LEFT
+		JOIN dt_order_papers dop 
+		  ON gor.seq = dop.form_ref
+		WHERE
+			1 = 1
+		<if test= "state != null">
+			AND ${col} = #{value}
+		</if>
   	</select>
   	<insert id="createGroupOrderForm" parameterType="GroupOrderForm"
   		useGeneratedKeys="true"
@@ -76,4 +97,11 @@
   	  , #{senderRef}
   	)
   	</insert>
+  	<update id="updateOrderState" parameterType="GroupOrderForm" >
+	  	UPDATE dt_order_forms 
+		SET
+			group_order_state = #{state}
+		WHERE seq = #{seq}
+  	</update>
+  	
   </mapper>
