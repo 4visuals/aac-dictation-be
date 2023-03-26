@@ -90,7 +90,7 @@ public class GoogleAuthService {
 	 * 
 	 * ref: https://developers.google.com/identity/gsi/web/guides/overview
 	 * 
-	 * 여기서 언급하는 id_token은 브라우저에서 구글 로그인 성공 후 얻어낸 응답의 "credential" 속성값입니다(포맷은 jwt token)  
+	 * 여기서 언급하는 id_token은 브라우저에서 구글 로그인 성공 후 반환받은 응답의 "credential" 속성값입니다(포맷은 jwt token)  
 	 * 
 	 * 응답의 상세 구조는 아래 문서를 참고하세요.
 	 * 

@@ -3,6 +3,7 @@ package github.visual4.aacweb.dictation.domain.section;
 import java.util.List;
 
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
+import github.visual4.aacweb.dictation.tools.Origin;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,4 +37,13 @@ public class Section {
 	List<Sentence> sentences;
 	
 	Integer chapterRef;
+
+	public Origin getOrigin() {
+		// seq: 1 ~ 60까지는 단계별 학습, 61부터는 교과서 학습
+		if (seq <= 60) {
+			return Origin.L;
+		} else {			
+			return Origin.B;
+		}
+	}
 }
