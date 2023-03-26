@@ -3,6 +3,8 @@ package github.visual4.aacweb.dictation.domain.student;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,5 +95,12 @@ public class StudentController {
 		Object value = param.get("value");
 		User student = studentService.updateStudent(teacherSeq.longValue(), studentSeq, prop, value);
 		return Res.success("student",student);
+	}
+	
+	@DeleteMapping("/{studentSeq}")
+	public Object deleteStudent(@JwtProp("useq") Integer teacherSeq, @PathVariable Integer studentSeq) {
+		
+		User student = studentService.deleteStudent(teacherSeq.longValue(), studentSeq.longValue());
+		return Res.success("student", student);
 	}
 }

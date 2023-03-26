@@ -38,29 +38,48 @@ public class StudentService {
 	}
 	public User regiserStudent(Long teacherSeq, TypeMap studentInfo) {
 		User teacher = userService.findTeacher(teacherSeq);
+		/*
 		List<License> licenses =  licenseService.findsBy(License.Column.receiver_ref, teacher.getSeq());
 		List<User> students = studentDao.findStudentsByTeacher(teacher.getSeq());
 		if (students.size() >= licenses.size()) {
 			throw new AppException(ErrorCode.LICENSE_IS_FULL, 422, 
 					String.format("%d students of %d licenses", students.size(), licenses.size()));
 		}
+		*/
+		Boolean randomProps = studentInfo.getBoolean("randomProps");
+		randomProps = randomProps == null ? Boolean.FALSE : randomProps;
 		
 		String name = studentInfo.getStr("name");
 		if (name == null || name.trim().length() == 0 ) {
 			throw new AppException(ErrorCode.INVALID_VALUE, 400);
 		}
+		LocalDate birth = studentInfo.getLocalDate("birth");
+		/*
+		 * userId, password는 학생이 등록되는 수강증에 따라서 없을 수도 있음.
+		 * 
+		 * ref: https://github.com/4visuals/aac-writing/issues/105
+		 * ([개별 구매 수강증] 아이디 비번 입력 막음)
+		 * 
+		 */
 		String userId = studentInfo.getStr("userId");
-		if (userId == null || userId.trim().length() == 0 ) {
+		if (!randomProps && (userId == null || userId.trim().length() == 0) ) {
 			throw new AppException(ErrorCode.INVALID_VALUE, 400);
+		}
+		if (userId == null) {
+			userId = teacherSeq + "-" + Instant.now().toEpochMilli();
 		}
 		if (userService.exist(User.Column.user_id, userId)) {
 			throw new AppException(ErrorCode.DUP_RESOURCE, 400, "userId: " + userId);
 		}
+		
 		String password = studentInfo.getStr("pass");
-		if (password == null || password.trim().length() == 0) {
+		if (!randomProps && (password == null || password.trim().length() == 0)) {
 			throw new AppException(ErrorCode.INVALID_VALUE, 400); 
 		}
-		LocalDate birth = studentInfo.getLocalDate("birth");
+		if (password == null) {
+			password = UUID.randomUUID().toString();
+		}
+		
 		User student = new User();
 		student.setName(name);
 		student.setUserId(userId);
@@ -184,13 +203,24 @@ public class StudentService {
 		
 	}
 	/**
-	 * 학생 삭제
+	 * 학생들 삭제
 	 * @param students
 	 */
 	public void deleteStudents(List<User> students, User teacher) {
 		for (User student : students) {
 			studentDao.deleteStudent(student.getSeq(), teacher.getSeq());
-		}
-		
+		}	
+	}
+	/**
+	 * 주어진 학생 삭제
+	 * @param teacherSeq
+	 * @param studentSeq
+	 * @return
+	 */
+	public User deleteStudent(Long teacherSeq, Long studentSeq) {
+		User teacher = userService.findTeacher(teacherSeq);
+		User student = studentDao.findBy(User.Column.user_seq, studentSeq);
+		deleteStudents(Arrays.asList(student), teacher);
+		return student;
 	}
 }
