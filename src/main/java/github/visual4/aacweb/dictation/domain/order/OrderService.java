@@ -1,8 +1,6 @@
 package github.visual4.aacweb.dictation.domain.order;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -71,6 +69,8 @@ public class OrderService {
 		order.setPaymentDueTime(paymentDueTime);
 		order.setPaidTime(null); // 관리자가 결제 승인할때 설정됨
 		
+		order.setTrialOrder(Boolean.TRUE);
+		
 		order.setCustomerRef(teacher.getSeq());
 		order.setConfirmerRef(null); // 관리자가 결제 승인할때 설정됨
 		order.setOrderUuid("odr-" + UUID.randomUUID().toString());
@@ -98,7 +98,11 @@ public class OrderService {
 	 * @param qttLicenses - 수강증 갯수
 	 * @return
 	 */
-	public Order createOrder(Long teacherSeq, String productCode, Integer qttProduct, Integer qttLicenses) {
+	public Order createOrder(
+			Long teacherSeq,
+			String productCode,
+			Integer qttProduct,
+			Consumer<Order> hook) {
 		User teacher = userService.findTeacher(teacherSeq);
 		
 		Product product = productService.findBy(Product.Column.prod_code, productCode);
@@ -120,13 +124,18 @@ public class OrderService {
 		order.setPaymentDueTime(paymentDueTime);
 		order.setPaidTime(null); // 관리자가 결제 승인할때 설정됨
 		
+		order.setTrialOrder(Boolean.FALSE);
+		
 		order.setCustomerRef(teacher.getSeq());
 		order.setConfirmerRef(null); // 관리자가 결제 승인할때 설정됨
 		order.setOrderUuid("odr-" + UUID.randomUUID().toString());
 		
 		order.setOrderState(OrderState.RDY);
-		order.setPaygateVendor("im_port");
+		order.setPaygateVendor(PG.im_port);
 //		System.out.println(order.getTotalAmount());
+		if(hook != null) {
+			hook.accept(order);
+		}
 		orderDao.insertOrder(order);
 		
 		/* licenses
@@ -144,14 +153,18 @@ public class OrderService {
 		Product trialProduct = productService.findBy(
 				Product.Column.prod_seq,
 				TRIAL_PRODUCT_SEQ);
-		Order order = createOrder(user.getSeq(), trialProduct.getCode(), 1, 1);
+		Order order = createOrder(
+				user.getSeq(), 
+				trialProduct.getCode(), 1,
+				(odr) -> odr.setTrialOrder(Boolean.TRUE));
 		return activateOrder(order.getOrderUuid(), 1L, 1, null);
 	}
+	
 	/**
 	 * 주문을 승인함. 수강증 생성
-	 * @param orderCode
-	 * @param confirmerSeq
-	 * @param qttLicenses
+	 * @param orderCode - order UUID
+	 * @param confirmerSeq - 주문 확인 후 승인한 관리자
+	 * @param qttLicenses - 라이선스 갯수
 	 * @param fn
 	 * @return
 	 */
@@ -160,7 +173,7 @@ public class OrderService {
 			Long confirmerSeq,
 			final Integer qttLicenses,
 			Consumer<Order> fn) {
-		Order order = orderDao.findBy(Order.Column.order_uuid, orderCode);
+		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderCode);
 		order.markAsActivated(Instant.now(), confirmerSeq);
 		order.setOrderState(OrderState.ATV);
 		if (fn != null) {
@@ -180,11 +193,16 @@ public class OrderService {
 			lcs.setCreatedAt(cur);
 			// 등록된 학생 상관없이 구매 후 바로 활성화시킴
 			lcs.markAsActive(cur, product.getDurationInHours());
+			lcs.setTrialVersion(product.isTrialProduct());
 		});
 		order.setItems(items);
 		
 		return order;
 	}
+	/**
+	 * 주문 내역(상품 정보 포함)
+	 * @return
+	 */
 	public List<Order> findOrdersWithProduct() {
 		List<Order> orders = orderDao.findOrders();
 		return orders;
@@ -195,7 +213,7 @@ public class OrderService {
 	 * @return
 	 */
 	public Order findOrder(String orderUuid) {
-		return orderDao.findBy(Order.Column.order_uuid, orderUuid);
+		return orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
 	}
 	/**
 	 * 주문 상세 정보
@@ -206,7 +224,7 @@ public class OrderService {
 	public Order findOrderDetail(String orderUuid, TypeMap option) {
 		Boolean loadProduct = option.getBoolean("product");
 		Boolean loadLicense = option.getBoolean("license");
-		Order order = orderDao.findBy(Order.Column.order_uuid, orderUuid);
+		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
 		if (loadProduct) {
 			Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
 			order.bindProduct(product);
@@ -223,13 +241,21 @@ public class OrderService {
 	 * @return
 	 */
 	public Order cancelOrder(String orderUuid) {
-		Order order = orderDao.findBy(Order.Column.order_uuid, orderUuid);
+		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
 		if (!order.isPending()) {
 			throw new AppException(ErrorCode.ORDER_ALREADY_ACTIVATED, 400);
 		}
 		order.cancelByUser();
 		orderDao.updateState(order);
 		return order;
+	}
+	/**
+	 * 주어진 사용자의 모든 주문 내역 조회
+	 * @param teacherSeq - 주문자
+	 * @return
+	 */
+	public List<Order> findPurchasedOrders(Long teacherSeq) {
+		return orderDao.findPurchasedOrders(teacherSeq);
 	}
 
 }

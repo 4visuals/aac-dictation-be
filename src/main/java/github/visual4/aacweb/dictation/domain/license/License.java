@@ -76,6 +76,10 @@ public class License {
 	 */
 	Long issuerRef;
 	/**
+	 * 평가판 라이선스인지 나타냄
+	 */
+	Boolean trialVersion;
+	/**
 	 * 사용 가능한 라이선스인지 확인
 	 * @param now
 	 * @return

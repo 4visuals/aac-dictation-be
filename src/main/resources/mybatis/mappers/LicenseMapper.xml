@@ -15,6 +15,7 @@
   		,expired_at
   		,receiver_ref
   		,issuer_ref
+  		,IFNULL(odr.trial_order, 'Y') as trial_version
   	</sql>
   	<resultMap type="License" id="lcsmap">
   		<id column="lcs_seq" property="seq"/>
@@ -27,12 +28,16 @@
   		<result column="expired_at" property="expiredAt"/>
   		<result column="receiver_ref" property="receiverRef"/>
   		<result column="issuer_ref" property="issuerRef"/>
+  		<result column="trial_version" property="trialVersion"/>
   	</resultMap>
   	
   	<select id="findBy" parameterType="map" resultMap="lcsmap">
   		SELECT
   			<include refid="lcsmap_cols"/>
   		FROM dt_licenses lcs
+  		LEFT
+  		JOIN dt_orders odr
+  		  ON lcs.order_ref = odr.odr_seq
   		WHERE
   			${colname} = #{value}
   	</select>

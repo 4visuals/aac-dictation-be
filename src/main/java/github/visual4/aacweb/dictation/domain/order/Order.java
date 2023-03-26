@@ -34,13 +34,15 @@ public class Order {
 		CNE
 	}
 	public enum Column {
-		order_uuid
+		order_uuid, customer_ref
 	}
 	/**
 	 * PK
 	 */
 	Integer seq;
-	
+	/**
+	 * 상품 참조
+	 */
 	Integer productRef;
 	Product product;
 	
@@ -56,6 +58,8 @@ public class Order {
 	 * 결제 확인 시간 - 결제된 시간
 	 */
 	Instant paidTime;
+	
+	Boolean trialOrder;
 	
 	Integer totalAmount;
 	
@@ -80,7 +84,7 @@ public class Order {
 	/**
 	 * 결제 대행 업체 정보
 	 */
-	String paygateVendor;
+	PG paygateVendor;
 	/**
 	 * 결제 후 생성된 상세 로그
 	 */

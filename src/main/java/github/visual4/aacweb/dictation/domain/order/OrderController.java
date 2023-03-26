@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation.domain.order;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,11 +45,11 @@ public class OrderController {
 			@RequestBody TypeMap form) {
 		String code = form.getStr("productCode");
 		final Integer numOfProduct = 1;
-		final Integer numOfLicenses = 1;
+//		final Integer numOfLicenses = 1;
 		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
 				code,
 				numOfProduct,
-				numOfLicenses);
+				null);
 		return Res.success("order", order);
 	}
 	/**
@@ -74,4 +76,9 @@ public class OrderController {
 		return Res.success("order", order);
 	}
 	
+	@GetMapping("/orders")
+	public Object listOfOrders(@JwtProp("useq") Integer teacherSeq) {
+		List<Order> orders = orderSerivce.findPurchasedOrders(teacherSeq.longValue());
+		return Res.success("orders", orders);
+	}
 }

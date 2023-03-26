@@ -10,6 +10,7 @@
   		, odr.order_time
   		, odr.payment_due_time
   		, odr.paid_time
+  		, odr.trial_order
   		, odr.total_amount
   		, odr.customer_ref
   		, odr.confirmer_ref
@@ -27,6 +28,7 @@
   		<result column="order_time" property="orderTime"/>
   		<result column="payment_due_time" property="paymentDueTime"/>
   		<result column="paid_time" property="paidTime"/>
+  		<result column="trial_order" property="trialOrder"/>
   		<result column="total_amount" property="totalAmount"/>
   		<result column="customer_ref" property="customerRef"/>
   		<result column="confirmer_ref" property="confirmerRef"/>
@@ -49,6 +51,21 @@
 	  		<include refid="order_cols" />
 	  	FROM dt_orders odr
 	  	WHERE odr.${colname} = #{value}
+	  	<if test="state != NULL">
+	  		AND odr.order_state = ${state}
+	  	</if>
+  	</select>
+  	<!-- 결제 구매 내역(무료 평가판 구매는 제외) -->
+  	<select id="findPurchasedOrders" parameterType="map" resultMap="ordermap">
+  		SELECT
+	  		<include refid="order_cols" />,
+	  		<include refid="ProductMapper.prodmap_cols"/>
+	  	FROM dt_orders odr
+	  	JOIN dt_products prod
+	  	  ON odr.product_ref = prod.prod_seq
+	  	WHERE odr.customer_ref = #{userSeq}
+	  		AND odr.order_state = 'ATV'
+	  		AND odr.trial_order = 'N'
   	</select>
   	
   	<select id="findOrders" resultMap="orderWithItemCount">
@@ -89,6 +106,7 @@
   		, order_time
   		, payment_due_time
   		, paid_time
+  		, trial_order
   		, total_amount
   		, customer_ref
   		, confirmer_ref
@@ -100,6 +118,7 @@
   		, #{orderTime}
   		, #{paymentDueTime}
   		, null
+  		, #{trialOrder}
   		, #{totalAmount}
   		, #{customerRef}
   		, null
