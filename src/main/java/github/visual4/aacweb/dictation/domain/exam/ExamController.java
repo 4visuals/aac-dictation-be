@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaper;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.domain.user.UserRole;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
@@ -22,10 +24,11 @@ import github.visual4.aacweb.dictation.web.aop.JwtProp;
 public class ExamController {
 
 	final ExamService examService;
+	final RecentPaperService recentPaperService;
 	
-	public ExamController(ExamService examService) {
-		super();
+	public ExamController(ExamService examService, RecentPaperService recentPaperService) {
 		this.examService = examService;
+		this.recentPaperService = recentPaperService;
 	}
 	/**
 	 * 주어진 section의 제출 답안 조회. section별 정답, 오답 입력까지 모두 반환함
@@ -55,6 +58,31 @@ public class ExamController {
 		} else {
 			papers = examService.findLearningPapersBySection(sectionSeq, license);
 		}
+		return Res.success("papers", papers);
+	}
+	/**
+	 * 주어진 섹션의 틀린 문제들
+	 * @return
+	 */
+	@GetMapping("/wrong/student/{studentSeq}/section/{sectionSeq}")
+	public Object findWrongAnswersBySection(
+			@JwtProp("useq") Integer teacherSeq,
+			@PathVariable Integer studentSeq,
+			@PathVariable Integer sectionSeq
+			) {
+		List<RecentPaper> papers = recentPaperService.findWrongAnswers(
+				studentSeq.longValue(),
+				sectionSeq);
+		return Res.success("papers", papers);
+	}
+	@GetMapping("/records/student/{studentSeq}")
+	public Object findSectionRecordsByStudent(
+			@JwtProp("useq") Integer teacherSeq,
+			@PathVariable Integer studentSeq) {
+		List<RecentPaper> papers = recentPaperService.findWrongAnswersByStudent(
+				teacherSeq.longValue(),
+				studentSeq.longValue()
+				);
 		return Res.success("papers", papers);
 	}
 	/**
@@ -111,6 +139,14 @@ public class ExamController {
 		exams.put("segments", segment.get("quiz"));
 		return Res.success(exams);
 	}
+	/**
+	 * 통계용.
+	 * section의 segment마다 가장 최근의 받아쓰기(mode: 'QUIZ')만 조회함
+	 * @param userId
+	 * @param role
+	 * @param params
+	 * @return
+	 */
 	@GetMapping("/exams/segments")
 	public Object queryBySectionChunk(
 			@JwtProp("aac_id") String userId,

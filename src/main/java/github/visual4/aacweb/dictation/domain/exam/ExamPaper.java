@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
+import github.visual4.aacweb.dictation.tools.Origin;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class ExamPaper {
 	String license;
 	
 	Integer sectionRef;
+	Origin origin;
 	
 	Long studentRef; // Fk to User.seq
 	Integer ageInMonth;
@@ -41,6 +43,10 @@ public class ExamPaper {
 	 * 문항 수
 	 */
 	Integer numOfQuestions;
+	/**
+	 * 오답연습 및 재시도 시험인지 나타냄. true인 경우 현재 section에 대한 오답의 갯수만 업데이트 해야함. 
+	 */
+	boolean retry;
 	
 	List<ExamAnswer> submissions;
 	
@@ -53,6 +59,9 @@ public class ExamPaper {
 		sb.append(seq);
 		sb.append(", sectionRef: ");
 		sb.append(sectionRef);
+		sb.append(", (");
+		sb.append(origin);
+		sb.append(")");
 		sb.append(", offset: ");
 		sb.append(questionOffset);
 		sb.append(", start: ");

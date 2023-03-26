@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.exam.ExamService;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaper;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
 import github.visual4.aacweb.dictation.domain.license.License;
+import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
 import github.visual4.aacweb.dictation.domain.student.StudentService;
@@ -37,6 +40,12 @@ public class UserControlller {
 	@Autowired
 	OrderService orderService;
 	
+	@Autowired
+	RecentPaperService recentPaperService;
+	
+	@Autowired
+	LicenseService licenseService;
+	
 	/**
 	 * oauth 로그인 후 얻어낸 token으로 사용자 프로필 확인 후 토큰 발행
 	 * @param params
@@ -54,7 +63,7 @@ public class UserControlller {
 		} else if ("access_token".equals(type)) {
 			res = userService.getMembership(vendor, token);
 		}
-		
+		checkTrialLicense(res);
 		String jwtToken = tokenService.generateJwt(
 				res.<Membership>get("membership").getProfile(),
 				UserRole.TEACHER);
@@ -67,12 +76,30 @@ public class UserControlller {
 	 * @return
 	 */
 	@PostMapping("/login")
-	public Object login(@JwtProp TypeMap payload) {
+	public Object login(@JwtProp TypeMap payload, @RequestBody TypeMap params) {
 		UserRole role = payload.get("role");
 		TypeMap res = null;
 		if (role == UserRole.TEACHER) {
 			res = userService.login(payload);
+			System.out.println("[auto login] " + params);
+			checkTrialLicense(res);
+			String licenseUuid = params.getStr("license");
+			if (licenseUuid != null) {
+				/*
+				 * 페이지 새로 고침 후 자동 로그인 시
+				 * 학생의 최근 시험 기록을 같이 첨부합니다.
+				  */
+				Long teacherSeq = payload.asLong("useq");
+				License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid);
+				
+				User student = userService.findStudent(license.getStudentRef(), (std) -> true);
+				List<RecentPaper> records = recentPaperService.findWrongAnswersByStudent(teacherSeq, student.getSeq());
+				res.put("records", records);
+			}
 		} else if (role == UserRole.STUDENT) {
+			/*
+			 * FIXME 학생이 로그인했을때 record 첨부 기능 필요함.
+			 */
 			String studentId = payload.getStr("aac_id");
 			res = studentService.login(studentId, null, true);
 			/*
@@ -99,15 +126,7 @@ public class UserControlller {
 		UserRole role = UserRole.TEACHER;
 		payload.put("role", role);
 		TypeMap res = userService.loginManually(payload);
-		
-		List<License> licenses = res.get("licenses");
-		Membership membership = res.get("membership");
-		if (licenses.isEmpty() ) {
-			User user = membership.getUser();
-			Order order = orderService.createTrialOrder(user);
-			// 평가판에는 라이선스 1장만 발급함
-			licenses.add(order.getItems().get(0));
-		}
+		checkTrialLicense(res);
 		String jwtToken = tokenService.generateJwt(
 				res.<Membership>get("membership").getProfile(), role);
 		res.put("jwt", jwtToken);
@@ -142,5 +161,22 @@ public class UserControlller {
 		Object value = param.get("value");
 		Object val = userService.isValidateProperty(column, value);
 		return Res.success("value", val);
+	}
+	/**
+	 * 발급된 라이선스가 하나도 없으면 무료 평가판 라이선스를 하나 발급함.
+	 * @param res
+	 */
+	private void checkTrialLicense(TypeMap res) {
+		Membership membership = res.get("membership");
+		User user = membership.getUser();
+		if (user == null) {
+			return;
+		}
+		List<License> licenses = res.get("licenses");
+		if (licenses.isEmpty() ) {
+			Order order = orderService.createTrialOrder(user);
+			// 평가판에는 라이선스 1장만 발급함
+			licenses.add(order.getItems().get(0));
+		}
 	}
 }

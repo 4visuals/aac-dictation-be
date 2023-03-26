@@ -1,8 +1,16 @@
 package github.visual4.aacweb.dictation.domain.exam;
 
 public enum ExamMode {
-
-	R,  // 보고쓰기
-	L, // 학습 
-	Q, // 퀴즈
+	/**
+	 * 보고쓰기
+	 */
+	R,
+	/**
+	 * 연습하기
+	 */
+	L,
+	/**
+	 * 받아쓰기
+	 */
+	Q,
 }

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="RecentPaperMapper">
+  	
+  	<sql id="recent_paper_base_map_cols">
+  		 rct.rct_seq
+  		 ,rct.rct_student_ref
+  		 ,rct.rct_section_ref
+  		 ,rct.rct_question_offset
+  		 ,rct.rct_type
+  		 ,rct.rct_paper_ref
+  		 ,rct.rct_incorrects
+  		 ,rct.rct_total
+  		 ,rct.rct_trials
+  	</sql>
+  	<resultMap type="RecentPaper" id="recent_paper_base_map">
+  		<id column="rct_seq" property="seq"/>
+  		<result column="rct_student_ref" property="studentRef"/>
+  		<result column="rct_section_ref" property="sectionRef"/>
+  		<result column="rct_question_offset" property="questionOffset"/>
+  		<result column="rct_type" property="type"/>
+  		<result column="rct_paper_ref" property="paperRef"/>
+  		<result column="rct_incorrects" property="numOfWrongAnswer"/>
+  		<result column="rct_total" property="numOfQuestions"/>
+  		<result column="rct_trials" property="trials"/>
+  	</resultMap>
+  	
+  	<resultMap type="RecentPaper" id="senence_paper_map" extends="recent_paper_base_map">
+  		<association property="paper" resultMap="ExamPaperMapper.exam_map"/>
+  	</resultMap>
+  	
+  	<select id="findRecentPapers" parameterType="map" resultMap="senence_paper_map">
+  		SELECT
+			<include refid="recent_paper_base_map_cols"/>
+			,
+			<include refid="ExamPaperMapper.exam_full_cols"></include>
+	  		,
+	  		<include refid="ExamAnswerMapper.ans_full_cols"></include>
+	    FROM
+	    	dt_recent_papers rct
+	    JOIN dt_exam_papers dep 
+		  ON rct.rct_paper_ref = dep.exam_seq 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref
+		WHERE 
+			rct.rct_student_ref = #{student}
+		<if test="section != null">
+			AND
+			rct.rct_section_ref =  #{section};
+		</if>
+  	</select>
+  	
+  	<select id="findExistingPaper"
+  		parameterType="RecentPaper"
+  		resultMap="recent_paper_base_map">
+	  	SELECT
+			<include refid="recent_paper_base_map_cols"/>
+	    FROM
+	    	dt_recent_papers rct
+	    WHERE 
+			rct.rct_student_ref = #{studentRef}
+			AND
+			rct.rct_section_ref = #{sectionRef}
+			AND
+			rct.rct_question_offset = #{questionOffset}
+			AND
+			rct.rct_type  = #{type}
+  	</select>
+  	
+  	<insert id="insertAsSentenceExam" parameterType="RecentPaper"
+  		useGeneratedKeys="true"
+  		keyColumn="rct_seq"
+  		keyProperty="seq">
+  		INSERT into dt_recent_papers (
+			rct_student_ref
+			,rct_section_ref
+			,rct_question_offset
+			,rct_type
+			,rct_paper_ref
+			,rct_incorrects
+			,rct_total
+			,rct_trials
+		) VALUES(
+			#{studentRef}
+			,#{sectionRef}
+			,#{questionOffset}
+			,#{type}
+			,#{paperRef}
+			,#{numOfWrongAnswer}
+			,#{numOfQuestions}
+			,#{trials}
+		)
+  	</insert>
+  	<!-- 
+  		// 새로운 시험으로 이력 갱신
+  	 -->
+  	<update id="updateForReplacement" parameterType="RecentPaper">
+	  	UPDATE
+	  		dt_recent_papers 
+		SET
+			rct_paper_ref  = #{paperRef},
+			rct_incorrects = #{numOfWrongAnswer},
+			rct_total      = #{numOfQuestions},
+			rct_trials     = #{trials}
+		WHERE rct_seq = #{seq}
+  	</update>
+  	
+  </mapper>

@@ -6,7 +6,8 @@
   	
   	<sql id="exam_full_cols">
   		   dep.exam_seq
-  			,dep.section_ref
+  			, dep.section_ref
+  			, dep.origin
  			, dep.student_ref
  			, dep.student_age_month
  			, dep.`type`
@@ -19,6 +20,7 @@
   	<resultMap type="ExamPaper" id="exam_map">
   		<id column="exam_seq" property="seq"/>
   		<result column="section_ref" property="sectionRef"/>
+  		<result column="origin" property="origin"/>
   		<result column="student_ref" property="studentRef"/>
   		<result column="student_age_month" property="ageInMonth"/>
   		<result column="type" property="type"/>
@@ -90,6 +92,7 @@
   		keyProperty="seq">
   		INSERT INTO dt_exam_papers (
  			  section_ref
+ 			, origin
  			, student_ref
  			, student_age_month
  			, `type`
@@ -100,6 +103,7 @@
  			, end_time
 		) VALUES (
 			  #{sectionRef}
+			, #{origin}
 			, #{studentRef}
 			, #{ageInMonth}
 			, #{type}

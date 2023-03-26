@@ -89,7 +89,7 @@ public class UserService {
 	/**
 	 * id_token을 통한 로그인
 	 * @param vendor
-	 * @param accessToken
+	 * @param idToken
 	 * @return
 	 */
 	public TypeMap getMembershipFromIdToken(String vendor, String idToken) {
@@ -135,7 +135,10 @@ public class UserService {
 		user.setStudents(studentDao.findStudentsByTeacher(user.getSeq()));
 		profile.put("useq", user.getSeq());
 		profile.put("aac_id", user.getEmail());
-		
+		/*
+		 * 만료 여부와 관계없이 발급됐던 모든 라이선스를 전부 가져옴
+		 * - 로그인했을때 라이선스가 하나도 없으면 무료 라이선스를 하나 발급함.
+		 */
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
 		Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
 		return TypeMap.with("membership", membership,  "licenses", licenses);
@@ -155,6 +158,7 @@ public class UserService {
 		User user = new User();
 		user.setCreationTime(currentTime);
 		user.setName(profile.getStr("name"));
+		user.setUserId(email);
 		user.setEmail(email);
 		user.setVendor(Vendor.GOOGLE);
 		user.setPass(UUID.randomUUID().toString());

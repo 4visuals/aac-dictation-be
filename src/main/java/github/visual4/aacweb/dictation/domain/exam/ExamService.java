@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.section.Section;
@@ -27,6 +28,7 @@ public class ExamService {
 	final ExamAnswerDao examAnswerDao;
 	final EojeolAnswerDao eojeolAnswerDao;
 	final SectionService sectionService;
+	final RecentPaperService recentPaperService;
 
 	public ExamService(
 			LicenseService licenseService,
@@ -35,7 +37,8 @@ public class ExamService {
 			LearningPaperDao learningPaperDao,
 			ExamAnswerDao examAnswerDao,
 			EojeolAnswerDao eojeolAnswerDao,
-			SectionService sectionService) {
+			SectionService sectionService,
+			RecentPaperService recentPaperService) {
 		super();
 		this.licenseService = licenseService;
 		this.userService = userService;
@@ -44,6 +47,7 @@ public class ExamService {
 		this.examAnswerDao = examAnswerDao;
 		this.eojeolAnswerDao = eojeolAnswerDao;
 		this.sectionService = sectionService;
+		this.recentPaperService = recentPaperService;
 	}
 
 	/**
@@ -53,6 +57,7 @@ public class ExamService {
 	 * @param examPaper
 	 */
 	public void insertExamPaper(ExamPaper examPaper) {
+		// 재시도가 아닌 경우만 시험 이력을 기록함
 		String licenseUuid = examPaper.getLicense();
 		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
 		User student = licenseToStudent(license);
@@ -66,6 +71,7 @@ public class ExamService {
 		}
 		examPaper.setStudentRef(student.getSeq());
 		examPaper.setAgeInMonth(student.getAgeInMonth(Instant.now()));
+		examPaper.setOrigin(section.getOrigin());
 	
 		examPaperDao.insertExamPaper(examPaper);
 		
@@ -73,6 +79,11 @@ public class ExamService {
 			answer.setExamRef(examPaper.getSeq());
 			examAnswerDao.insertExamAnswer(answer);
 		});
+		if (examPaper.getMode() == ExamMode.Q || examPaper.isRetry()) {
+			// 받아쓰기일때만 최신 이력을 입력함
+			// section마다 틀린 문제를 추적함
+			 recentPaperService.insertRecentPaper(examPaper);			
+		}
 	}
 	/**
 	 * 낱말학습, 문장학습 제출 답안. 각 문장의 어절에 대해 답안이 작성됨
