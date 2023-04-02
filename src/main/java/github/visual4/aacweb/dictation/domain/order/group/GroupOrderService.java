@@ -32,6 +32,7 @@ import github.visual4.aacweb.dictation.service.mailing.MailingService;
 @Service
 @Transactional
 public class GroupOrderService {
+	
 	final String host;
 	final String receiverMail;
 	
@@ -69,6 +70,16 @@ public class GroupOrderService {
 		this.licenseService = licenseService;
 		this.productService = productService;
 		this.om = om;
+	}
+	public GroupOrderForm findOrderByState(GroupOrderForm.Column column, Object value, GroupOrderForm.OrderFormState state) {
+		GroupOrderForm order = this.findBy(column, value);
+		if (!order.isStateOf(state)) {
+			throw new AppException(ErrorCode.GROUP_ORDER_ERROR, 400, "unexpected group order state: " + state);
+		}
+		return order;
+	}
+	public GroupOrderForm findBy(GroupOrderForm.Column column, Object value) {
+		return this.groupOrderDao.findBy(column, value);
 	}
 	/**
 	 * 단체 구매 문의 등록
@@ -110,7 +121,7 @@ public class GroupOrderService {
 		 */
 		MailDto mailToAdmin = new MailDto(
 				"[신규 문의] 단체 구매 " + orderForm.getSenderEmail(), 
-				"group-order-admin", 
+				"mailing/group-order-admin", 
 				orderForm, 
 				orderForm.getSenderEmail(), 
 				receiverMail, null, null);

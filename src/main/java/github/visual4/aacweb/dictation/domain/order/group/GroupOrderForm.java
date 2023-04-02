@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 public class GroupOrderForm {
 	public enum Column {
-		seq, group_order_state
+		seq, group_order_state, group_order_uuid
 	}
 	public enum OrderFormState {
 		/**
@@ -120,9 +120,20 @@ public class GroupOrderForm {
 	 * 결제 완료 상태로 변경
 	 */
 	public void commit() {
-		if (this.state != OrderFormState.PND) {
+		if (!this.isPendingState()) {
 			throw new AppException(ErrorCode.GROUP_ORDER_ERROR, 422, "not pending state");
 		}
 		this.state = OrderFormState.CMT;
+	}
+	/**
+	 * 대기 상태인지 조회함. 
+	 * @return
+	 */
+	public boolean isPendingState() {
+		return this.state == OrderFormState.PND;
+	}
+
+	public boolean isStateOf(OrderFormState state) {
+		return this.state == state;
 	}
 }

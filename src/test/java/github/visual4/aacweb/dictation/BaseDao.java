@@ -11,7 +11,7 @@ import github.visual4.aacweb.dictation.config.AacDaoConfig;
 @MybatisTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-@Import(AacDaoConfig.class)
+@Import({AacDaoConfig.class, AacTestConfiguration.class})
 public class BaseDao {
 
 }

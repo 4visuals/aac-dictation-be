@@ -39,8 +39,8 @@ public class NcpMailingService {
     
     final ObjectMapper mapper;
     
-    public NcpMailingService() {
-		this.mapper = new ObjectMapper();
+    public NcpMailingService(ObjectMapper om) {
+		this.mapper = om;
 	}
     
     public void sendMail(Mail mail) {

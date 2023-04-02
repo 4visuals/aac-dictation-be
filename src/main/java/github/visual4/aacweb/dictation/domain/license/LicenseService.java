@@ -1,7 +1,6 @@
 package github.visual4.aacweb.dictation.domain.license;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

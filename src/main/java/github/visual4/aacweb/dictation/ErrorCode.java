@@ -92,7 +92,10 @@ public enum ErrorCode {
     
     MAILING_ERROR("fail to send mail: %s"),
     
-    GROUP_ORDER_ERROR("group order error: %s");
+    GROUP_ORDER_ERROR("group order error: %s"),
+    SMS_ERROR("sms error: %s"),
+    SMS_PHONENUMBER_ERROR("invalid phone number: [%s]"),
+    SMS_INVALID_TEMPLATE("no such template: [%s]");
     ;
     
 
