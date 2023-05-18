@@ -66,6 +66,10 @@ public class GroupOrderForm {
 	 */
 	String orgEmail;
 	/**
+	 * 기관 연락처(주로 전화번호)
+	 */
+	String orgContactInfo;
+	/**
 	 * 문의 내용
 	 */
 	String content;

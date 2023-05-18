@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
+import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.service.sms.SmsService;
 
 /**
@@ -30,6 +32,17 @@ public class AdminMessagingController {
 	@PostMapping("/sms/group-order/{uuid}/{templateName}")
 	public Object sendSmsPapper(@PathVariable String uuid, @PathVariable String templateName) {
 		Object smsResponse = smsService.notifyForOrderDocument(uuid, templateName);
+		return Res.success("sms", smsResponse);
+	}
+	/**
+	 * 직접 문자메세지 전송
+	 * @param uuid
+	 * @return
+	 */
+	@PostMapping("/sms/group-order/{uuid}/manual")
+	public Object sendSmsPapper(@PathVariable String uuid, @RequestBody TypeMap args) {
+		String body = args.getStr("body");
+		Object smsResponse = smsService.notifyWithManualText(uuid, body);
 		return Res.success("sms", smsResponse);
 	}
 	

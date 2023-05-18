@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,10 +65,15 @@ public class LicenseService {
 		if (licenses.size() == 0) {
 			return null;
 		}
-		if (licenses.size() > 1) {
-			throw new AppException(ErrorCode.SERVER_ERROR, 500, "expected 1 result, but %d, results", licenses.size());
+		Instant now = Instant.now();
+		List<License> alives = licenses.stream().filter((lcs) -> lcs.isAlive(now)).collect(Collectors.toList());
+		if (alives.size() > 1) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, String.format("expected 1 result, but %d, results", alives.size()));
 		}
-		License license = licenses.get(0);
+		if (alives.size() == 0) {
+			return null;
+		}
+		License license = alives.get(0);
 		if (checkValidity && !license.isAlive(Instant.now())) {
 			// 만료됨
 			throw new AppException(ErrorCode.LICENSE_EXPIRED, 410, value);

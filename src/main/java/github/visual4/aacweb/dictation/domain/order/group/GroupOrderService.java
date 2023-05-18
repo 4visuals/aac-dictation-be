@@ -139,6 +139,10 @@ public class GroupOrderService {
 		mailingService.sendMail(mailtoClient);
 		return orderForm;
 	}
+	/**
+	 * XSS 방어
+	 * @param form
+	 */
 	private void escapeForm(GroupOrderForm form) {
 		form.setContent(StringEscapeUtils.escapeHtml4(form.getContent()));
 		form.setOrgEmail(StringEscapeUtils.escapeHtml4(form.getOrgEmail()));

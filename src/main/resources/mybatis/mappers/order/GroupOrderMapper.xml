@@ -11,6 +11,7 @@
   	  , gor.sender_contact_info
   	  , gor.sender_email
   	  , gor.org_email
+  	  , gor.org_contact_info
   	  , gor.content
   	  , gor.group_order_uuid
   	  , gor.creation_time
@@ -24,6 +25,7 @@
   		<result column="sender_contact_info" property="senderContactInfo"/>
   		<result column="sender_email" property="senderEmail"/>
   		<result column="org_email" property="orgEmail"/>
+  		<result column="org_contact_info" property="orgContactInfo"/>
   		<result column="content" property="content"/>
   		<result column="group_order_uuid" property="orderUuid"/>
   		<result column="creation_time" property="creationTime"/>
@@ -79,6 +81,7 @@
   	  , sender_contact_info
   	  , sender_email
   	  , org_email
+  	  , org_contact_info
   	  , content
   	  , group_order_uuid
   	  , creation_time
@@ -90,6 +93,7 @@
   	  , #{senderContactInfo}
   	  , #{senderEmail}
   	  , #{orgEmail}
+  	  , #{orgContactInfo}
   	  , #{content}
   	  , #{orderUuid}
   	  , #{creationTime}
