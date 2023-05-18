@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.user;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,7 @@ public class UserControlller {
 	public Object login(@JwtProp TypeMap payload, @RequestBody TypeMap params) {
 		UserRole role = payload.get("role");
 		TypeMap res = null;
+		License license = null;
 		if (role == UserRole.TEACHER) {
 			res = userService.login(payload);
 			System.out.println("[auto login] " + params);
@@ -88,13 +90,9 @@ public class UserControlller {
 				/*
 				 * 페이지 새로 고침 후 자동 로그인 시
 				 * 학생의 최근 시험 기록을 같이 첨부합니다.
-				  */
-				Long teacherSeq = payload.asLong("useq");
-				License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid);
-				
-				User student = userService.findStudent(license.getStudentRef(), (std) -> true);
-				List<RecentPaper> records = recentPaperService.findWrongAnswersByStudent(teacherSeq, student.getSeq());
-				res.put("records", records);
+				 */
+//				Long teacherSeq = payload.asLong("useq");
+				license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid);
 			}
 		} else if (role == UserRole.STUDENT) {
 			/*
@@ -107,9 +105,21 @@ public class UserControlller {
 			 * 성취도 표시에 사용됨
 			 */
 			List<License> licenses = res.get("licenses");
-			TypeMap exams = examService.queryBySectionChunk(licenses.get(0).getUuid());
+			license = licenses.get(0);
+			TypeMap exams = examService.queryBySectionChunk(license.getUuid());
 			res.put("segments", exams.get("quiz"));
 		}
+		
+		if (license == null) {
+			res.put("records", Collections.EMPTY_LIST);
+		} else {
+			User student = userService.findStudent(license.getStudentRef(), (std) -> true);
+			// teacherSeq를 사용하지 않음. 일단 null을 사용해도 됨
+			List<RecentPaper> records = recentPaperService.findWrongAnswersByStudent(null, student.getSeq());
+			res.put("records", records);					
+			
+		}
+		
 //		UserRole role = isTeacher ? UserRole.TEACHER : UserRole.STUDENT;
 		String jwtToken = tokenService.generateJwt(
 				res.<Membership>get("membership").getProfile(), role);

@@ -55,10 +55,13 @@ public class StudentService {
 		}
 		LocalDate birth = studentInfo.getLocalDate("birth");
 		/*
-		 * userId, password는 학생이 등록되는 수강증에 따라서 없을 수도 있음.
+		 * userId, password는 학생이 등록되는 수강증에 따라서 없을 수도 있음(x).
 		 * 
-		 * ref: https://github.com/4visuals/aac-writing/issues/105
+		 * 학생 비번 다시 살림
+		 * (XXXX) ref: https://github.com/4visuals/aac-writing/issues/105
 		 * ([개별 구매 수강증] 아이디 비번 입력 막음)
+		 * 
+		 * 
 		 * 
 		 */
 		String userId = studentInfo.getStr("userId");
@@ -102,6 +105,10 @@ public class StudentService {
 	 */
 	public TypeMap login(String studentId, String password, boolean autoLogin) {
 		User student = studentDao.findBy(User.Column.user_id, studentId);
+		if (student == null) {
+			System.out.println("no such student id: " + studentId);
+			throw new AppException(ErrorCode.STUDENT_LOGIN_FAILED, 404);
+		}
 		if (!autoLogin && !student.getPass().equals(password)) {
 			throw new AppException(ErrorCode.STUDENT_LOGIN_FAILED, 403);
 		}
@@ -141,7 +148,10 @@ public class StudentService {
 				"picture", null,
 				"aac_id", student.getUserId());
 		Membership membership = new Membership(student, studentProfile, Vendor.MANUAL.name());
-		return TypeMap.with("membership", membership, "licenses", Arrays.asList(license));
+		return TypeMap.with(
+				"membership", membership,
+				"licenses", Arrays.asList(license),
+				"student", student);
 	}
 	/**
 	 * 학생 정보 수정

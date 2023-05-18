@@ -165,20 +165,11 @@ public class UserService {
 		user.setRole(UserRole.TEACHER);
 		user.setStudents(Collections.emptyList());
 		// user.setBirth(LocalDate.of(1900, 1, 1));
+				
 		userDao.insertUser(user);
+		
 		profile.put("useq", user.getSeq());
 		
-		/*
-		AppConfiguration config = configService.getConfiguration();
-		Product product = productService.findBy(Product.Column.prod_seq, 1);
-		Util.notNull(product, ErrorCode.SERVER_ERROR, 500, "no such product seq(" + 1 + ")");
-		int cnt = config.getFreeCertsPerUser();
-		List<License> licenses = licenseService.createLicenses(product, cnt, null, (lcs) -> {
-			lcs.setIssuerRef(adminAccount.getSeq());
-			lcs.setReceiverRef(user.getSeq());
-			lcs.setDurationInHours(License.UNLIMITED);
-		});
-		*/
 		List<License> licenses = Collections.emptyList();
 		
 		user.setPass(null);

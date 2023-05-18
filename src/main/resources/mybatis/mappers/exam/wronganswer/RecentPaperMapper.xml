@@ -46,6 +46,8 @@
 		  ON dep.exam_seq = ans.exam_ref
 		WHERE 
 			rct.rct_student_ref = #{student}
+			AND
+			dep.num_of_questions = 10
 		<if test="section != null">
 			AND
 			rct.rct_section_ref =  #{section};

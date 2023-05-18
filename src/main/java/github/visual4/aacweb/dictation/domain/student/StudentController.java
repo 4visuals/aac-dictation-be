@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.exam.ExamService;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaper;
+import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.user.Membership;
@@ -41,6 +43,9 @@ public class StudentController {
 	
 	@Autowired
 	ExamService examService;
+	
+	@Autowired
+	RecentPaperService recentPaperService;
 	
 	@PostMapping
 	public Object registerStudent(@RequestBody TypeMap studentInfo, @JwtProp("useq") Integer teacherSeq) {
@@ -77,8 +82,16 @@ public class StudentController {
 		 * 성취도 표시에 사용됨
 		 */
 		List<License> licenses = res.get("licenses");
-		TypeMap exams = examService.queryBySectionChunk(licenses.get(0).getUuid());
+		License lcs = licenses.get(0);
+		TypeMap exams = examService.queryBySectionChunk(lcs.getUuid());
 		res.put("segments", exams.get("quiz"));
+		
+		User student = res.get("student");
+		List<RecentPaper> records = recentPaperService.findWrongAnswersByStudent(student.getTeacherRef(), student.getSeq());
+		res.put("records", records);
+		
+		res.remove("student");
+		
 		return Res.success(res);
 	}
 	
