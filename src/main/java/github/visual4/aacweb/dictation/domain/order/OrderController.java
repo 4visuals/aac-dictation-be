@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import github.visual4.aacweb.dictation.AppException;
+import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
@@ -24,13 +26,14 @@ public class OrderController {
 
 	@PostMapping("/order/beta")
 	public Object createBetaOrder(@JwtProp("useq") Integer teacherSeq, @RequestBody TypeMap form) {
-		System.out.println(form);
-		String code = form.getStr("productCode");
-		Integer qtt = form.getInt("quantity");
-		Order order = orderSerivce.createBetaOrder(teacherSeq.longValue(), code, qtt);
-		
-		orderSerivce.activateOrder(order.getOrderUuid(), 1L, 1, null);
-		return Res.success("order", order);
+//		System.out.println(form);
+//		String code = form.getStr("productCode");
+//		Integer qtt = form.getInt("quantity");
+//		Order order = orderSerivce.createBetaOrder(teacherSeq.longValue(), code, qtt);
+//		
+//		orderSerivce.activateOrder(order.getOrderUuid(), 1L, 1, null);
+//		return Res.success("order", order);
+		throw new AppException(ErrorCode.ORDER_BETA_CLOSED, 400);
 		
 	}
 	/**

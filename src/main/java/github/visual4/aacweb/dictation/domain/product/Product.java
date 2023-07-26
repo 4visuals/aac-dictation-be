@@ -23,7 +23,13 @@ public class Product {
 	}
 	
 	Integer seq;
+	/**
+	 * 상품명
+	 */
 	String name;
+	/**
+	 * product uuid
+	 */
 	String code;
 	Integer priceKrWon;
 	Integer discountKrWon;

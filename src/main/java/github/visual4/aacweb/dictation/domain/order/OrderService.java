@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.order;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public class OrderService {
 	final UserService userService;
 	final LicenseService licenseService;
 	final OrderDao orderDao;
+	
+	private final static Instant EXP2023 = Instant.parse("2024-01-01T00:00:00Z").minus(9, ChronoUnit.HOURS);
 	
 	public OrderService(
 			ProductService productService,
@@ -95,7 +98,6 @@ public class OrderService {
 	 * @param teacherSeq
 	 * @param productCode
 	 * @param qttProduct - 상품 갯수(보통 1개)
-	 * @param qttLicenses - 수강증 갯수
 	 * @return
 	 */
 	public Order createOrder(
@@ -157,7 +159,18 @@ public class OrderService {
 				user.getSeq(), 
 				trialProduct.getCode(), 1,
 				(odr) -> odr.setTrialOrder(Boolean.TRUE));
-		return activateOrder(order.getOrderUuid(), 1L, 1, null);
+		order= activateOrder(order.getOrderUuid(), 1L, 1, null);
+		/*
+		 * [이용권 무료 기간 연장] 12월 31일까지로
+		 * https://github.com/4visuals/aac-writing/issues/143
+		 */
+		List<License> items = order.getItems();
+		for (License license : items) {
+			if (license.getExpiredAt().isBefore(EXP2023)) {
+				licenseService.updateExpirationTime(license, EXP2023);
+			}	
+		}
+		return order;
 	}
 	
 	/**
@@ -182,11 +195,11 @@ public class OrderService {
 		orderDao.activateOrder(order);
 		
 		/* licenses 발급 */
-		AppConfiguration config = configService.getConfiguration();
 		User teacher = userService.findTeacher(order.getCustomerRef());
 		Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
 		
 		Instant cur = Instant.now();
+		AppConfiguration config = configService.getConfiguration();
 		List<License> items = licenseService.createLicenses( qttLicenses, order, (lcs) -> {
 			lcs.setIssuerRef(config.getAdminAccountSeq());
 			lcs.setReceiverRef(teacher.getSeq());

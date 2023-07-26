@@ -61,4 +61,12 @@ public class LicenseDao {
 	public void deleteLicense(License license) {
 		session.delete(Dao.mapper(this, "deleteLicense"), license);
 	}
+	/**
+	 * 만료 기간 변경함
+	 * @param license
+	 */
+	public void updateExpirationTime(License license) {
+		session.update(Dao.mapper(this, "updateExpirationTime"), license);
+		
+	}
 }

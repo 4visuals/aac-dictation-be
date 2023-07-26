@@ -125,4 +125,14 @@ public class LicenseService {
 			licenseDao.deleteLicense(license);
 		}
 	}
+	/**
+	 * 만료 기간 연장 (https://github.com/4visuals/aac-writing/issues/143)
+	 * 이용권 무료 기간을 2023년 말까지로 변경하려고 사용함
+	 * @param license
+	 * @param exp2023
+	 */
+	public void updateExpirationTime(License license, Instant exp2023) {
+		license.setExpiredAt(exp2023);
+		licenseDao.updateExpirationTime(license);
+	}
 }

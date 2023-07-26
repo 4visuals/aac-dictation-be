@@ -84,6 +84,10 @@ public enum ErrorCode {
     ORDER_EXPIRED_PROD("product is expired. cannot purchse: %s"),
     ORDER_INVALID_PRICE("null or negative price"),
     ORDER_ALREADY_ACTIVATED("order is already activated"),
+    /**
+     * 화면에서 평가판 이용권 제공 기능을 중지시킴
+     */
+    ORDER_BETA_CLOSED("Beta order is not allowed."),
     
     PAYMENT_VALIDATION_ERROR("payment error: %s"),
     
