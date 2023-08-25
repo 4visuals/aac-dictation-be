@@ -43,6 +43,7 @@ public class AacSecurityConfig extends WebSecurityConfigurerAdapter{
     			"/robots.txt",
     			"/img/icons/*.png",
     			"/api/chapters/origin/L",
+    			"/hooks/import",
     			"/api/**").permitAll()
     		.anyRequest().authenticated();
     	

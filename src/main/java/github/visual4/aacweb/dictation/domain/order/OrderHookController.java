@@ -39,8 +39,12 @@ public class OrderHookController {
 		log.info("[PaymentHook] I'm port: " + info);
 		String clientIp = req.getRemoteAddr();
 		String xff = req.getHeader("X-Forwarded-For");
-		log.info("[PaymentHook] client ip" + clientIp);
+		log.info("[PaymentHook] client ip" + xff);
 		log.info("[XFF      ]" + xff);
+		
+		if ("52.78.5.241".equals(xff)) {
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
 		AimportHook hook = AimportHook
 				.newBuilder()
 				.clientIP(clientIp, xff)
