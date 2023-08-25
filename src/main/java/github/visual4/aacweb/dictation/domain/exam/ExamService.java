@@ -79,7 +79,7 @@ public class ExamService {
 			answer.setExamRef(examPaper.getSeq());
 			examAnswerDao.insertExamAnswer(answer);
 		});
-		if (examPaper.getMode() == ExamMode.Q || examPaper.isRetry()) {
+		if (examPaper.getMode() == ExamMode.Q && !examPaper.isRetry()) {
 			// 받아쓰기일때만 최신 이력을 입력함
 			// section마다 틀린 문제를 추적함
 			 recentPaperService.insertRecentPaper(examPaper);			
