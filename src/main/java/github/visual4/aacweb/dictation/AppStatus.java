@@ -5,7 +5,12 @@ package github.visual4.aacweb.dictation;
  *
  */
 public enum AppStatus {
-
-	B, // 베타 테스트 중
-	S  // 판매중(sales)
+	/**
+	 * 베타 테스트 중
+	 */
+	B,
+	/**
+	 * 실서버 운영 중
+	 */
+	S
 }

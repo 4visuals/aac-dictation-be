@@ -28,7 +28,7 @@ public class ProductController {
 	}
 	@GetMapping("product")
 	public Object findProduct(@RequestParam String code) {
-		Product product = productService.findBy(Product.Column.prod_code, code);
+		Product product = productService.findProductForPurchase(code);
 		return Res.success("product", product);
 	}
 }

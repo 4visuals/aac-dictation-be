@@ -45,6 +45,11 @@ public class Product {
 	Instant activatedAt;
 	Instant expiredAt;
 	String createdBy;
+	/**
+	 * 상품 디자인용 theme value("green", "picton-blue", "yellow", "violet", ...)
+	 * 
+	 */
+	String theme;
 	
 	public boolean isBeta() {
 		return "B".equals(this.type); 
