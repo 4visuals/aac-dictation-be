@@ -23,9 +23,14 @@ public class GroupOrderDao {
 	public void createGroupOrderForm(GroupOrderForm form) {
 		session.insert(Dao.mapper(this, "createGroupOrderForm"), form);
 	}
-
-	public List<GroupOrderForm> findOrders(Column column, Object value) {
-		return session.selectList(Dao.mapper(this, "findOrders"),
+	/**
+	 * 소매 상품에 등록된 단체 주문 양식 조회(공동 구매 조회시 사용하면 안됨)
+	 * @param column
+	 * @param value
+	 * @return
+	 */
+	public List<GroupOrderForm> findRetailGroupOrderForms(Column column, Object value) {
+		return session.selectList(Dao.mapper(this, "findRetailGroupOrderForms"),
 				TypeMap.with("col", column, "value", value ));
 	}
 	/**
@@ -38,6 +43,18 @@ public class GroupOrderDao {
 		return session.selectOne(
 				Dao.mapper(this, "findBy"),
 				TypeMap.with("col", column, "value", value ));
+	}
+	public List<GroupOrderForm> findsBy(Column column, Object value) {
+		return session.selectList(
+				Dao.mapper(this, "findBy"),
+				TypeMap.with("col", column, "value", value ));
+	}
+	/**
+	 * content 만 수정함
+	 * @param form
+	 */
+	public void updateContent(GroupOrderForm form) {
+		session.update(Dao.mapper(this, "updateContent"), form);
 	}
 	/**
 	 * 단체 구매 문의 취소
@@ -60,5 +77,12 @@ public class GroupOrderDao {
 		form.commit();
 		return session.update(Dao.mapper(this, "updateOrderState"), form);
 		
+	}
+	/**
+	 * 공동 구매 참여 양식 삭제
+	 * @param form
+	 */
+	public void deleteOrderForm(Integer formSeq) {
+		Dao.deleteOne(session, Dao.mapper(this, "deleteOrderForm"), formSeq);
 	}
 }

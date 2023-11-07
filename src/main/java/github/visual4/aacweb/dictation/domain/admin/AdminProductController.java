@@ -33,8 +33,15 @@ public class AdminProductController {
 		List<Product> products = productService.findProducts(admin);
 		return Res.success("products", products);
 	}
+	/**
+	 * 새로운 상품 등록
+	 * @param userSeq
+	 * @param product
+	 * @return
+	 */
 	@PostMapping("/product")
-	public Object createProduct(@JwtProp("useq") Integer userSeq, @RequestBody Product product) {
+	public Object createProduct(
+			@JwtProp("useq") Integer userSeq, @RequestBody Product product) {
 		User admin = userService.loadAdmin(userSeq.longValue());
 		productService.createProduct(admin, product);
 		return Res.success("product", product);

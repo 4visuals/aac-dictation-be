@@ -21,7 +21,7 @@ class GroupOrderDaoTest extends BaseDao{
 	
 	@Test
 	void test() {
-		List<GroupOrderForm> orders = groupOrderDao.findOrders(GroupOrderForm.Column.group_order_state, OrderFormState.PND);
+		List<GroupOrderForm> orders = groupOrderDao.findRetailGroupOrderForms(GroupOrderForm.Column.group_order_state, OrderFormState.PND);
 		assertThat(orders.size()).isGreaterThan(0);
 		for (GroupOrderForm order : orders) {
 			User sender = order.getSender();

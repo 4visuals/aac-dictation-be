@@ -6,16 +6,17 @@
   	
   	<sql id="prodmap_cols">
   		 prod.prod_seq
-  		,prod.prod_name
-  		,prod.prod_code
-  		,prod.prod_price_ko
-  		,prod.prod_discount_ko
-  		,prod.prod_desc
-  		,prod.prod_type
-  		,prod.prod_duration_hours
-  		,prod_activated_at
-  		,prod_expired_at
-  		,prod_created_by
+  		, prod.prod_name
+  		, prod.prod_code
+  		, prod.prod_price_ko
+  		, prod.prod_discount_ko
+  		, prod.prod_desc
+  		, prod.prod_type
+  		, prod_sales_type
+  		, prod.prod_duration_hours
+  		, prod_activated_at
+  		, prod_expired_at
+  		, prod_created_by
   	</sql>
   	<resultMap type="Product" id="prodmap">
   		<id column="prod_seq" property="seq"/>
@@ -25,6 +26,7 @@
   		<result column="prod_discount_ko" property="discountKrWon"/>
   		<result column="prod_desc" property="description"/>
   		<result column="prod_type" property="type"/>
+  		<result column="prod_sales_type" property="salesType"/>
   		<result column="prod_duration_hours" property="durationInHours"/>
   	</resultMap>
   	
@@ -72,6 +74,7 @@
 			prod_price_en,
 			prod_desc,
 			prod_type,
+			prod_sales_type,
 			prod_duration_hours,
 			prod_activated_at,
 			prod_created_by
@@ -83,6 +86,7 @@
 			NULL, -- price in dollar null
 			#{description},
 			#{type},
+			#{salesType},
 			#{durationInHours},
 			#{activatedAt},
 			#{createdBy}

@@ -15,6 +15,7 @@
 	<description>dictionary service</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.skip>true</sonar.skip>
 	</properties>
 	<dependencies>
 		<dependency>

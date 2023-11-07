@@ -84,6 +84,7 @@ public enum ErrorCode {
     ORDER_EXPIRED_PROD("product is expired. cannot purchse: %s"),
     ORDER_INVALID_PRICE("null or negative price"),
     ORDER_ALREADY_ACTIVATED("order is already activated"),
+    ORDER_STATE_MISMATCH("[ORDER STATE] %s"),
     /**
      * 화면에서 평가판 이용권 제공 기능을 중지시킴
      */
@@ -97,9 +98,14 @@ public enum ErrorCode {
     MAILING_ERROR("fail to send mail: %s"),
     
     GROUP_ORDER_ERROR("group order error: %s"),
+    /**
+     * 공동 구매 접수 오류
+     */
+    GBUYING_ORDER_ERROR("%s"),
     SMS_ERROR("sms error: %s"),
     SMS_PHONENUMBER_ERROR("invalid phone number: [%s]"),
-    SMS_INVALID_TEMPLATE("no such template: [%s]");
+    SMS_INVALID_TEMPLATE("no such template: [%s]")
+    ;
     ;
     
 

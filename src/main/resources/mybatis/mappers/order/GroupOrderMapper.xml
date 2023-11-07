@@ -17,6 +17,7 @@
   	  , gor.creation_time
   	  , gor.group_order_state
   	  , gor.sender_ref
+  	  , gor.target_product_ref
   	</sql>
   	<resultMap type="GroupOrderForm" id="groupOrderMap">
   		<id column="gor_seq" property="seq"/>
@@ -31,6 +32,7 @@
   		<result column="creation_time" property="creationTime"/>
   		<result column="group_order_state" property="state"/>
   		<result column="sender_ref" property="senderRef"/>
+  		<result column="target_product_ref" property="productRef"/>
   		<association property="sender" resultMap="UserMapper.usermap"/>
   		<collection property="papers" resultMap="GroupPaperMapper.orderPaperMap"/>
   	</resultMap>
@@ -52,7 +54,7 @@
 		WHERE
 			${col} = #{value};
   	</select>
-  	<select id="findOrders" parameterType="map" resultMap="groupOrderMap">
+  	<select id="findRetailGroupOrderForms" parameterType="map" resultMap="groupOrderMap">
 	  	SELECT
 		  	<include refid="group_order_cols"/>
 		  	,
@@ -87,6 +89,7 @@
   	  , creation_time
   	  , group_order_state
   	  , sender_ref
+  	  , target_product_ref
   	) VALUES (
   		#{orgName}
   	  , #{senderName}
@@ -99,6 +102,7 @@
   	  , #{creationTime}
   	  , #{state}
   	  , #{senderRef}
+  	  , #{productRef}
   	)
   	</insert>
   	<update id="updateOrderState" parameterType="GroupOrderForm" >
@@ -107,5 +111,14 @@
 			group_order_state = #{state}
 		WHERE seq = #{seq}
   	</update>
-  	
+  	<update id="updateContent" parameterType="GroupOrderForm">
+		UPDATE dt_order_forms 
+		SET
+			content = #{content}
+		WHERE seq = #{seq}
+	</update>
+	<delete id="deleteOrderForm" parameterType="int">
+		DELETE FROM dt_order_forms 
+		WHERE seq  = #{seq} 
+	</delete>
   </mapper>

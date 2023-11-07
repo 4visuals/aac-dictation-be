@@ -33,6 +33,8 @@ public class AacSecurityConfig extends WebSecurityConfigurerAdapter{
     		.antMatchers(
     			"/",
     			"/index.html",
+    			"/support",
+    			"/purchase",
     			"/manifest.json",
     			"/service-worker.js",
     			"/precache-manifest*.js",

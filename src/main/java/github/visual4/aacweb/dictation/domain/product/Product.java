@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.ProductSalesType;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -11,6 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
 
 	public final static Integer DUR_YEARL       = 24 * 30 * 12 + 5;
@@ -22,6 +25,7 @@ public class Product {
 		prod_code
 	}
 	
+	@EqualsAndHashCode.Include
 	Integer seq;
 	/**
 	 * 상품명
@@ -50,6 +54,10 @@ public class Product {
 	 * 
 	 */
 	String theme;
+	/**
+	 * 소매용인지 공동구매용인지 나타냄 (See {@link https://github.com/4visuals/aac-writing/issues/151})
+	 */
+	ProductSalesType salesType;
 	
 	public boolean isBeta() {
 		return "B".equals(this.type); 
@@ -86,5 +94,15 @@ public class Product {
 		}
 		return this.expiredAt.isAfter(time);
 	}
+	public Boolean checkIfRetail() {
+		return this.salesType == ProductSalesType.RT;
+	}
+	public Boolean checkIfGroupBuying() {
+		return this.salesType == ProductSalesType.GB;
+	}
+	public boolean hasValidSalesType() {
+		return this.salesType != null;
+	}
+	
 	
 }

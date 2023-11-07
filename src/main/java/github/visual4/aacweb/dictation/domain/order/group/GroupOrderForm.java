@@ -7,6 +7,7 @@ import java.util.List;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.ProductSalesType;
 import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,11 @@ import lombok.ToString;
 @ToString
 public class GroupOrderForm {
 	public enum Column {
-		seq, group_order_state, group_order_uuid
+		seq,
+		group_order_state,
+		group_order_uuid,
+		target_product_ref
+		
 	}
 	public enum OrderFormState {
 		/**
@@ -45,6 +50,10 @@ public class GroupOrderForm {
 	 * PK
 	 */
 	Integer seq;
+	/**
+	 * 상품 판매 유형(소매용, 공동구매용)
+	 */
+	ProductSalesType salesType;
 	/**
 	 * 기관명
 	 */
@@ -104,6 +113,13 @@ public class GroupOrderForm {
 	 * 주문 조회 url
 	 */
 	String orderFullUrl;
+	/**
+	 * 구매 대상 상품 정보(FK)
+	 * 
+	 * 기존의 단체 주문에서는 별도의 상품 정보가 필요없었으나,
+	 * 공동구매에서는 참조하는 상품 정보가 필요함
+	 */
+	Integer productRef;
 	
 	public void setCreationTime(Instant time) {
 		this.creationTime = time;
@@ -112,6 +128,10 @@ public class GroupOrderForm {
 		 */
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Seoul"));
 		this.creationTimeKr = formatter.format(time);
+	}
+	public void setSender(User sender) {
+		this.sender = sender;
+		this.senderRef = sender.getSeq();
 	}
 
 	public void cancel(OrderFormState formState) {
@@ -139,5 +159,17 @@ public class GroupOrderForm {
 
 	public boolean isStateOf(OrderFormState state) {
 		return this.state == state;
+	}
+	/**
+	 * 주문자가 동일한지 확인함
+	 * @param other
+	 * @return
+	 */
+	public Boolean checkIfSameUser(GroupOrderForm other) {
+		return this.senderRef.equals(other.senderRef);
+	}
+
+	public Boolean checkIfOwner(User user) {
+		return this.senderRef.equals(user.getSeq());
 	}
 }

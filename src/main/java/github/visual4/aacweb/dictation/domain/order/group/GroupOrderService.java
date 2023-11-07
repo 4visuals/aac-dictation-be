@@ -3,7 +3,6 @@ package github.visual4.aacweb.dictation.domain.order.group;
 import java.time.Instant;
 import java.util.List;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +14,7 @@ import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
+import github.visual4.aacweb.dictation.domain.order.GroupOrderForms;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
@@ -46,7 +46,7 @@ public class GroupOrderService {
 	final ProductService productService;
 	final ObjectMapper om;
 	
-	private final static String ORDER_URL = "@host/console";
+	private static final String ORDER_URL = "@host/console";
 	public GroupOrderService(
 			@Value("${dictation.host}") String host,
 			@Value("${dictation.ncp.mailing.receiver}") String receiverMail,
@@ -78,6 +78,9 @@ public class GroupOrderService {
 		}
 		return order;
 	}
+	public List<GroupOrderForm> findOrderForms(GroupOrderForm.Column column, Object value) {
+		return groupOrderDao.findsBy(column, value);
+	}
 	public GroupOrderForm findBy(GroupOrderForm.Column column, Object value) {
 		return this.groupOrderDao.findBy(column, value);
 	}
@@ -85,15 +88,16 @@ public class GroupOrderService {
 	 * 단체 구매 문의 등록
 	 * @param teacherSeq 
 	 * @param orderForm
+	 * @param sendMail 메일 전송 여부(관리자가 등록하는 공동구매에서는 메일 전송 생략)
 	 * @return
 	 */
-	public GroupOrderForm createGroupOrderForm(Long teacherSeq, GroupOrderForm orderForm) {
+	public GroupOrderForm createGroupOrderForm(Long teacherSeq, GroupOrderForm orderForm, boolean sendMail) {
 		
-		User teacher = userService.findTeacher(teacherSeq.longValue());
+		User teacher = userService.findTeacher(teacherSeq);
 		if (teacher == null) {
 			throw new AppException(ErrorCode.NOT_A_MEMBER, 400);
 		}
-		/* 1, 2, 3 순서 바꾸면 안됨*/
+		/* 1, 2 순서 바꾸면 안됨: 2에서 uuid를 생성할때 1의 정보를 이용함 */
 		
 		/* 1 */
 		orderForm.setCreationTime(Instant.now());
@@ -108,7 +112,7 @@ public class GroupOrderService {
 		String fullUrl = ORDER_URL.replace("@host", host);
 		orderForm.setOrderFullUrl(fullUrl);
 		
-		escapeForm(orderForm);
+		GroupOrderForms.escape(orderForm);
 		
 		groupOrderDao.createGroupOrderForm(orderForm);
 		for (OrderPaper paper : orderForm.getPapers()) {
@@ -116,52 +120,46 @@ public class GroupOrderService {
 			paperDao.insertOrderPaper(orderForm.getSeq(), paper);
 		}
 		orderForm.setSender(teacher);
-		/*
-		 * 4. 관리자에게 메일 통보
-		 */
-		MailDto mailToAdmin = new MailDto(
-				"[신규 문의] 단체 구매 " + orderForm.getSenderEmail(), 
-				"mailing/group-order-admin", 
-				orderForm, 
-				orderForm.getSenderEmail(), 
-				receiverMail, null, null);
-		mailingService.sendMail(mailToAdmin);
-		/*
-		 * 5. 신청자에게도 메일 통보
-		 */
-		MailDto mailtoClient = new MailDto(
-				"[받아쓰기] 단체 구매 접수 완료",
-				"group-order-client",
-				orderForm,
-				receiverMail,
-				orderForm.getSenderEmail(),
-				null, null);
-		mailingService.sendMail(mailtoClient);
+		if (sendMail) {
+			/*
+			 * 4. 관리자에게 메일 통보
+			 */
+			MailDto mailToAdmin = new MailDto(
+					"[신규 문의] 단체 구매 " + orderForm.getSenderEmail(), 
+					"mailing/group-order-admin", 
+					orderForm, 
+					orderForm.getSenderEmail(), 
+					receiverMail, null, null);
+			mailingService.sendMail(mailToAdmin);
+			/*
+			 * 5. 신청자에게도 메일 통보
+			 */
+			MailDto mailtoClient = new MailDto(
+					"[받아쓰기] 단체 구매 접수 완료",
+					"group-order-client",
+					orderForm,
+					receiverMail,
+					orderForm.getSenderEmail(),
+					null, null);
+			mailingService.sendMail(mailtoClient);
+		}
 		return orderForm;
 	}
-	/**
-	 * XSS 방어
-	 * @param form
-	 */
-	private void escapeForm(GroupOrderForm form) {
-		form.setContent(StringEscapeUtils.escapeHtml4(form.getContent()));
-		form.setOrgEmail(StringEscapeUtils.escapeHtml4(form.getOrgEmail()));
-		form.setOrgName(StringEscapeUtils.escapeHtml4(form.getOrgName()));
-		form.setSenderContactInfo(StringEscapeUtils.escapeHtml4(form.getSenderContactInfo()));
-		form.setSenderEmail(StringEscapeUtils.escapeHtml4(form.getSenderEmail()));
-		form.setSenderName(StringEscapeUtils.escapeHtml4(form.getSenderName()));
-		
-		for (OrderPaper paper : form.getPapers()) {
-			paper.setDesc(StringEscapeUtils.escapeHtml4(paper.getDesc()));
-		}
-		
-	}
+	
 	public List<GroupOrderForm> findOrdersByState(OrderFormState state) {
-		List<GroupOrderForm> orders = groupOrderDao.findOrders(GroupOrderForm.Column.group_order_state, state);
+		List<GroupOrderForm> orders = groupOrderDao.findRetailGroupOrderForms(GroupOrderForm.Column.group_order_state, state);
 		for (GroupOrderForm order : orders) {
-			escapeForm(order);
+			GroupOrderForms.escape(order);
 		}
 		return orders;
+	}
+	/**
+	 * 단체 주문 양식 content 수정
+	 * @param form
+	 */
+	public void updateContent(GroupOrderForm form) {
+		GroupOrderForms.escape(form);
+		groupOrderDao.updateContent(form);
 	}
 	/**
 	 * 단체 구매 문의 취소
@@ -212,14 +210,14 @@ public class GroupOrderService {
 		Order order = orderService.createOrder(
 				form.getSenderRef(),
 				dto.getProductCode(),
-				qtt, (odr) -> {
+				qtt, odr -> {
 					odr.setTotalAmount(dto.getContractPrice());
 					/*
 					 * pg 벤더를 단체구매로 변경
 					 */
 					odr.setPaygateVendor(PG.group_order);
 				});
-		order = orderService.activateOrder(order.getOrderUuid(), adminSeq, qtt, (odr) -> {
+		order = orderService.activateOrder(order.getOrderUuid(), adminSeq, qtt, odr -> {
 			odr.setMidTransactionUid(PG.group_order.name());
 			odr.setEndTransactionUid(PG.group_order.name());
 			odr.setOrderState(OrderState.ATV);
@@ -234,5 +232,9 @@ public class GroupOrderService {
 	private String createGroupOrderDetail(Long adminSeq, GroupOrderForm form, OrderCommitDto commitDto) {
 		TypeMap detail = TypeMap.with("admin", adminSeq, "form", form, "tx", commitDto);
 		return Util.stringify(this.om, detail);
+	}
+	
+	public GroupOrderDao getDao() {
+		return this.groupOrderDao;
 	}
 }

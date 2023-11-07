@@ -23,14 +23,16 @@ public class GroupOrderController {
 		this.groupOrderService = groupOrderService;
 	}
 	/**
-	 * 
+	 * 고객이 단체 주문 양식을 제출함
 	 * @return
 	 */
 	@PostMapping("/contact")
-	public Object newGroupOrderForm(@JwtProp("useq") Integer teacherSeq, @RequestBody GroupOrderForm orderForm) {
+	public Object newGroupOrderForm(
+			@JwtProp("useq") Integer teacherSeq,
+			@RequestBody GroupOrderForm orderForm) {
 		
 		orderForm.setSenderRef(teacherSeq.longValue());
-		groupOrderService.createGroupOrderForm(teacherSeq.longValue(), orderForm);
+		groupOrderService.createGroupOrderForm(teacherSeq.longValue(), orderForm, true);
 		
 		return Res.success("orderForm", orderForm);
 		

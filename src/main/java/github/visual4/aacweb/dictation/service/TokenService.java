@@ -1,7 +1,7 @@
 package github.visual4.aacweb.dictation.service;
 
 import java.io.UnsupportedEncodingException;
-import java.time.Instant;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
-import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.domain.user.UserRole;
 import github.visual4.aacweb.dictation.service.codec.ICodec;
 import github.visual4.aacweb.dictation.service.codec.RsaCodec;
@@ -29,21 +28,18 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class TokenService {
-	final private transient byte [] secretKey;
     final String host;
 	final ObjectMapper om;
-    final static long ONE_HOUR_MILLIS = 60 * 60 * 1000;
+    static final long ONE_HOUR_MILLIS = 60L * 60 * 1000;
 	final ICodec<String, String> aes256;
 	final RsaCodec rsa;
 	
 	public TokenService(
 			@Value("${dictation.host}") String host,
-    		@Value("${dictation.aes256.secret}") String secretKey, 
     		ObjectMapper om,
     		@Qualifier("aes256") ICodec<String, String> codec,
     		RsaCodec rsaCodec) {
 		this.host = host;
-		this.secretKey = keys(secretKey);
 		this.om = om;
 		this.aes256 = codec;
 		this.rsa = rsaCodec;
@@ -54,7 +50,6 @@ public class TokenService {
      * @return
      */
     public String generateJwt(TypeMap props, UserRole role) {
-//        String secret = SECRET_KEY;
         Date current = new Date();
         TypeMap headers = TypeMap.with("typ", "JWT");
         
@@ -66,19 +61,9 @@ public class TokenService {
             .setIssuedAt(current)
             .setIssuer(host)
             .addClaims(claim);
-        String jwt = builder
+        return builder
         		.signWith(SignatureAlgorithm.RS256, rsa.getPrivateKey())
                 .compact();
-        return jwt;
-    }
-
-	private byte[] keys(String secret) {
-        String s = secret.substring(0, 32);
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
     
     public TypeMap parseJwt(String jwtToken) {

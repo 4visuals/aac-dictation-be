@@ -186,4 +186,17 @@ public class TypeMap extends HashMap<String, Object> {
 		}
 		return null;
 	}
+	/**
+	 * 주어진 key에 대응하는 값을 업데이트함. 키가 존재해야함. 없으면 예외 던짐
+	 * @param key
+	 * @param value
+	 */
+	public void update(String key, Object value) {
+		if(this.containsKey(key)) {
+			this.put(key, value);
+		}else {
+			throw new AppException(ErrorCode.APP_BUG, 500, "[TypeMap] fail to update (k, v). No such key: " + key);
+		}
+		
+	}
 }

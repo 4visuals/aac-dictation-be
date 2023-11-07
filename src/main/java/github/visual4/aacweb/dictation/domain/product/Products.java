@@ -7,7 +7,7 @@ import github.visual4.aacweb.dictation.ErrorCode;
 
 public class Products {
 
-	public static void assertProduct(Product product) {
+	public static void assertRetailProduct(Product product) {
 		Integer price = product.getPriceKrWon();
 		if (price == null || price < 0) {
 			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "invalid price");
@@ -46,6 +46,24 @@ public class Products {
 			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "type should be \"S\"");
 		}
 		
+	}
+
+	public static void assertGroupBuyingProduct(Product product) {
+		
+		product.setPriceKrWon(0);
+		product.setDiscountKrWon(0);
+		product.setDurationInHours(0);
+		
+		String name = product.getName();
+		if (product.getName() == null || name.trim().length() == 0) {
+			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "null or empty product name");
+		}
+		
+		product.setName(name.trim());
+		String type = product.getType();
+		if (type == null || !"S".equals(type)) {
+			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "type should be \"S\"");
+		}
 	}
 
 }
