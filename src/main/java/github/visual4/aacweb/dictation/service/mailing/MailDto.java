@@ -19,7 +19,11 @@ public class MailDto {
     Instant whenRegistered;
     Instant whenProcessed;
     
-	public MailDto(String title, String templateId, Object props, String sender, String receiver,
+	public MailDto(String title, 
+			String templateId,
+			Object props,
+			String sender,
+			String receiver,
 			Instant whenRegistered, Instant whenProcessed) {
 		super();
 		this.title = title;

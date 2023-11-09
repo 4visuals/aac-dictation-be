@@ -128,4 +128,12 @@ public class Util {
 		}
 		
 	}
+
+	public static String join(Object ... tokens) {
+		StringBuilder sb = new StringBuilder();
+		for (Object token : tokens) {
+			sb.append(token);
+		}
+		return sb.toString();
+	}
 }

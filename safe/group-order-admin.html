@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>새로운 주문</title>
+  </head>
+  <body>
+    <div style="margin: 0 auto;max-width:480px; color: #444; font-size: 14px; font-weight: 400; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';">
+      <h3>신규 단체 주문 발생</h3>
+      <p>{{creationTimeKr}}</p>
+      <p><a href={{orderFullUrl}} target="_blank">console/단체구매로 이동</a></p>
+      <div>
+        <h4 style="font-size: 1.5em; margin-bottom: 4px; font-weight: 600; border-bottom: 1px solid #444">주문자</h4>
+        <div style="margin: 8px 0"><ul style="list-style: none; margin:0; padding:0;">
+          <li>{{senderName}}</li>
+          <li>{{senderEmail}}</li>
+          <li>{{#senderContactInfo}}{{.}}{{/senderContactInfo}}{{^senderContactInfo}}연락처 미입력{{/senderContactInfo}}</li>
+        </ul></div>
+      </div>
+      <div>
+        <h4 style="font-size: 1.5em; margin-bottom: 4px; font-weight: 600; border-bottom: 1px solid #444">증빙서류</h4>
+        <div style="margin: 8px 0">
+          <ul style="list-style: none; margin:0; padding:0;">
+          {{#papers}}
+            <li>{{desc}}</li>
+          {{/papers}}
+          {{^papers}}
+          서류 미신청
+          {{/papers}}
+        </ul>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size: 1.5em; margin-bottom: 4px; font-weight: 600; border-bottom: 1px solid #444">기관정보</h4>
+        <div style="margin: 8px 0">
+          <ul style="list-style: none; margin:0; padding:0;">
+          	<li>기관명 - {{orgName}}</li>
+            <li>이메일 - {{orgEmail}}</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size: 1.5em; margin-bottom: 4px; font-weight: 600; border-bottom: 1px solid #444">문의내용</h4>
+        <div style="margin: 8px 0"><p style="margin:0; background-color: #dfffbb; padding: 8px;">{{content}}</p></div>
+      </div>
+    </body>
+  </div>
+</html>

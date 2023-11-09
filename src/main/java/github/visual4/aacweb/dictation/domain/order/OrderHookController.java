@@ -43,6 +43,8 @@ public class OrderHookController {
 		log.info("[XFF      ]" + xff);
 		
 		if ("52.78.5.241".equals(xff)) {
+			// Test 호출(관리자 화면에서 웹훅 설정을 테스트한 경우)
+			log.warn("[PORTONE][WEBHOOK] Test Request! Did you test it?");
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		AimportHook hook = AimportHook

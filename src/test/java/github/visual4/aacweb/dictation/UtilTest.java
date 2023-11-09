@@ -9,6 +9,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import github.visual4.aacweb.dictation.korean.level.Level34;
 import github.visual4.aacweb.dictation.korean.level.LevelContext;
@@ -50,5 +52,14 @@ class UtilTest {
 		Instant exp2023Kr = Instant.parse("2024-01-01T00:00:00Z").minus(9, ChronoUnit.HOURS);
 		System.out.println(exp2023Kr.getEpochSecond());
 		
+	}
+	@Test
+	void test_jsonsobject() throws JSONException {
+		
+		JSONObject map = new JSONObject();
+		map.put("a", "AAA");
+		map.put("b", "BBB");
+		map.put("c", 988);
+		System.out.println(map.toString());
 	}
 }

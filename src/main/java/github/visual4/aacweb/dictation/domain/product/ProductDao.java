@@ -46,4 +46,7 @@ public class ProductDao {
 			throw new AppException(ErrorCode.APP_BUG, 500, "multiple rows updated by updateBasicInfo(product: " + product.seq + ")");
 		}
 	}
+	public void updateAsExpired(Product product) {
+		Dao.updateOne(session, Dao.mapper(this, "updateAsExpired"), product);
+	}
 }

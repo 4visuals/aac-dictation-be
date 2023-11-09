@@ -25,11 +25,9 @@ public class MailingService {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void sendMail(MailDto dto) {
-		// String body = "<html><body><style>h3{color:red}</style><h3>단체구매 메일 전송 테스트2</h3></body></html>";
 		String template = templateService.loadTemplate(dto.getTemplateId());
 		String body = c.compile(template).execute(dto.getProps());
 		Mail mail = new Mail(dto.getSender(), dto.getReceiver(), dto.getTitle(), body );
 		mailSender.sendMail(mail);
 	}
-	
 }

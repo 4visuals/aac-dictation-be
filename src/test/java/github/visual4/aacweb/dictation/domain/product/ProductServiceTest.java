@@ -14,11 +14,35 @@ import org.springframework.context.annotation.Import;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.Asserts;
 import github.visual4.aacweb.dictation.BaseDao;
+import github.visual4.aacweb.dictation.ProductSalesType;
 import github.visual4.aacweb.dictation.domain.appconfig.ImportAppConfig;
 
-@Import(ImportProduct.class)
-class ProductServiceTest extends BaseDao {
+@Import(ProductServiceTest.Imports.class)
+public class ProductServiceTest extends BaseDao {
 
+	@Import({ProductService.class, ProductDao.class, ImportAppConfig.class})
+	public static class Imports {}
+	
+	public static class Sample {
+		public static Product retailProduct(Consumer<Product> hook) {
+			Product p = new Product();
+			p.setName("Dummy Product");
+			p.setDescription("For test");
+			p.setDiscountKrWon(0);
+			p.setDurationInHours(100);
+			p.setPriceKrWon(1000);
+			p.setSalesType(ProductSalesType.RT);
+			p.setType("S");
+			if (hook != null) {
+				hook.accept(p);
+			}
+			return p;
+		}
+
+		public static Product groupBuyingProduct() {
+			return retailProduct((prod) -> prod.setSalesType(ProductSalesType.GB));
+		}
+	}
 	@Autowired
 	ProductService productService;
 	
@@ -33,7 +57,7 @@ class ProductServiceTest extends BaseDao {
 	@Test
 	@DisplayName("[관리자] 소매 상품 등록")
 	void test_creat_product() {
-		Product dummy = ImportProduct.retailProduct(null);
+		Product dummy = Sample.retailProduct(null);
 		int cntBefore = productService.filterProducts(product -> product.checkIfRetail()).size();
 		productService.createProduct(ImportAppConfig.admin(), dummy);
 		
@@ -47,7 +71,7 @@ class ProductServiceTest extends BaseDao {
 	@Test
 	@DisplayName("[관리자] 공구 상품 등록")
 	void put_groupbying_product() {
-		Product dummy = ImportProduct.groupBuyingProduct();
+		Product dummy = Sample.groupBuyingProduct();
 		int cntBefore = productService.filterProducts(product -> product.checkIfGroupBuying()).size();
 		productService.createProduct(ImportAppConfig.admin(), dummy);
 		
@@ -62,7 +86,7 @@ class ProductServiceTest extends BaseDao {
 	@Test
 	@DisplayName("[관리자] sales type이 없는 경우")
 	void no_sailes_type() {
-		Product dummy = ImportProduct.retailProduct(p -> p.setSalesType(null));
+		Product dummy = Sample.retailProduct(p -> p.setSalesType(null));
 		assertThatThrownBy(() -> {
 			productService.createProduct(ImportAppConfig.admin(), dummy);	
 		}).isInstanceOf(AppException.class);

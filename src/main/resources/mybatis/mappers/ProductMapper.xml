@@ -32,7 +32,7 @@
   	
   	<!-- 관리자용 -->
   	<resultMap type="Product" id="ext_prodmap" extends="prodmap">
-  	<result column="prod_activated_at" property="activatedAt"/>
+  		<result column="prod_activated_at" property="activatedAt"/>
   		<result column="prod_expired_at" property="expiredAt"/>
   		<result column="prod_created_by" property="createdBy"/>
   	</resultMap>
@@ -101,4 +101,14 @@
   		WHERE
   			prod_seq = #{seq}
   	</update>
+  	<!--
+  	// 제품 단종 처리함 
+  	-->
+  	<update id="updateAsExpired" parameterType="Product">
+		UPDATE dt_products
+  		SET
+  			prod_expired_at = #{expiredAt}
+  		WHERE
+  			prod_seq = #{seq}
+	</update>
   </mapper>

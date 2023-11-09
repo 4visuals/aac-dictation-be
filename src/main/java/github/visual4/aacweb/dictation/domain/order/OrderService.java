@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import github.visual4.aacweb.dictation.AppException;
@@ -18,6 +20,7 @@ import github.visual4.aacweb.dictation.domain.appconfig.AppConfiguration;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
+import github.visual4.aacweb.dictation.domain.order.aim_port.AimportDriver;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.user.User;
@@ -26,26 +29,33 @@ import github.visual4.aacweb.dictation.domain.user.UserService;
 @Service
 @Transactional
 public class OrderService {
-	final private static Integer TRIAL_PRODUCT_SEQ = 2;
+	private static final Integer TRIAL_PRODUCT_SEQ = 2;
 	final AppConfigService configService;
 	final ProductService productService;
 	final UserService userService;
 	final LicenseService licenseService;
 	final OrderDao orderDao;
+	final AimportDriver portOneDriver;
 	
-	private final static Instant EXP2023 = Instant.parse("2024-01-01T00:00:00Z").minus(9, ChronoUnit.HOURS);
+	private static final Instant EXP2023 = Instant.parse("2024-01-01T00:00:00Z").minus(9, ChronoUnit.HOURS);
+	private static final Set<OrderState> CANCEL_STATES = Set.of(
+			OrderState.CNE,
+			OrderState.CNR,
+			OrderState.CNU);
 	
 	public OrderService(
 			ProductService productService,
 			AppConfigService configService,
 			UserService userService, 
 			LicenseService licenseService,
-			OrderDao orderDao) {
+			OrderDao orderDao, 
+			AimportDriver portOneDriver) {
 		this.productService = productService;
 		this.configService = configService;
 		this.userService = userService;
 		this.licenseService = licenseService;
 		this.orderDao = orderDao;
+		this.portOneDriver = portOneDriver;
 	}
 	public Order createBetaOrder(Long teacherSeq, String productCode, Integer qtt) {
 		User teacher = userService.findTeacher(teacherSeq);
@@ -94,7 +104,7 @@ public class OrderService {
 	}
 	
 	/**
-	 * 새로운 주문 생성. 생성한 주문은 결제가 이루어지기 전까지 READY상태로 남아있음.
+	 * 소매 상품에 대한 새로운 주문 생성. 생성한 주문은 결제가 이루어지기 전까지 READY상태로 남아있음.
 	 * @param teacherSeq
 	 * @param productCode
 	 * @param qttProduct - 상품 갯수(보통 1개)
@@ -134,7 +144,7 @@ public class OrderService {
 		
 		order.setOrderState(OrderState.RDY);
 		order.setPaygateVendor(PG.im_port);
-//		System.out.println(order.getTotalAmount());
+
 		if(hook != null) {
 			hook.accept(order);
 		}
@@ -239,7 +249,7 @@ public class OrderService {
 		Boolean loadLicense = option.getBoolean("license");
 		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
 		if (loadProduct) {
-			Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
+			Product product = pickProduct(order.getProductRef()); // productService.findBy(Product.Column.prod_seq, order.getProductRef());
 			order.bindProduct(product);
 		}
 		if (loadLicense) {
@@ -248,17 +258,59 @@ public class OrderService {
 		}
 		return order;
 	}
+	private Product pickProduct(Integer productSeq) {
+		// theme 정보를 얻기 위해서 findProducts()를 호출함
+		List<Product> products = productService.findProducts();
+		return products
+				.stream()
+				.filter(prd -> prd.getSeq().equals(productSeq))
+				.findFirst()
+				.orElse(null);
+	}
 	/**
-	 * 진행중인 주문을 취소함(결제 완료된 주문을 취소하는 기능 아님). 주문이 READY상태일때만 가능
+	 * 결제 대기 중인 주문을 사용자가 취소함
 	 * @param orderUuid
 	 * @return
 	 */
-	public Order cancelOrder(String orderUuid) {
-		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
-		if (!order.isPending()) {
-			throw new AppException(ErrorCode.ORDER_ALREADY_ACTIVATED, 400);
+	public Order cancelPendingOrder(String orderUuid) {
+		return cancelOrder(orderUuid, OrderState.RDY, OrderState.CNU);
+	}
+	/**
+	 * 결제 완료된 주문을 취소시킴(전체 취소만 지원함)
+	 * @param orderUuid
+	 * @param reason - 취소 상태 코드
+	 * @param updateRemote - 아임포트 api 호출 여부(kdict console에서 주문을 취소한 경우 원격 호출 필요함)
+	 * @return
+	 */
+	public Order cancelActiveOrder(String orderUuid, OrderState reason, boolean updateRemote) {
+		if (!CANCEL_STATES.contains(reason)) {
+			String msg = String.format("expected %s, but %s", CANCEL_STATES.toString(), reason.name());
+			throw new AppException(ErrorCode.ORDER_STATE_MISMATCH, 400, msg);
 		}
-		order.cancelByUser();
+		Order order = cancelOrder(orderUuid, OrderState.ATV, reason);
+		
+		if (updateRemote && !order.isGroupOrder()) {
+			// FIXME 개별 구매인 경우 포트원 결제취소 api를 호출해야 함
+			portOneDriver.cancelPayment(order.getOrderUuid());
+		}
+		return order;
+	}
+	/**
+	 * 주문을 취소함
+	 * @param orderUuid
+	 * @param expectedStatus - 현재 주문 상태
+	 * @param newStatus - 새로운 주문 상태. CNU(화면에서 결제 중에 창을 닫음),CNE(오류 발생),CNR(아임포트 관리자 화면에서 취소시킴)
+	 * @return
+	 */
+	@Transactional(propagation = Propagation.MANDATORY)
+	private Order cancelOrder(String orderUuid, OrderState expectedStatus, OrderState newStatus) {
+		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
+		if (order.getOrderState() != expectedStatus) {
+			throw new AppException(ErrorCode.ORDER_STATE_MISMATCH, 400,
+					String.format("expected %s, but %s", expectedStatus.name(), order.getOrderState().name()));
+		}
+		
+		order.setOrderState(newStatus);
 		orderDao.updateState(order);
 		return order;
 	}
@@ -269,6 +321,21 @@ public class OrderService {
 	 */
 	public List<Order> findPurchasedOrders(Long teacherSeq) {
 		return orderDao.findPurchasedOrders(teacherSeq);
+	}
+	/**
+	 * 결제 시작 전 포트원에 검증 정보를 전송함
+	 * @param teacherSeq
+	 * @param orderUuid
+	 */
+	public void sendPaymentVerification(Long teacherSeq, String orderUuid) {
+		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderUuid);
+		if (order.getOrderState() != OrderState.RDY) {
+			throw new AppException(ErrorCode.ORDER_STATE_MISMATCH, 422, "NOT_A_READY");
+		}
+		if (!order.getCustomerRef().equals(teacherSeq)) {
+			throw new AppException(ErrorCode.ORDER_INVALID_OWNER, 403, "NOT_A_OWNER");
+		}
+		portOneDriver.preparePayment(order.getOrderUuid(), order.getTotalAmount());
 	}
 
 }

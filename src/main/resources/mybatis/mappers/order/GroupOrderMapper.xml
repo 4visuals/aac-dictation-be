@@ -36,8 +36,6 @@
   		<association property="sender" resultMap="UserMapper.usermap"/>
   		<collection property="papers" resultMap="GroupPaperMapper.orderPaperMap"/>
   	</resultMap>
-  	<!-- <select id="" parameterType="" resultMap="*">
-  	</select> -->
   	<select id="findBy" parameterType="map" resultMap="groupOrderMap">
 	  	SELECT
 		  	<include refid="group_order_cols"/>

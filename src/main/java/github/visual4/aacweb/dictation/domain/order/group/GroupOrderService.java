@@ -211,6 +211,9 @@ public class GroupOrderService {
 				form.getSenderRef(),
 				dto.getProductCode(),
 				qtt, odr -> {
+					/*
+					 * 단체 구매 문의시 합의한 금액으로 바꿔줌
+					 */
 					odr.setTotalAmount(dto.getContractPrice());
 					/*
 					 * pg 벤더를 단체구매로 변경
@@ -236,5 +239,8 @@ public class GroupOrderService {
 	
 	public GroupOrderDao getDao() {
 		return this.groupOrderDao;
+	}
+	public OrderService getOrderService() {
+		return this.orderService;
 	}
 }

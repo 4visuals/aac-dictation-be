@@ -55,7 +55,12 @@
 	  		AND odr.order_state = ${state}
 	  	</if>
   	</select>
-  	<!-- 결제 구매 내역(무료 평가판 구매는 제외) -->
+  	<!-- 
+  	결제 구매 내역(무료 평가판 구매는 제외)
+  	공동구매 상품까지 가져오기 위해서 ('RDY', 'ATV') 상태로 조회함
+  	공구 상품은 관리자가 주문을 입력하면 'RDY' 상태에서 시작함
+  	odr.produt_ref 를 이용해서 product.salesType으로 주문의 유형을 특정할 수 있음 
+  	-->
   	<select id="findPurchasedOrders" parameterType="map" resultMap="ordermap">
   		SELECT
 	  		<include refid="order_cols" />,
@@ -64,9 +69,13 @@
 	  	JOIN dt_products prod
 	  	  ON odr.product_ref = prod.prod_seq
 	  	WHERE odr.customer_ref = #{userSeq}
-	  		AND odr.order_state = 'ATV'
+	  		AND odr.order_state IN ('RDY', 'ATV')
+	  		AND NOT (prod.prod_sales_type = 'RT' AND odr.order_state = 'RDY') 
 	  		AND odr.trial_order = 'N'
+	  	ORDER
+	  	  BY odr.odr_seq DESC
   	</select>
+  	<select id="findGroupOrders"></select>
   	
   	<select id="findOrders" resultMap="orderWithItemCount">
   		SELECT

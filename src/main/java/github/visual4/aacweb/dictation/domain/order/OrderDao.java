@@ -25,7 +25,7 @@ public class OrderDao {
 		if (orders.size() > 1) {
 			throw new AppException(ErrorCode.APP_BUG, 500, "multiple rows found: " + orders.size());
 		}
-		return orders.size() == 0 ? null : orders.get(0);
+		return orders.isEmpty() ? null : orders.get(0);
 	}
 	/**
 	 * 주어진 사용자의 구매 내역

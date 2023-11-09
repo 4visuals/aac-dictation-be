@@ -13,23 +13,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
-import github.visual4.aacweb.dictation.domain.order.gbuying.GroupBuyingOrderService;
+import github.visual4.aacweb.dictation.domain.order.Order;
+import github.visual4.aacweb.dictation.domain.order.gbuying.GbuyingOrderService;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserService;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
-
+/**
+ * 공동구매 참여 및 주문 관련 api
+ * 
+ * 현재 공동구매 참여 문의는 관리자가 오프라인에서 수집한 정보를 직접 입력 및 수정하는 상태
+ */
 @RestController
 @RequestMapping("/api/admin/gbuying")
 public class AdminGroupBuyingController {
 
-	final GroupBuyingOrderService gBuyingService;
+	final GbuyingOrderService gBuyingService;
 	final ProductService productSerivce;
 	final UserService userService;
 	public AdminGroupBuyingController(
-			GroupBuyingOrderService gBuyingService,
+			GbuyingOrderService gBuyingService,
 			ProductService productSerivce,
 			UserService userService) {
 		this.gBuyingService = gBuyingService;
@@ -61,7 +66,19 @@ public class AdminGroupBuyingController {
 		return Res.success("forms", forms);
 	}
 	/**
-	 * 공구 상품에 주문 양식 등록(실제 주문이 아님)
+	 * 공구 참여자들에게 실제 주문을 생성함.
+	 * @return
+	 */
+	@PostMapping("/product/{productUuid}/orders")
+	public Object createGbuyingOrdering(@JwtProp("useq") Integer adminSeq,
+			@PathVariable String productUuid) {
+		User admin = userService.loadAdmin(adminSeq.longValue());
+		List<Order> orders = gBuyingService.createOrders(admin, productUuid);
+		return Res.success("orders", orders);
+	}
+	
+	/**
+	 * 공구 참여 문의 등록(실제 주문이 아님)
 	 * @param adminSeq
 	 * @param form
 	 * @return
@@ -74,6 +91,13 @@ public class AdminGroupBuyingController {
 		gBuyingService.insertOrderForm(form);
 		return Res.success("form", form);
 	}
+	/**
+	 * 공구 참여 문의 수정(가격, 수량 정도만 구현됨)
+	 * @param adminSeq
+	 * @param formSeq
+	 * @param body
+	 * @return
+	 */
 	@PutMapping("/form/{formSeq}")
 	public Object updateOrderForm(
 			@JwtProp("useq") Integer adminSeq,
@@ -83,6 +107,12 @@ public class AdminGroupBuyingController {
 		GroupOrderForm form = gBuyingService.updateOrderForm(formSeq, body);
 		return Res.success("form", form);
 	}
+	/**
+	 * 공구 참여 문의 삭제
+	 * @param adminSeq
+	 * @param formSeq
+	 * @return
+	 */
 	@DeleteMapping("/form/{formSeq}")
 	public Object deleteOrderForm(
 			@JwtProp("useq") Integer adminSeq,

@@ -28,6 +28,7 @@ import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
 import github.visual4.aacweb.dictation.domain.order.PG;
+import github.visual4.aacweb.dictation.domain.order.aim_port.AimportDriver.AimportResponse;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportHook.PayStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,18 +48,35 @@ public class AimPortService {
 	@Value("${aimport.secret-key}")
 	String importAPISecret;
 	
-	final private String HOST = "https://api.iamport.kr";
-	private AccessToken token;
+	private final String HOST = "https://api.iamport.kr";
 	
 	OrderService orderService;
 	final ObjectMapper om;
+
+	private final AimportDriver portOneDriver;
+	/**
+	 * 결제를 승인한 관리자
+	 */
+	private final static Long CONFIRMER = 1L;
 	
-	public AimPortService(OrderService orderService, ObjectMapper om) {
+	public AimPortService(OrderService orderService, AimportDriver portOneDriver, ObjectMapper om) {
 		this.orderService = orderService;
+		this.portOneDriver = portOneDriver;
 		this.om = om;
 	}
 	/**
-	 * 결제 확인
+	 * 결제 시작 전 포트원에 금액 검증 정보를 전송함
+	 * @see https://developers.portone.io/docs/ko/auth/guide/5/pre 
+	 * @param order
+	 */
+	public void sendPaymentVerification(Order order) {
+		String orderUuid = order.getOrderUuid();
+		Integer amount = order.getTotalAmount();
+		portOneDriver.preparePayment(orderUuid, amount);
+		
+	}
+	/**
+	 * 포트원에서 결제 결과 확인 - 결제승인, 결제취소(전체취소)
 	 * 
 	 * 
 	 * @param hook
@@ -67,27 +85,12 @@ public class AimPortService {
 		log.info("[aimport uuid] {}", hook.aimportUuid);
 		log.info("[order   uuid] {}", hook.orderUuid);
 		
-		AimportResponse res = get("/payments/" + hook.aimportUuid);
-		System.out.println(res.body);
-		/*
-		 * {
-		 * 	imp_uid=imp_249885652156,
-		 *  merchant_uid=y5kfd34zbkg4tt292glx6,
-		 *  status=paid,
-		 *  amount=6900,
-		 *  paid_at=1668495090,
-		 *  pg_provider=danal_tpay,
-		 *  pg_tid=202....400,
-		 */
-		String aimportUuid = res.body.getStr("imp_uid");
-		String orderUuid = res.body.getStr("merchant_uid");
-		String status = res.body.getStr("status");
-		Integer amount = res.body.asInt("amount"); //결제된 금액
-		Integer paidTime = res.body.asInt("paid_at"); // 결제 시간(초단위)
-		String pgVendor = res.body.getStr("pg_provider");
-		String endTxUid = res.body.getStr("pg_tid");
+		AimportResponse remote = portOneDriver.queryPaymentDetail(hook.aimportUuid);
 		
-		log.info("[paygate id] {}", pgVendor);
+		String aimportUuid = remote.body.getStr("imp_uid");
+		String orderUuid = remote.body.getStr("merchant_uid");
+		String status = remote.body.getStr("status");
+		PayStatus paymentStatus = PayStatus.valueOf(status);
 		
 		if (!hook.checkUuid(aimportUuid, orderUuid)) {
 			log.error(String.format("[PAYMENT] uuid mismatch, hook(a:%s, o:%s) vs real(a:%s, o:%s)",
@@ -95,168 +98,115 @@ public class AimPortService {
 					aimportUuid, orderUuid));
 			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, "uuid mismatch");
 		}
-		if (!hook.checkStatus(PayStatus.valueOf(status))) {
-			log.error(String.format("[PAYMENT] status mismatch hook(%s) vs real(%s)", hook.status, status));
+		if (!hook.checkStatus(paymentStatus)) {
+			log.error(String.format("[PAYMENT] status mismatch hook(%s) vs real(%s)", hook.status, paymentStatus.name()));
 			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, 
 					String.format(
 							"payment status mismatch. [%s] from requst, but [%s] from rest api",
-							hook.getStatus(), status));
+							hook.getStatus(), paymentStatus.name()));
 		}
 		
 		Order order = orderService.findOrder(orderUuid);
-		log.info("[detail]", order.getTransactionDetail());
-		if (!order.isPending()) {
-			log.error(String.format("[PAYMENT] not a RDY order, order state : %s", order.getOrderState()));
-			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, "not a pending payment");
+		log.info("[detail]", order.getTransactionDetail()); 
+		if(paymentStatus == PayStatus.paid) {
+			// PG에서 결제완료됨
+			orderPaid(order, remote.body);
+		} else if(paymentStatus == PayStatus.cancelled) {
+			// PG 관리자 화면에서 결제를 취소함
+			orderCancelledByRemote(order, remote.body);
 		}
+	}
+	/**
+	 * 결제 승인됨
+	 * @param order - 대기 상태인 주문
+	 * @param body
+	 */
+	private void orderPaid(Order order, TypeMap body) {
+		Integer amount = body.asInt("amount"); //결제된 금액
+		/*
+		 * 아임포트의 uid
+		 */
+		String aimportUuid = body.getStr("imp_uid");
+		/*
+		 * 실제 PG사의 uid
+		 */
+		String endTxUid = body.getStr("pg_tid");
+		/*
+		 * kdict 백엔드에서 생성한 orderUuid
+		 */
+		String orderUuid = body.getStr("merchant_uid");
+		String pgVendor = body.getStr("pg_provider");
+		
+		PayStatus paymentStatus = PayStatus.valueOf(body.getStr("status"));
+		if(paymentStatus != PayStatus.paid) {
+			String msg = String.format("paid required but %s", paymentStatus.name());
+			log.error(msg);
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
+		}
+		if (!order.isPending()) {
+			String msg = String.format("not a pending order, order state : %s", order.getOrderState());
+			log.error(msg);
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
+		}
+		
 		Integer price = order.getTotalAmount();
 		if (!price.equals(amount)) {
 			/*
 			 * 청구 금액과 실제 결제 금액이 다름
 			 * 결제를 취소시킴
 			 */
-			log.error(String.format("[PAYMENT] amount mismatch: order: " + orderUuid));
-			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409,
-					String.format("amount mismatch. expected: %d, but %d", price, amount));
+			String msg = String.format("paid amount mismatch: order: %s", orderUuid);
+			log.error(msg);
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
 		}
-		
-		
-		final String detail = Util.stringify(om, res.body);
 		
 		/*
 		 * 1주문당 1개의 수강증 발급으로 다시 변경(원래 2장이었음)
 		 */
 		final Integer numOfLicenses = 1;
+		final String detail = Util.stringify(om, body);
 		
-		orderService.activateOrder(order.getOrderUuid(), 1L, numOfLicenses, (odr) -> {
+		orderService.activateOrder(order.getOrderUuid(), CONFIRMER, numOfLicenses, odr -> {
 			odr.setMidTransactionUid(aimportUuid);
 			odr.setEndTransactionUid(endTxUid);
 			odr.setOrderState(OrderState.ATV);
 			odr.setPaygateVendor(PG.valueOf(pgVendor));
 			odr.setTransactionDetail(detail);
 		});
+		
 	}
-	
-	private AimportResponse get(String endPoint) {
-		String accessToken = getAccesstoken();
+	/**
+	 * 포트원 관리자 화면에서 결제를 취소했음
+	 * @param order
+	 * @param body
+	 */
+	private void orderCancelledByRemote(Order order, TypeMap body) {
 		
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", accessToken);
-		HttpEntity request = new HttpEntity(headers);
-		
-		RestTemplate rest = new RestTemplate();
-		ResponseEntity<Map> r = rest.exchange(
-				HOST + endPoint,
-				HttpMethod.GET,
-				request,
-				Map.class);
-		
-		Map<String, Object> response = r.getBody();
-		AimportResponse res = AimportResponse.pase(response);
-		return res;
-	}
-	
-	private AimportResponse connect(String method, String endPoint, TypeMap req) {
-		boolean isGet = "get".equals(method);
-		boolean isPost = "post".equals(method);
-		
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(HOST + endPoint);
-		if (isGet && req != null) {
-			req.forEach((key, value) -> {
-				builder.queryParam(key, value.toString());
-			});
-		}
-		URI uri = builder.encode().build().toUri();
-		RestTemplate rest = new RestTemplate();
-		
-		Map<String, Object> response = null;
-		
-		if (isPost) {
-			response = rest.postForObject(uri, req, HashMap.class);
-		} else if (isGet) {
-			response= rest.getForObject(uri, HashMap.class);
-		} else {
-			throw new AppException(ErrorCode.SERVER_ERROR, 500, "not supported http method(Aimport) :" + method );
-		}
-		
-		AimportResponse res = AimportResponse.pase(response);
-		return res;
-	}
-	private AccessToken issueAcessToken() {
-		String endPoint = "/users/getToken";
-		AimportResponse res = connect(
-			"post",
-			endPoint,
-			TypeMap.with("imp_key", importAPIKey, "imp_secret", importAPISecret));
-		
-		/* 
-		 * {
-		 *   code=0, 
-		 *   response={
-		 *     access_token=b08fee26c661d468f33d85d358c98cd10a41e791,
-		 *     now=1670149240,
-		 *     expired_at=1670149308
-		 *   },
-		 *   message=null}
+		Integer cancelledAmount = body.getInt("cancel_amount");
+		/*
+		 * kdict 백엔드에서 생성한 주문 식별 코드
 		 */
-		Long nowMillis = res.body.asLong("now") * 1000;
-		Long expMillis = res.body.asLong("expired_at")* 1000;
-		Long durationInMillis = expMillis - nowMillis; //
-		Long localNow = System.currentTimeMillis();
-		System.out.printf("LocalNow: %d, now: %d, exp: %d\n", localNow, nowMillis, expMillis);
-		String accessToken = res.body.getStr("access_token");
-		AccessToken token = new AccessToken(localNow, durationInMillis, accessToken);
-		System.out.println(token);
-		return token;
-	}
-	public String getAccesstoken() {
+		String orderUuid = body.getStr("merchant_uid");
+		if (!order.isActive()) {
+			String msg = String.format("cannot cancel order(expected active, but %s)", order.getOrderState());
+			log.error(msg);
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
+		}
 		
-		if (token == null) {
-			token = issueAcessToken();
+		Integer price = order.getTotalAmount();
+		if (!price.equals(cancelledAmount)) {
+			/*
+			 * 결제했던 금액과 취소 금액이 다름
+			 * 결제를 취소시킴
+			 */
+			String msg = String.format("cancel amount mismatch. expected: %d, but %d", price, cancelledAmount);
+			log.error(msg);
+			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
 		}
-		if (!token.isValid()) {
-			token = issueAcessToken();
-		}
-		return token.value;
+		
+		orderService.cancelActiveOrder(orderUuid, OrderState.CNR, false);
 	}
 	
-	private static class AccessToken {
-		long issuedAt;
-		long expiredAt;
-		String value;
-		
-		AccessToken(Long now, Long duration, String accessToken) {
-			this.issuedAt = now;
-			this.expiredAt = now + duration;
-			this.value = accessToken;
-		}
-		
-		boolean isValid() {
-			long remaining = expiredAt - System.currentTimeMillis();
-			return remaining > 30 * 1000; // 30초
-		}
-
-		@Override
-		public String toString() {
-			return "AccessToken [now=" + issuedAt + ", expiredAt=" + expiredAt + ", token=" + value + "]";
-		}
-	}
-	private static class AimportResponse {
-		int code;
-		String message;
-		TypeMap body;
-		
-		public AimportResponse(int code, String message, TypeMap body) {
-			super();
-			this.code = code;
-			this.message = message;
-			this.body = body;
-		}
-		static AimportResponse pase(Map<String, Object> res) {
-			Integer code = (Integer)res.get("code");
-			String message = (String) res.get("message");
-			TypeMap body = new TypeMap((Map<String, Object>)res.get("response"));
-			return new AimportResponse(code, message, body);
-		}
-	}
+	
+	
 }

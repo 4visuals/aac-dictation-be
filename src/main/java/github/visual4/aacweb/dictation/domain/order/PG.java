@@ -7,7 +7,7 @@ package github.visual4.aacweb.dictation.domain.order;
 public enum PG {
 	im_port,
 	/**
-	 * import에서 토스페이먼츠를 사용할 경우
+	 * import에서 토스페이먼츠를 사용할 경우(구모듈, LGU+ 로 결제됨)
 	 * https://guide.portone.io/01cd8f06-6952-493c-8b77-9c4f235c464c
 	 */
 	uplus,

@@ -48,7 +48,6 @@ public class OrderController {
 			@RequestBody TypeMap form) {
 		String code = form.getStr("productCode");
 		final Integer numOfProduct = 1;
-//		final Integer numOfLicenses = 1;
 		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
 				code,
 				numOfProduct,
@@ -56,7 +55,7 @@ public class OrderController {
 		return Res.success("order", order);
 	}
 	/**
-	 * 주문 취소 - 주문 진행중에 취소됨
+	 * 사용자가 주문을 취소함 - 주문 진행중에 취소됨(결제 시도 중 결제팝업을 닫음)
 	 * @return
 	 */
 	@PutMapping("/order")
@@ -64,7 +63,7 @@ public class OrderController {
 			@JwtProp("useq") Integer teacherSeq,
 			@RequestBody TypeMap form) {
 		String orderUuid = form.getStr("orderUuid");
-		Order order = orderSerivce.cancelOrder(orderUuid);
+		Order order = orderSerivce.cancelPendingOrder(orderUuid);
 		return Res.success("order", order);
 	}
 	/**
@@ -72,11 +71,24 @@ public class OrderController {
 	 * @return
 	 */
 	@GetMapping("/order/{orderUuid}")
-	public Object orderDetail(@JwtProp("useq") Integer teacherSeq,
+	public Object orderDetail(
+			@JwtProp("useq") Integer teacherSeq,
 			@PathVariable String orderUuid) {
 		Order order = orderSerivce.findOrderDetail(orderUuid,
 				TypeMap.with("product", true, "license", true));
 		return Res.success("order", order);
+	}
+	/**
+	 * 클라이언트 화면에서 결제를 시작하려고 함.
+	 * 포트원에 결제 검증 코드를 전송함
+	 * @return
+	 */
+	@PostMapping("/order/{orderUuid}/prepare")
+	public Object sendPaymentVerification(
+			@JwtProp("useq") Integer teacherSeq,
+			@PathVariable String orderUuid) {
+		orderSerivce.sendPaymentVerification(teacherSeq.longValue(), orderUuid);
+		return Res.success(true);
 	}
 	
 	@GetMapping("/orders")

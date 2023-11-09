@@ -25,13 +25,17 @@ public class Order {
 		 */
 		ATV,
 		/**
-		 * CANCEL BY USER - 사용자가 결제를 취소함
+		 * CANCEL BY USER - 사용자가 결제를 취소함(사용자가 결제 팝업을 띄운 후 결제를 끝마치지 않고 팝업을 닫음)
 		 */
 		CNU,
 		/**
 		 * CANCEL BY ERROR - 결제 중 오류 발생으로 취소됨
 		 */
-		CNE
+		CNE,
+		/**
+		 * CANCEL BY REMOTE - 포트원(아임포트) 관리자 화면에서 결제를 취소한 경우.(webhook을 통해서 취소 결과가 인입됨)
+		 */
+		CNR,
 	}
 	public enum Column {
 		order_uuid, customer_ref
@@ -129,11 +133,11 @@ public class Order {
 	/**
 	 * 사용자가 결제 도중에 취소함
 	 */
-	public void cancelByUser() {
-		if (this.orderState == OrderState.RDY) {
-			this.orderState = OrderState.CNU;
-		}
-	}
+//	public void cancelByUser() {
+//		if (this.orderState == OrderState.RDY) {
+//			this.orderState = OrderState.CNU;
+//		}
+//	}
 
 	public void bindProduct(Product product) {
 		this.product = product;
@@ -144,5 +148,10 @@ public class Order {
 	public void bindItems(List<License> licenses) {
 		this.items = licenses;
 		this.itemCount = null;
+	}
+
+	public boolean isGroupOrder() {
+		return this.paygateVendor == PG.group_order;
+//		return false;
 	}
 }

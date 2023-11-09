@@ -13,12 +13,29 @@ public class Dao {
 		String nameSpace = clsName.replace("Dao", "Mapper.");
 		return nameSpace + method;
 	}
-
+	/**
+	 * [0, 1]개 row 수정 보장
+	 * @param session
+	 * @param queryPath
+	 * @param param
+	 */
+	public static void updateOne(SqlSession session, String queryPath, Object param) {
+		int nUpdated = session.update(queryPath, param);
+		if (nUpdated > 1) {
+			throw new AppException(ErrorCode.APP_BUG, 500, "tried to update " + nUpdated + " rows.");
+		}
+	}
+	/**
+	 * [0, 1]개 삭제 보장
+	 * @param session
+	 * @param queryPath
+	 * @param param
+	 */
 	public static void deleteOne(SqlSession session, String queryPath, Object param) {
 		int nDeleted = session.delete(queryPath, param);
 		if (nDeleted > 1) {
 			throw new AppException(ErrorCode.APP_BUG, 500, "tried to delete " + nDeleted + " rows.");
 		}
-		
 	}
+	
 }

@@ -22,7 +22,7 @@ import github.visual4.aacweb.dictation.domain.user.User;
 @Service
 public class ProductService {
 
-	final private static String PRODUCT_CODE_PREFIX = "prod-cert-";
+	private static final String PRODUCT_CODE_PREFIX = "prod-cert-";
 	final ProductDao productDao;
 	final AppConfigService appConfigService;
 	
@@ -89,7 +89,7 @@ public class ProductService {
 		if (!product.hasValidSalesType()) {
 			throw new AppException(ErrorCode.PRODUCT_ERROR, 400, "sales type required [RT, GB]");
 		}
-		// FIXME 상품 노출 시간이 없는 경우에만...
+		/* FIXME 상품 노출 시간이 없는 경우에만... */
 		product.setActivatedAt(Instant.now());
 		product.setCode(PRODUCT_CODE_PREFIX + UUID.randomUUID().toString());
 		product.setCreatedBy(adminUser.getEmail());
@@ -116,6 +116,17 @@ public class ProductService {
 		productDao.updateBasicInfo(product);
 		return productDao.findBy(Product.Column.prod_seq, product.seq);
 		
+	}
+	/**
+	 * 상품을 단종시킴
+	 * @param productSeq
+	 */
+	public void exipreProduct(Integer productSeq) {
+		// expired 를 현재 시간으로 지정해서 조회 시 노출되지 않게 함
+		Product product = productDao.findBy(Product.Column.prod_seq, productSeq);
+		Products.checkIfGBuyingProduct(product);
+		product.setExpiredAt(Instant.now());
+		productDao.updateAsExpired(product);
 	}
 	
 }

@@ -44,6 +44,12 @@ public class GroupOrderDao {
 				Dao.mapper(this, "findBy"),
 				TypeMap.with("col", column, "value", value ));
 	}
+	/**
+	 * 조건에 맞는 form 조회
+	 * @param column
+	 * @param value
+	 * @return
+	 */
 	public List<GroupOrderForm> findsBy(Column column, Object value) {
 		return session.selectList(
 				Dao.mapper(this, "findBy"),

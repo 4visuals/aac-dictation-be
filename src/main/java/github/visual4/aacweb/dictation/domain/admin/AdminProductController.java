@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +24,15 @@ import github.visual4.aacweb.dictation.web.aop.JwtProp;
 @RequestMapping("/api/admin")
 public class AdminProductController {
 
-	@Autowired
-	ProductService productService;
-	@Autowired
-	UserService userService;
+	final ProductService productService;
+	final UserService userService;
+
+    public AdminProductController(
+    		ProductService productService,
+    		UserService userService) {
+        this.productService = productService;
+        this.userService = userService;
+    }
 	
 	@GetMapping("/products")
 	public Object listProducts(@JwtProp("useq") Integer userSeq) {
@@ -46,11 +53,31 @@ public class AdminProductController {
 		productService.createProduct(admin, product);
 		return Res.success("product", product);
 	}
+	/**
+	 * 등록된 상품 정보 수정
+	 * @param userSeq
+	 * @param product
+	 * @return
+	 */
 	@PutMapping("/product")
 	public Object updateProduct(
 			@JwtProp("useq") Integer userSeq,
 			@RequestBody Product product) {
 		var prod = productService.updateBasicInfo(product);
 		return Res.success("product", prod);
+	}
+	/**
+	 * 등록된 상품을 만료 처리함(더이상 구매 불가)
+	 * @param userSeq
+	 * @param productSeq
+	 * @return
+	 */
+	@DeleteMapping("/product/{productSeq}")
+	public Object deleteProduct(
+			@JwtProp("useq") Integer userSeq,
+			@PathVariable Integer productSeq) {
+		userService.loadAdmin(userSeq.longValue());
+		productService.exipreProduct(productSeq);
+		return Res.success(true);
 	}
 }

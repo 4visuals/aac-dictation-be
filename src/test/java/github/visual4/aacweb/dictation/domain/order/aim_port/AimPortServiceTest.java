@@ -5,15 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class AimPortServiceTest {
-
-	@Test
-	void test_issue_accesskey() {
-		
-		AimPortService service = new AimPortService(null, null);
-		
-		String token = service.getAccesstoken();
-		System.out.println(token);
-	}
 	
 	@Test
 	void test_confirmPayments() {
@@ -22,7 +13,7 @@ class AimPortServiceTest {
 		hook.orderUuid = "odr-8ed5ef92-4571-4761-8fed-66a7e10c4360";
 		hook.status = "paid";
 		
-		AimPortService service = new AimPortService(null, null);
+		AimPortService service = new AimPortService(null,null,  null);
 		
 		service.confirmPayment(hook);
 	}

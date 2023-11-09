@@ -6,7 +6,19 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 
 public class Products {
-
+	/**
+	 * db 에서 읽어들인 Product가 공구 상품인지 확인함
+	 * @param product
+	 */
+	public static void checkIfGBuyingProduct(Product product) {
+		if(!product.checkIfGroupBuying()) {
+			throw new AppException(ErrorCode.GROUP_ORDER_ERROR, 422, "not_a_groupbuying_product");
+		}
+	}
+	/**
+	 * db에 소매 상품을 추가하기 전 검증함
+	 * @param product
+	 */
 	public static void assertRetailProduct(Product product) {
 		Integer price = product.getPriceKrWon();
 		if (price == null || price < 0) {
@@ -47,7 +59,10 @@ public class Products {
 		}
 		
 	}
-
+	/**
+	 * db에 공구 상품을 추가하기 전 검증함
+	 * @param product
+	 */
 	public static void assertGroupBuyingProduct(Product product) {
 		
 		product.setPriceKrWon(0);

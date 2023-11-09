@@ -9,10 +9,42 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import github.visual4.aacweb.dictation.BaseDao;
+import github.visual4.aacweb.dictation.domain.appconfig.ImportAppConfig;
+import github.visual4.aacweb.dictation.domain.license.LicenseServiceTest;
+import github.visual4.aacweb.dictation.domain.student.StudentDao;
 
 @Import(UserDao.class)
-class UserServiceTest extends BaseDao{
+public class UserServiceTest extends BaseDao{
 
+	@Import({UserService.class,
+		StudentDao.class, 
+		UserDao.class,
+		ImportAppConfig.class,
+		GoogleAuthService.class,
+		LicenseServiceTest.Imports.class
+	})
+	public static class Imports {}
+	
+	public static class Sample {
+		public static User teacher1() {
+			User user = new User();
+			user.setSeq(682L);
+			user.setName("마우스");
+			user.setEmail("nole.coding@gmail.com");
+			user.setRole(UserRole.TEACHER);
+			return user;
+		}
+
+		public static User admin() {
+			User admin = teacher1();
+			admin.setSeq(1L);
+			admin.setName("SuperAdmin");
+			admin.setEmail("admin@aacdict");
+			admin.setRole(UserRole.TEACHER);
+			return admin;
+		}
+	}
+	
 	@Autowired
 	UserDao userDao;
 	

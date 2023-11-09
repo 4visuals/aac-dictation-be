@@ -19,9 +19,12 @@ import github.visual4.aacweb.dictation.domain.order.group.OrderPaper;
 import github.visual4.aacweb.dictation.domain.order.group.OrderPaper.PaperType;
 import github.visual4.aacweb.dictation.service.template.TemplateService;
 
-@Import({MailingService.class, NcpMailingService.class, TemplateService.class})
-class MailingServiceTest extends BaseDao{
+@Import(MailingServiceTest.Imports.class)
+public class MailingServiceTest extends BaseDao{
 
+	@Import({MailingService.class, NcpMailingService.class, TemplateService.class})
+	public static class Imports {}
+	
 	@Autowired
 	MailingService mailingService;
 	
