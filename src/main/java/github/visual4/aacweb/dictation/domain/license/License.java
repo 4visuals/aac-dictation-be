@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -79,6 +80,11 @@ public class License {
 	 * 평가판 라이선스인지 나타냄
 	 */
 	Boolean trialVersion;
+	/**
+	 * 라이선스 결제 상태
+	 * @derived - Order.orderState
+	 */
+	OrderState orderState;
 	/**
 	 * 사용 가능한 라이선스인지 확인
 	 * @param now

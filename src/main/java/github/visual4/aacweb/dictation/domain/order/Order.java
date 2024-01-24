@@ -102,6 +102,8 @@ public class Order {
 	 */
 	String endTransactionUid;
 	
+	Integer licenseQtt;
+	
 	
 	public void setTotalAmount(Integer amount) {
 		if (amount == null || amount < 0) {
@@ -151,7 +153,7 @@ public class Order {
 	}
 
 	public boolean isGroupOrder() {
-		return this.paygateVendor == PG.group_order;
+		return this.paygateVendor == PG.group_order || this.licenseQtt > 1;
 //		return false;
 	}
 }

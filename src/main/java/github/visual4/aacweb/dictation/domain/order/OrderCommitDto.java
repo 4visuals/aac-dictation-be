@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class OrderCommitDto {
 	/**
-	 * 단체구매 문의 참조
+	 * 단체구매 문의(GroupOrderForm) 참조
 	 */
 	Integer groupOrderSeq;
 	/**

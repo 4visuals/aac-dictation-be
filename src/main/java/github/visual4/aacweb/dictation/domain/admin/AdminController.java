@@ -117,12 +117,31 @@ public class AdminController {
 		return Res.success("order", order);
 	}
 	/**
-	 * 단체 주문에 이용권을 발급함.(입금을 확인함)
+	 * 단체 주문에 이용권을 발급함.(입금을 확인한 후)
 	 * @return
+	 * @deprecated 기존에 입금 확인 후 관리자가 이용권을 발급하는 로직. 카드결제 링크 방식으로 전환하기때문에 사용하지 않을 예정
 	 */
 	@PostMapping("/group-orders")
-	public Object commitGroupOrders(@JwtProp("useq") Integer adminSeq, @RequestBody OrderCommitDto dto) {
+	public Object commitGroupOrders(
+			@JwtProp("useq") Integer adminSeq,
+			@RequestBody OrderCommitDto dto) {
+		userService.loadAdmin(adminSeq.longValue());
 		Order order = groupOrderService.commitOrder(adminSeq.longValue(), dto);
+		return Res.success("order", order);
+	}
+	
+	/**
+	 * 고객의 제출했던 단체구매 문의로부터 고객에게 실제 주문 링크를 생성함. 
+	 * (이후 고객은 주문 링크를 클릭해서 결제를 진행함)
+	 *  
+	 * @return
+	 */
+	@PostMapping("/group-order-link")
+	public Object issueGroupOrderLink(
+			@JwtProp("useq") Integer adminSeq,
+			@RequestBody OrderCommitDto dto) {
+		userService.loadAdmin(adminSeq.longValue());
+		Order order = groupOrderService.issueGroupOrder(adminSeq.longValue(), dto);
 		return Res.success("order", order);
 	}
 

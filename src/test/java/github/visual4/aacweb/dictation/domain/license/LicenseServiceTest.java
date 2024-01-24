@@ -12,8 +12,10 @@ import github.visual4.aacweb.dictation.BaseDao;
 import github.visual4.aacweb.dictation.domain.product.Product;
 
 @Import({LicenseDao.class, LicenseService.class})
-class LicenseServiceTest extends BaseDao {
+public class LicenseServiceTest extends BaseDao {
 
+	@Import({LicenseDao.class, LicenseService.class})
+	public static class Imports {}
 	@Autowired
 	LicenseService lcsService;
 	

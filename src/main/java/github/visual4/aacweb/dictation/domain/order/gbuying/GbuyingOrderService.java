@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.order.gbuying;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -160,15 +161,19 @@ public class GbuyingOrderService {
 	public List<Order> createOrders(User admin, String productUuid) {
 		Product product = productService.findBy(Product.Column.prod_code, productUuid);
 		Products.assertGroupBuyingProduct(product);
-		OrderService orderService = groupOrderService.getOrderService();
 		List<GroupOrderForm> forms = groupOrderService.findOrderForms(
 				GroupOrderForm.Column.target_product_ref,
 				product.getSeq());
 		
+		if (product.checkExpiration(Instant.now())) {
+			throw new AppException(ErrorCode.GBUYING_ORDER_ERROR, 422, "PRODUCT_EXPIRED");
+		}
 		if (forms.isEmpty()) {
 			// 문의 양식이 없다!
 			throw new AppException(ErrorCode.GBUYING_ORDER_ERROR, 422, "NO_FORMS_REGSITERED");
 		}
+		
+		OrderService orderService = groupOrderService.getOrderService();
 		Map<GroupOrderForm, Order> orders = new HashMap<>(forms.size());
 		for (GroupOrderForm form : forms) {
 			GroupOrderForms.unescape(form);

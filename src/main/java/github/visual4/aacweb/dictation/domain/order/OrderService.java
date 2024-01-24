@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.domain.order;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +22,7 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportDriver;
+import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.user.User;
@@ -107,7 +109,7 @@ public class OrderService {
 	 * 소매 상품에 대한 새로운 주문 생성. 생성한 주문은 결제가 이루어지기 전까지 READY상태로 남아있음.
 	 * @param teacherSeq
 	 * @param productCode
-	 * @param qttProduct - 상품 갯수(보통 1개)
+	 * @param qttProduct - 라이선스 갯수(보통 1개)
 	 * @return
 	 */
 	public Order createOrder(
@@ -144,6 +146,7 @@ public class OrderService {
 		
 		order.setOrderState(OrderState.RDY);
 		order.setPaygateVendor(PG.im_port);
+		order.setLicenseQtt(qttProduct);
 
 		if(hook != null) {
 			hook.accept(order);
@@ -175,10 +178,9 @@ public class OrderService {
 		 * https://github.com/4visuals/aac-writing/issues/143
 		 */
 		List<License> items = order.getItems();
+		Instant expDate = Instant.now().plus(7, ChronoUnit.DAYS);
 		for (License license : items) {
-			if (license.getExpiredAt().isBefore(EXP2023)) {
-				licenseService.updateExpirationTime(license, EXP2023);
-			}	
+			licenseService.updateExpirationTime(license, expDate);
 		}
 		return order;
 	}

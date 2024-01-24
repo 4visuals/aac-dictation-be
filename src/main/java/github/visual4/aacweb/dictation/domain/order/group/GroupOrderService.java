@@ -28,9 +28,11 @@ import github.visual4.aacweb.dictation.domain.user.UserService;
 import github.visual4.aacweb.dictation.service.UuidService;
 import github.visual4.aacweb.dictation.service.mailing.MailDto;
 import github.visual4.aacweb.dictation.service.mailing.MailingService;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class GroupOrderService {
 	
 	final String host;
@@ -85,7 +87,41 @@ public class GroupOrderService {
 		return this.groupOrderDao.findBy(column, value);
 	}
 	/**
-	 * 단체 구매 문의 등록
+	 * 사용자가 작성한 단체 구매 문의에서 단체 주문을 생성함.
+	 * 관리자가 [console/단체 구매] 화면에서 대기중인 단체 구매 문의 확인 후 결제 생성 화면에서 [결제 링크 생성]을 클릭함
+	 * @param dto 생성할 주문에 대한 정보(원래는 주문을 승인할 때 라이선스 갯수 및 총액을 기록하는 용도였으나 사용자에게 주문을 생성할때에도 사용함)
+	 * @return
+	 */
+	public Order issueGroupOrder(Long adminSeq, OrderCommitDto dto) {
+		GroupOrderForm form = groupOrderDao.findBy(GroupOrderForm.Column.seq, dto.getGroupOrderSeq());
+		if (form.getState() != GroupOrderForm.OrderFormState.PND) {
+			throw new AppException(ErrorCode.ORDER_ALREADY_ACTIVATED, 422);
+		}
+		GroupOrderForms.unescape(form);
+		
+		log.info("[GROUP ORDER] ISSUE: {}", form.toString());
+		Integer qtt = dto.getQtt();
+		
+		Long teacher = form.getSenderRef();
+		Order order = orderService.createOrder(
+				teacher,
+				dto.getProductCode(),
+				qtt, odr -> {
+					/*
+					 * 단체 구매 문의시 합의한 금액으로 바꿔줌
+					 */
+					odr.setTotalAmount(dto.getContractPrice());
+					/*
+					 * pg 벤더를 단체구매로 변경
+					 */
+					odr.setPaygateVendor(PG.group_order);
+				});
+		
+		
+		return order;
+	}
+	/**
+	 * 단체 구매 문의 등록. 사용자가 작성한 단체구매 문의 양식)
 	 * @param teacherSeq 
 	 * @param orderForm
 	 * @param sendMail 메일 전송 여부(관리자가 등록하는 공동구매에서는 메일 전송 생략)

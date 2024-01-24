@@ -16,6 +16,7 @@
   		,receiver_ref
   		,issuer_ref
   		,IFNULL(odr.trial_order, 'Y') as trial_version
+  		,odr.order_state AS order_state
   	</sql>
   	<resultMap type="License" id="lcsmap">
   		<id column="lcs_seq" property="seq"/>
@@ -29,6 +30,7 @@
   		<result column="receiver_ref" property="receiverRef"/>
   		<result column="issuer_ref" property="issuerRef"/>
   		<result column="trial_version" property="trialVersion"/>
+  		<result column="order_state" property="orderState"/>
   	</resultMap>
   	
   	<select id="findBy" parameterType="map" resultMap="lcsmap">

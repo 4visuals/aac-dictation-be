@@ -98,6 +98,7 @@ public class GroupOrderForm {
 	 */
 	OrderFormState state;
 	/**
+	 * 단체 구매 문의자(회원)
 	 * FK: dt_users참조
 	 */
 	Long senderRef;

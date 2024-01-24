@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
+import github.visual4.aacweb.dictation.domain.order.Order;
+import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
 /**
  * 단체 주문 관련 uri
@@ -35,6 +37,5 @@ public class GroupOrderController {
 		groupOrderService.createGroupOrderForm(teacherSeq.longValue(), orderForm, true);
 		
 		return Res.success("orderForm", orderForm);
-		
 	}
 }

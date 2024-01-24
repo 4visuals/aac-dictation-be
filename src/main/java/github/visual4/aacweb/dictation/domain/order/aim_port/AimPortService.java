@@ -161,9 +161,10 @@ public class AimPortService {
 		}
 		
 		/*
-		 * 1주문당 1개의 수강증 발급으로 다시 변경(원래 2장이었음)
+		 * (x): 1주문당 1개의 수강증 발급으로 다시 변경(원래 2장이었음)
+		 * (o): 주문마다 라이선스 갯수를 담도록 변경함(2024-01-24)
 		 */
-		final Integer numOfLicenses = 1;
+		final Integer numOfLicenses = order.getLicenseQtt();
 		final String detail = Util.stringify(om, body);
 		
 		orderService.activateOrder(order.getOrderUuid(), CONFIRMER, numOfLicenses, odr -> {
@@ -192,7 +193,7 @@ public class AimPortService {
 			log.error(msg);
 			throw new AppException(ErrorCode.PAYMENT_VALIDATION_ERROR, 409, msg);
 		}
-		
+		// FIXME 주문 취소된거 확인함. 발급된 이용권 취소시켜야 함
 		Integer price = order.getTotalAmount();
 		if (!price.equals(cancelledAmount)) {
 			/*

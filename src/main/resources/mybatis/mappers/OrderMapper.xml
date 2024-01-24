@@ -15,12 +15,12 @@
   		, odr.customer_ref
   		, odr.confirmer_ref
   		, odr.order_uuid
-  		
   		, odr.order_state
   		, odr.pg_vendor
   		, odr.trx_detail
   		, odr.mid_trx_uid
   		, odr.end_trx_uid
+  		, odr.license_qtt
   	</sql>
   	<resultMap type="Order" id="ordermap">
   		<id column="odr_seq" property="seq"/>
@@ -38,6 +38,7 @@
   		<result column="trx_detail" property="transactionDetail"/>
   		<result column="mid_trx_uid" property="midTransactionUid"/>
   		<result column="end_trx_uid" property="endTransactionUid"/>
+  		<result column="license_qtt" property="licenseQtt"/>
   		<association property="product" resultMap="ProductMapper.prodmap"/>
   		<association property="customer" resultMap="UserMapper.usermap"/>
   	</resultMap>
@@ -70,7 +71,6 @@
 	  	  ON odr.product_ref = prod.prod_seq
 	  	WHERE odr.customer_ref = #{userSeq}
 	  		AND odr.order_state IN ('RDY', 'ATV')
-	  		AND NOT (prod.prod_sales_type = 'RT' AND odr.order_state = 'RDY') 
 	  		AND odr.trial_order = 'N'
 	  	ORDER
 	  	  BY odr.odr_seq DESC
@@ -122,6 +122,7 @@
   		, order_uuid
   		, order_state
   		, pg_vendor
+  		, license_qtt
   	) values (
   		#{productRef}
   		, #{orderTime}
@@ -134,6 +135,7 @@
   		, #{orderUuid}
   		, #{orderState}
   		, #{paygateVendor}
+  		, #{licenseQtt}
   	)
   	</insert>
   	<!-- 결제 승인 처리: 승인날짜와 승인자 seq를 기록함 -->

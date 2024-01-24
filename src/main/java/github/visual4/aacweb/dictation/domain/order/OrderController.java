@@ -90,7 +90,11 @@ public class OrderController {
 		orderSerivce.sendPaymentVerification(teacherSeq.longValue(), orderUuid);
 		return Res.success(true);
 	}
-	
+	/**
+	 * 사용자 화면에 노출되는 주문 내역(active, ready)인 주문만 조회함
+	 * @param teacherSeq
+	 * @return
+	 */
 	@GetMapping("/orders")
 	public Object listOfOrders(@JwtProp("useq") Integer teacherSeq) {
 		List<Order> orders = orderSerivce.findPurchasedOrders(teacherSeq.longValue());

@@ -60,6 +60,19 @@ public class SmsService {
 		String body = getSmsPreview(form.getOrderUuid(), templateName);
 		return smsSender.sendSms(phoneNumber, body);
 	}
+	/**
+	 * 단체구매자에게 문자 발송
+	 * @param orderUuid
+	 * @param body
+	 * @return
+	 */
+	public Object notifyWithManualText(String orderUuid, String body) {
+		GroupOrderForm form = groupOrderService.findBy(
+				GroupOrderForm.Column.group_order_uuid,
+				orderUuid);
+		String phoneNumber = form.getSenderContactInfo();
+		return smsSender.sendSms(phoneNumber, body);
+	}
 	
 	public TypeMap notifyForOrderDocument(GroupOrderForm form, String templateName) {
 //		GroupOrderForm form = groupOrderService.findBy(GroupOrderForm.Column.group_order_uuid, orderUuid);
@@ -71,9 +84,9 @@ public class SmsService {
 			throw new AppException(ErrorCode.SMS_PHONENUMBER_ERROR, 422, phoneNumber);
 		}
 		String body = getSmsPreview(form.getOrderUuid(), templateName);
-		return smsSender.sendSms(phoneNumber, body);
-		
+		return smsSender.sendSms(phoneNumber, body);	
 	}
+
 	/**
 	 * 문자 내용 미리 보기
 	 * @param orderUuid 단체구매 uuid
@@ -90,6 +103,7 @@ public class SmsService {
 		String body = c.compile(template).execute(form);
 		return body;
 	}
+	
 
 	
 }

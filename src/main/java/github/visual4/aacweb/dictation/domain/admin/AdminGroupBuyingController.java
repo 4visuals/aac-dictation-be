@@ -66,7 +66,7 @@ public class AdminGroupBuyingController {
 		return Res.success("forms", forms);
 	}
 	/**
-	 * 공구 참여자들에게 실제 주문을 생성함.
+	 * 공구 참여자들에게 실제 주문을 생성함. 공구 참여자들 페이지에서 결제 링크가 나타남
 	 * @return
 	 */
 	@PostMapping("/product/{productUuid}/orders")

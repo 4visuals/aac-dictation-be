@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
@@ -38,6 +40,9 @@ public class AimportDriver {
 	private final String HOST = "https://api.iamport.kr";
 
 	private AccessToken token;
+	
+	@Autowired
+	ObjectMapper om;
 	
 	private AimportResponse connect(String method, String endPoint, TypeMap req) {
 		boolean isGet = "get".equals(method);
@@ -172,8 +177,7 @@ public class AimportDriver {
 		headers.set("Authorization", accessToken);
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		
-		JSONObject body = new JSONObject(bodies);
-		HttpEntity request = new HttpEntity(body.toString(), headers);
+		HttpEntity request = new HttpEntity(Util.stringify(om, bodies), headers);
 		
 		RestTemplate rest = new RestTemplate();
 		Map r = rest.postForObject(
