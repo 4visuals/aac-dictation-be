@@ -26,4 +26,7 @@ public class VoiceDao {
 	public List<String> selectHashes() {
 		return session.selectList(Dao.mapper(this, "selectHashes"));
 	}
+	public Voice findVoice(String textHash) {
+		return session.selectOne(Dao.mapper(this, "findVoice"), textHash);
+	}
 }

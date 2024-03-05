@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation.tts;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.config.AacDictationConfig;
 import github.visual4.aacweb.dictation.domain.exam.EojeolAnswerDao;
 import github.visual4.aacweb.dictation.domain.sentence.SentenceDao;
+import github.visual4.aacweb.dictation.domain.voice.Voice;
 import github.visual4.aacweb.dictation.domain.voice.VoiceDao;
 import github.visual4.aacweb.dictation.domain.voice.VoiceService;
 
@@ -108,6 +113,7 @@ class TtsDemo{
 	}
 	
 	@Test
+	@Disabled
 	@Rollback(false)
 	void pushSentence() {
 		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
@@ -138,6 +144,7 @@ class TtsDemo{
 	    System.out.println(text.size());
 	}
 	@Test
+	@Disabled
 	@Rollback(false)
 	void pushEojeols() throws SQLException {
 		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
@@ -171,6 +178,42 @@ class TtsDemo{
 		}
 		System.out.println("[dup]");
 		System.out.println(dup.size());
+	}
+	/**
+	 * 
+	 */
+	@Test
+	@Rollback(false)
+	public void push2022Data() {
+		InputStream in = this.getClass().getResourceAsStream("w2022.txt");
+		assertNotNull(in);
+		Scanner sc = new Scanner(in);
+		int k = 0;
+		int cnt = 0;
+		Set<String> words = new HashSet<>();
+		while(sc.hasNextLine()) {
+			String text = sc.nextLine().trim();
+			words.add(text);
+			String [] tokens = text.split(" ");
+			for(String token : tokens) {
+				words.add(token);
+			}
+		}
+		
+		for(String text: words) {
+			String hash = Util.Hash.md5(text).toLowerCase();
+			Voice existing = voiceService.findVoice(hash);
+			if (existing != null) {
+				// System.out.printf("%d: %s(%s)\n", ++k, text, "skip");
+			} else {
+				System.out.printf("%d: %s(%s)\n", ++k, text, hash);
+				voiceService.download(text);
+				cnt ++;
+				sleep(50);
+			}
+		}
+		System.out.println(cnt);
+		sc.close();
 	}
 	
 

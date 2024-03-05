@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class AacTestConfiguration {
 
-	@Bean
-	public ObjectMapper om() {
-		return new ObjectMapper();
-	}
+//	@Bean
+//	public ObjectMapper om() {
+//		return new ObjectMapper();
+//	}
 }

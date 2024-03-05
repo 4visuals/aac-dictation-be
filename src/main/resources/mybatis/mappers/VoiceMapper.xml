@@ -21,6 +21,17 @@
   	<select id="selectHashes" resultType="string">
   		SELECT text_hash from dt_voices
   	</select>
+  	<select id="findVoice" parameterType="string" resultType="Voice">
+  		SELECT
+  			vseq as seq ,
+ 			text_hash AS textHash,  
+ 			origin_text AS originText, 
+ 			voice_origin AS origin,
+ 			file_path AS filePath, 
+ 			file_size AS fileSize
+		FROM dt_voices
+		WHERE text_hash = #{text_hash}
+  	</select>
   	<insert id="insertVoice" parameterType="Voice"
   		useGeneratedKeys="true" keyColumn="vseq" keyProperty="seq">
   	INSERT INTO dt_voices (

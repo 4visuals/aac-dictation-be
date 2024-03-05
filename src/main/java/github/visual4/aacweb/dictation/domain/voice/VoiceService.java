@@ -36,10 +36,16 @@ public class VoiceService {
 		Voice voice = meta.toVoice(textHash, text);
 		voiceDao.insertVoice(voice);
 		storageService.store(meta);
+//		Voice voice = new Voice();
+//		voice.setTextHash(textHash);
+//		voice.setFilePath(textHash + ".mp3");
+//		voice.setOriginText(text);
+//		voice.setOrigin("ncp");
+//		voice.setFileSize(0);
 	}
 
 	public Voice findVoice(String textHash) {
-		return null;
+		return voiceDao.findVoice(textHash);
 	}
 	
 	
