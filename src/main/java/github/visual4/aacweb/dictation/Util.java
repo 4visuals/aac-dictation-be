@@ -1,7 +1,12 @@
 package github.visual4.aacweb.dictation;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -11,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -135,5 +143,55 @@ public class Util {
 			sb.append(token);
 		}
 		return sb.toString();
+	}
+
+	public static void write(byte[] data, HttpServletResponse res) {
+		ServletOutputStream out = null;
+		try  {
+			out = res.getOutputStream();
+			out.write(data);
+			out.flush();	
+		} catch(IOException e) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, "fail to flush data");
+		}
+		
+		
+	}
+	private static void close(Closeable out) {
+		try {
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * in에서 읽어서 out에 써넣음
+	 * @param in
+	 * @param closeInStream - true이면 다 읽은 후 닫아줌
+	 * @param out
+	 * @param closeOutStream - true이면 다 읽은 후 닫아줌
+	 */
+	public static void tranfer(
+			InputStream in, boolean closeInStream,
+			OutputStream out, boolean closeOutStream) {
+		BufferedInputStream bin = in instanceof BufferedInputStream ? (BufferedInputStream) in : new BufferedInputStream(in);
+		BufferedOutputStream bout = out instanceof BufferedOutputStream ? (BufferedOutputStream) out: new BufferedOutputStream(out);
+		int b= -1;
+		try {
+			while((b = bin.read()) != -1) {
+				bout.write(b);
+			}	
+			bout.flush();
+		} catch (IOException e) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, "fail to transfer data");
+		} finally {
+			if(closeInStream) {
+				close(bin);
+			}
+			if(closeOutStream) {
+				close(bout);
+			}
+		}
+		
 	}
 }

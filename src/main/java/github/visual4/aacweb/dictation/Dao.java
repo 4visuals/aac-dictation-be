@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 
 public class Dao {
@@ -36,6 +38,17 @@ public class Dao {
 		if (nDeleted > 1) {
 			throw new AppException(ErrorCode.APP_BUG, 500, "tried to delete " + nDeleted + " rows.");
 		}
+	}
+	
+	public static <T> T selectOne(SqlSession session, String queryPath, Object param) {
+		List<T> elems = session.selectList(queryPath, param);
+		int len = elems.size();
+		if(len == 0) {
+			return null;
+		} else if (len > 1) {
+			throw new AppException(ErrorCode.APP_BUG, 500, "expected one, but " + len + " selected");
+		}
+		return elems.get(0);
 	}
 	
 }

@@ -2,6 +2,7 @@ package github.visual4.aacweb.dictation.service.storage.ncp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -21,9 +22,12 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.service.storage.IFileStorage;
 import github.visual4.aacweb.dictation.service.storage.INameResolver;
 import github.visual4.aacweb.dictation.service.storage.IUpfile;
@@ -32,8 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NcpStorage implements IFileStorage {
 
-	final String endPoint = "https://kr.object.ncloudstorage.com";
-	final String regionName = "kr-standard";
+	static final String endPoint = "https://kr.object.ncloudstorage.com";
+	static final String regionName = "kr-standard";
 	
 	@Value("${dictation.ncp.storage.access-key}") String accessKey;
 	@Value("${dictation.ncp.storage.secret-key}") String secretKey;
@@ -84,8 +88,15 @@ public class NcpStorage implements IFileStorage {
 	
 	private String ext(String filename) {
 		int i = filename.indexOf('.');
-		String ext = filename.substring(i+1).toLowerCase();
-		return ext;
+		return filename.substring(i+1).toLowerCase();
+	}
+	
+	public void fetch(INameResolver resolver, OutputStream out, boolean closeStream) {
+		String filePath = resolver.resolveFileName(null);
+		S3Object s3Object = s3.getObject(bucketName, filePath);
+		S3ObjectInputStream s3in = s3Object.getObjectContent();
+		
+		Util.tranfer(s3in, true, out, closeStream);
 	}
 	@Override
 	public void deleteFile(String path) {

@@ -69,11 +69,11 @@ public class StreamSourceFile implements IUpfile {
 		}
 	}
 
-	public Voice toVoice(String textHash, String originText) {
-		Voice v = new Voice(); // textHash, "local", getName(), getSize());
+	public Voice toVoice(String textHash, String originText, StorageTarget origin) {
+		Voice v = new Voice();
 		v.setTextHash(textHash);
 		v.setOriginText(originText);
-		v.setOrigin("ncp");
+		v.setOrigin(origin);
 		v.setFilePath(getFileName());
 		v.setFileSize(getFileLength());
 		return v;

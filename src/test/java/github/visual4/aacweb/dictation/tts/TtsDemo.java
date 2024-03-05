@@ -1,7 +1,5 @@
 package github.visual4.aacweb.dictation.tts;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,11 +29,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import github.visual4.aacweb.dictation.BaseDao;
 import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.config.AacDictationConfig;
 import github.visual4.aacweb.dictation.domain.exam.EojeolAnswerDao;
 import github.visual4.aacweb.dictation.domain.sentence.SentenceDao;
-import github.visual4.aacweb.dictation.domain.voice.Voice;
 import github.visual4.aacweb.dictation.domain.voice.VoiceDao;
 import github.visual4.aacweb.dictation.domain.voice.VoiceService;
 
@@ -44,7 +42,7 @@ import github.visual4.aacweb.dictation.domain.voice.VoiceService;
 @ExtendWith(SpringExtension.class)
 @Import({AacDictationConfig.class, VoiceService.class})
 @BootstrapWith(SpringBootTestContextBootstrapper.class)
-class TtsDemo{
+class TtsDemo {
 
 	@Value("${dictation.aws.access-key}") String accessKey;
 	@Value("${dictation.aws.secret-key}") String secretKey;
@@ -56,39 +54,34 @@ class TtsDemo{
 	SentenceDao sentenceDao;
 	
 	@Test
+	@Disabled
 	@Rollback(false)
 	void run() throws IOException {
-//		voiceService.download("우유 마셔요.");
-//		voiceService.download("모두 여기로 모여.");
-//		sleep(500);
-//		voiceService.download("벼가 어서 자라서");
-//		sleep(500);
-//		voiceService.download("나비야, 이리 오너라.");
-//		sleep(500);
-//		voiceService.download("우리 야구하러 가요.");
-//		sleep(500);
-//		voiceService.download("이야기 나누자.");
-//		sleep(500);
-//		voiceService.download("테스트 문장입니다.");
-//		sleep(500);
-//		voiceService.download("비가 오려나?");
-//		sleep(500);
-//		voiceService.download("요요로 묘기 부리기");
-//		sleep(500);
-//		voiceService.download("여기서 기다려요.");
-		
-		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
+//		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
 		
 //		String _text = "삼촌/물병/창문/낮/젖/보물찾기/낮잠/우리 모여서 윷놀이하자./윷놀이하자./옆집/쏟아지다/주의/계절/의지/예매/낚시/손바닥/학습장/맛살/물난리/본래/단련/신랑/난로/천천히/우연히/즐거이/높이";
-		String _text = "언니가 사진을 찍습니다.";
-		List<String> words = Arrays.asList(_text.split("/"));
+//		String _text = "언니가 사진을 찍습니다.";
+		List<String> words = new ArrayList<>();
+		InputStream in = this.getClass().getResourceAsStream("word.txt");
+		Scanner sc = new Scanner(in);
+		while(sc.hasNextLine()) {
+			words.add(sc.nextLine().trim());
+		}
+		sc.close();
+		
+		publish(words);
+		
+	}
+	
+	void publish(List<String> words) {
+		Set<String> hashing = new HashSet<>(voiceDao.selectHashes());
+		List<String> dup = new ArrayList<>();
 		for (String word : words) {
 			word  = word.trim();
-			// System.out.println("[" + word + "]");
 			String hash = Util.Hash.md5(word).toLowerCase();
 			String url = "https://kr.object.ncloudstorage.com/aac-dict-bucket/voices3/@hash.mp3".replace("@hash", hash);
 			if (hashing.contains(hash)) {
-				System.out.printf("[>>>] skip: %s, %s\n", word, url);
+				dup.add(hash + ":"+word);
 			}
 			else {
 				voiceService.download(word);
@@ -97,19 +90,12 @@ class TtsDemo{
 				sleep(100);
 			}
 		}
-		/*
-		voiceService.download(text);
-		String hash = Util.Hash.md5(text).toLowerCase();
-		if (hashing.contains(hash)) {
-			System.out.println("[existing] " + text);
+		System.out.println("[dup]");
+		System.out.println(dup.size());
+		for (String hash : hashing) {
+			String url = "https://kr.object.ncloudstorage.com/aac-dict-bucket/voices3/@hash.mp3".replace("@hash", hash);
+			System.out.println(url);
 		}
-		else {
-			voiceService.download(text);
-			hashing.add(hash);
-			
-		}
-		*/
-		
 	}
 	
 	@Test
@@ -179,43 +165,14 @@ class TtsDemo{
 		System.out.println("[dup]");
 		System.out.println(dup.size());
 	}
-	/**
-	 * 
-	 */
+	
 	@Test
 	@Rollback(false)
-	public void push2022Data() {
-		InputStream in = this.getClass().getResourceAsStream("w2022.txt");
-		assertNotNull(in);
-		Scanner sc = new Scanner(in);
-		int k = 0;
-		int cnt = 0;
-		Set<String> words = new HashSet<>();
-		while(sc.hasNextLine()) {
-			String text = sc.nextLine().trim();
-			words.add(text);
-			String [] tokens = text.split(" ");
-			for(String token : tokens) {
-				words.add(token);
-			}
-		}
-		
-		for(String text: words) {
-			String hash = Util.Hash.md5(text).toLowerCase();
-			Voice existing = voiceService.findVoice(hash);
-			if (existing != null) {
-				// System.out.printf("%d: %s(%s)\n", ++k, text, "skip");
-			} else {
-				System.out.printf("%d: %s(%s)\n", ++k, text, hash);
-				voiceService.download(text);
-				cnt ++;
-				sleep(50);
-			}
-		}
-		System.out.println(cnt);
-		sc.close();
+	void testAddTestSentence() {
+		String text="테스트 하나 둘 셋 넷";
+//		String hash = Util.Hash.md5(text).toLowerCase();
+		voiceService.download(text);
 	}
-	
 
 	private void sleep(long t) {
 		try {

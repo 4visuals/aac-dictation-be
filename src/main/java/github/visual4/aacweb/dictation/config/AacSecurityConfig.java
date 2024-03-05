@@ -46,6 +46,7 @@ public class AacSecurityConfig extends WebSecurityConfigurerAdapter{
     			"/img/icons/*.png",
     			"/api/chapters/origin/L",
     			"/hooks/import",
+    			"/lf/voice/*.mp3",
     			"/api/**").permitAll()
     		.anyRequest().authenticated();
     	

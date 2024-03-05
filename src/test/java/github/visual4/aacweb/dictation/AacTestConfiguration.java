@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AacTestConfiguration {
 
 //	@Bean
-//	public ObjectMapper om() {
+//	public ObjectMapper om2() {
 //		return new ObjectMapper();
 //	}
 }
