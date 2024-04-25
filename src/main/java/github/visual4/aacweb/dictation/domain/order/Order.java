@@ -6,6 +6,7 @@ import java.util.List;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.domain.license.License;
+import github.visual4.aacweb.dictation.domain.order.delivery.DeliveryInfo;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.Getter;
@@ -103,6 +104,11 @@ public class Order {
 	String endTransactionUid;
 	
 	Integer licenseQtt;
+	
+	/**
+	 * 오프라인 상품에 대한 주문인 경우 배송지 정보가 있어야 함
+	 */
+	DeliveryInfo deliveryInfo;
 	
 	
 	public void setTotalAmount(Integer amount) {

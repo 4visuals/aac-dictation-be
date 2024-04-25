@@ -16,7 +16,7 @@ import github.visual4.aacweb.dictation.service.template.TemplateService;
 @Service
 public class SmsService {
 
-	private static Set<String> TEMPALTES = Set.of("paper","license");
+	private static Set<String> TEMPALTES = Set.of("paper", "license", "book");
 	final TemplateService templateService;
 	final GroupOrderService groupOrderService;
 	final NcpSmsService smsSender;
@@ -73,7 +73,6 @@ public class SmsService {
 		String phoneNumber = form.getSenderContactInfo();
 		return smsSender.sendSms(phoneNumber, body);
 	}
-	
 	public TypeMap notifyForOrderDocument(GroupOrderForm form, String templateName) {
 //		GroupOrderForm form = groupOrderService.findBy(GroupOrderForm.Column.group_order_uuid, orderUuid);
 		if (!form.isPendingState()) {

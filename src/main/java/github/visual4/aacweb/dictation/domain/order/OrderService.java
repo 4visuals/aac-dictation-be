@@ -22,6 +22,8 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportDriver;
+import github.visual4.aacweb.dictation.domain.order.delivery.DeliveryInfo;
+import github.visual4.aacweb.dictation.domain.order.delivery.DeliveryInfoDao;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
@@ -38,6 +40,7 @@ public class OrderService {
 	final LicenseService licenseService;
 	final OrderDao orderDao;
 	final AimportDriver portOneDriver;
+	final DeliveryInfoDao deliveryDao;
 	
 	private static final Instant EXP2023 = Instant.parse("2024-01-01T00:00:00Z").minus(9, ChronoUnit.HOURS);
 	private static final Set<OrderState> CANCEL_STATES = Set.of(
@@ -51,13 +54,15 @@ public class OrderService {
 			UserService userService, 
 			LicenseService licenseService,
 			OrderDao orderDao, 
-			AimportDriver portOneDriver) {
+			AimportDriver portOneDriver,
+			DeliveryInfoDao deliveryDao) {
 		this.productService = productService;
 		this.configService = configService;
 		this.userService = userService;
 		this.licenseService = licenseService;
 		this.orderDao = orderDao;
 		this.portOneDriver = portOneDriver;
+		this.deliveryDao = deliveryDao;
 	}
 	public Order createBetaOrder(Long teacherSeq, String productCode, Integer qtt) {
 		User teacher = userService.findTeacher(teacherSeq);
@@ -152,6 +157,13 @@ public class OrderService {
 			hook.accept(order);
 		}
 		orderDao.insertOrder(order);
+		
+		DeliveryInfo delivery = order.getDeliveryInfo();
+		if(delivery != null) {
+			delivery.setUserRef(teacher.getSeq());
+			delivery.setOrderRef(order.getSeq());
+			deliveryDao.insertDeliveryInfo(delivery);
+		}
 		
 		/* licenses
 		 * 주문을 확인한 후에 수강증을 발급함  

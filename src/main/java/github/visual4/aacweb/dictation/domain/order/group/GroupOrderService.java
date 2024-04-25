@@ -103,22 +103,14 @@ public class GroupOrderService {
 		Integer qtt = dto.getQtt();
 		
 		Long teacher = form.getSenderRef();
-		Order order = orderService.createOrder(
-				teacher,
-				dto.getProductCode(),
-				qtt, odr -> {
-					/*
-					 * 단체 구매 문의시 합의한 금액으로 바꿔줌
-					 */
+		return orderService.createOrder( teacher, dto.getProductCode(), qtt,
+				odr -> {
+					// 단체 구매 문의시 합의한 금액으로 바꿔줌
 					odr.setTotalAmount(dto.getContractPrice());
-					/*
-					 * pg 벤더를 단체구매로 변경
-					 */
+					// pg 벤더를 단체구매로 변경
 					odr.setPaygateVendor(PG.group_order);
 				});
 		
-		
-		return order;
 	}
 	/**
 	 * 단체 구매 문의 등록. 사용자가 작성한 단체구매 문의 양식)
@@ -198,15 +190,15 @@ public class GroupOrderService {
 		groupOrderDao.updateContent(form);
 	}
 	/**
-	 * 단체 구매 문의 취소
+	 * 단체 구매 문의 상태 변경 
 	 * @param orderSeq
-	 * @param formState - 취소 사유
+	 * @param formState - 주문 문의 양식 상태
 	 * @return
 	 */
-	public GroupOrderForm cancelGroupOrder(Integer orderSeq, OrderFormState formState) {
+	public GroupOrderForm changeGroupOrderState(Integer orderSeq, OrderFormState formState) {
 		GroupOrderForm form = groupOrderDao.findBy(GroupOrderForm.Column.seq, orderSeq);
-		form.cancel(formState);
-		groupOrderDao.cancelOrder(form);
+		form.setState(formState);
+		groupOrderDao.changeOrderState(form);
 		return form;
 	}
 	/**

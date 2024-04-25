@@ -17,6 +17,8 @@
   		, prod_activated_at
   		, prod_expired_at
   		, prod_created_by
+  		, prod_digital
+  		, prod_tax
   	</sql>
   	<resultMap type="Product" id="prodmap">
   		<id column="prod_seq" property="seq"/>
@@ -28,6 +30,8 @@
   		<result column="prod_type" property="type"/>
   		<result column="prod_sales_type" property="salesType"/>
   		<result column="prod_duration_hours" property="durationInHours"/>
+  		<result column="prod_digital" property="digitalType" />
+  		<result column="prod_tax" property="tax" />
   	</resultMap>
   	
   	<!-- 관리자용 -->
@@ -77,7 +81,9 @@
 			prod_sales_type,
 			prod_duration_hours,
 			prod_activated_at,
-			prod_created_by
+			prod_created_by,
+			prod_digital,
+			prod_tax
 		) VALUES (
 			#{name},
 			#{code},
@@ -89,7 +95,9 @@
 			#{salesType},
 			#{durationInHours},
 			#{activatedAt},
-			#{createdBy}
+			#{createdBy},
+			#{digitalType},
+			#{tax}
 		)
   	</insert>
   	

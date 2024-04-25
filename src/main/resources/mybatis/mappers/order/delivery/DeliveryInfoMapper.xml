@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="DeliveryInfoMapper">
+  	
+  	<sql id="delivery_info_cols">
+  		 dlv.dl_seq
+		, dlv.dl_base_address
+		, dlv.dl_detail_address
+		, dlv.dl_receiver_name
+		, dlv.dl_zipcode
+		, dlv.dl_order_ref
+		, dlv.dl_user_ref
+  	</sql>
+  	<resultMap type="DeliveryInfo" id="deliveryMap">
+  		<id column="dl_seq" property="seq"/>
+  		<result column="dl_base_address" property="baseAddress"/>
+  		<result column="dl_detail_address" property="detailAddress"/>
+  		<result column="dl_receiver_name" property="receiverName"/>
+  		<result column="dl_zipcode" property="zipCode"/>
+  		<result column="dl_order_ref" property="orderRef"/>
+  		<result column="dl_user_ref" property="userRef"/>
+  	</resultMap>
+  	<select id="findByOrder" parameterType="int" resultMap="deliveryMap">
+		  SELECT
+		  	<include refid="delivery_info_cols"/>
+		  FROOM dt_deliveries dlv
+		  WHERE dlv.dl_order_ref = #{orderRef}
+  	</select>
+  	<insert id="insertDeliveryInfo" parameterType="DeliveryInfo" useGeneratedKeys="true" keyColumn="dl_seq" keyProperty="seq">
+		INSERT INTO dt_deliveries(
+			dl_base_address
+			, dl_detail_address
+			, dl_receiver_name
+			, dl_zipcode
+			, dl_order_ref
+			, dl_user_ref
+		) VALUES(
+			#{baseAddress}
+			, #{detailAddress}
+			, #{receiverName}
+			, #{zipCode}
+			, #{orderRef}
+			, #{userRef}
+		)
+	</insert>
+  	
+  </mapper>

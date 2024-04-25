@@ -111,6 +111,9 @@ public class UserService {
 		if (user == null) {
 			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
 		}
+		if(configService.isAdmin(user)) {
+			user.setAdmin(Boolean.TRUE);
+		}
 		return buildLoginResponse(profile, user, Vendor.GOOGLE);
 	}
 

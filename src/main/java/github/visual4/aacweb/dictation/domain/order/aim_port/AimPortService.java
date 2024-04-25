@@ -30,6 +30,10 @@ import github.visual4.aacweb.dictation.domain.order.OrderService;
 import github.visual4.aacweb.dictation.domain.order.PG;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportDriver.AimportResponse;
 import github.visual4.aacweb.dictation.domain.order.aim_port.AimportHook.PayStatus;
+import github.visual4.aacweb.dictation.domain.user.User;
+import github.visual4.aacweb.dictation.domain.user.UserService;
+import github.visual4.aacweb.dictation.service.mailing.MailDto;
+import github.visual4.aacweb.dictation.service.mailing.MailingService;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -48,10 +52,15 @@ public class AimPortService {
 	@Value("${aimport.secret-key}")
 	String importAPISecret;
 	
+	@Value("${dictation.ncp.mailing.receiver}")
+	String adminEmail;
+	
 	private final String HOST = "https://api.iamport.kr";
 	
-	OrderService orderService;
+	final UserService userService;
+	final OrderService orderService;
 	final ObjectMapper om;
+	final MailingService mailingService;
 
 	private final AimportDriver portOneDriver;
 	/**
@@ -59,8 +68,15 @@ public class AimPortService {
 	 */
 	private final static Long CONFIRMER = 1L;
 	
-	public AimPortService(OrderService orderService, AimportDriver portOneDriver, ObjectMapper om) {
+	
+	public AimPortService(OrderService orderService,
+			AimportDriver portOneDriver,
+			ObjectMapper om,
+			UserService userService,
+			MailingService mailingService) {
+		this.userService = userService;
 		this.orderService = orderService;
+		this.mailingService = mailingService;
 		this.portOneDriver = portOneDriver;
 		this.om = om;
 	}
@@ -80,8 +96,9 @@ public class AimPortService {
 	 * 
 	 * 
 	 * @param hook
+	 * @return 
 	 */
-	public void confirmPayment(AimportHook hook) {
+	public Order confirmPayment(AimportHook hook) {
 		log.info("[aimport uuid] {}", hook.aimportUuid);
 		log.info("[order   uuid] {}", hook.orderUuid);
 		
@@ -111,10 +128,40 @@ public class AimPortService {
 		if(paymentStatus == PayStatus.paid) {
 			// PG에서 결제완료됨
 			orderPaid(order, remote.body);
+			return order;
+			
 		} else if(paymentStatus == PayStatus.cancelled) {
 			// PG 관리자 화면에서 결제를 취소함
 			orderCancelledByRemote(order, remote.body);
+			return null;
+		} else {
+			return null;
 		}
+	}
+	/**
+	 * 결제 성공 후 관리자에게 메일 전송
+	 * @param order 성공한 결제
+	 */
+	public void sendPaymentSuccessEmail(Order order) {
+		User customer = order.getCustomer();
+		if (customer == null) {
+			customer = userService.findUser(order.getCustomerRef());
+		}
+		
+		String sender = customer.getEmail();
+		TypeMap props = TypeMap.with(
+				"creationTimeKr", Util.toKoreanTime(order.getPaidTime()),
+				"senderName", customer.getName(),
+				"senderEmail", customer.getEmail(),
+				"content", order.getTotalAmount());
+		
+		String receiver = adminEmail;
+		MailDto dto = new MailDto(
+				"[신규 결제 완료] 신규 결제", 
+				"payment-success.admin", props, 
+				sender, receiver, null, null );
+		mailingService.sendMail(dto);
+		
 	}
 	/**
 	 * 결제 승인됨
@@ -131,7 +178,7 @@ public class AimPortService {
 		 * 실제 PG사의 uid
 		 */
 		String endTxUid = body.getStr("pg_tid");
-		/*
+		/*R
 		 * kdict 백엔드에서 생성한 orderUuid
 		 */
 		String orderUuid = body.getStr("merchant_uid");

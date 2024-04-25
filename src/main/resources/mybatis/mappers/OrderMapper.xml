@@ -41,6 +41,7 @@
   		<result column="license_qtt" property="licenseQtt"/>
   		<association property="product" resultMap="ProductMapper.prodmap"/>
   		<association property="customer" resultMap="UserMapper.usermap"/>
+  		<association property="deliveryInfo" resultMap="DeliveryInfoMapper.deliveryMap"/>
   	</resultMap>
   	
   	<resultMap type="Order" id="orderWithItemCount" extends="ordermap">
@@ -84,8 +85,10 @@
 	  		<include refid="ProductMapper.prodmap_cols"/>
 	  		,
 	  		<include refid="UserMapper.usermap_cols"/>
-	  		,_cnt.item_count
-	  		
+	  		,
+	  		<include refid="DeliveryInfoMapper.delivery_info_cols"/>
+	  		,
+	  		_cnt.item_count
 	  	FROM (
 	  		SELECT
 				odr.odr_seq ,
@@ -103,6 +106,9 @@
   		LEFT
   		JOIN dt_products prod
   		  ON odr.product_ref = prod.prod_seq
+  		LEFT
+  		JOIN dt_deliveries dlv
+  		  ON dlv.dl_order_ref = _cnt.odr_seq
   		ORDER BY odr.odr_seq DESC
   	</select>
   	

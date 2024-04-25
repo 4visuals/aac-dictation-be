@@ -112,8 +112,20 @@ public class AdminController {
 	public Object cancelOrderBySystem(
 			@JwtProp("useq") Integer adminSeq,
 			@PathVariable Integer orderSeq) {
-		System.out.println("orderSeq" + orderSeq);
-		GroupOrderForm order = groupOrderService.cancelGroupOrder(orderSeq, OrderFormState.CBS);
+		GroupOrderForm order = groupOrderService.changeGroupOrderState(orderSeq, OrderFormState.CBS);
+		return Res.success("order", order);
+	}
+	/**
+	 * 관리자가 단체 주문 양식을 완료 처리함
+	 * @param adminSeq
+	 * @param orderSeq
+	 * @return
+	 */
+	@PutMapping("/group-orders/{orderSeq}/CMT")
+	public Object commitOrderBySystem(
+			@JwtProp("useq") Integer adminSeq,
+			@PathVariable Integer orderSeq) {
+		GroupOrderForm order = groupOrderService.changeGroupOrderState(orderSeq, OrderFormState.CMT);
 		return Res.success("order", order);
 	}
 	/**

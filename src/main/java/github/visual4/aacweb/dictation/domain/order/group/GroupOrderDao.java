@@ -67,11 +67,11 @@ public class GroupOrderDao {
 	 * @param form - 취소시킬 단체 구매
 	 * @return
 	 */
-	public int cancelOrder(GroupOrderForm form) {
-		if (form.state == GroupOrderForm.OrderFormState.CMT 
-				|| form.state == GroupOrderForm.OrderFormState.PND) {
-			throw new AppException(ErrorCode.APP_BUG, 500, "invalidte group order state: " + form.state);
-		}
+	public int changeOrderState(GroupOrderForm form) {
+//		if (form.state == GroupOrderForm.OrderFormState.CMT 
+//				|| form.state == GroupOrderForm.OrderFormState.PND) {
+//			throw new AppException(ErrorCode.APP_BUG, 500, "invalidte group order state: " + form.state);
+//		}
 		return session.update(Dao.mapper(this, "updateOrderState"), form);
 	}
 	/**

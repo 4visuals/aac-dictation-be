@@ -15,6 +15,8 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.order.delivery.DeliveryInfo;
+import github.visual4.aacweb.dictation.domain.order.dto.NewOrderDto;
 import github.visual4.aacweb.dictation.web.aop.JwtProp;
 
 @RestController
@@ -45,13 +47,15 @@ public class OrderController {
 	@PostMapping("/order")
 	public Object prepareOrder(
 			@JwtProp("useq") Integer teacherSeq,
-			@RequestBody TypeMap form) {
-		String code = form.getStr("productCode");
-		final Integer numOfProduct = 1;
+			@RequestBody NewOrderDto form) {
+		String code = form.getProductCode();
+		DeliveryInfo delivery = form.getDelivery();
+		System.out.println(delivery);
+		final Integer numOfProduct = form.getQtt();
 		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
 				code,
 				numOfProduct,
-				null);
+				odr -> odr.setDeliveryInfo(delivery));
 		return Res.success("order", order);
 	}
 	/**

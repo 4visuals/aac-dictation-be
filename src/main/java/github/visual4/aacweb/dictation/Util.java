@@ -12,6 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,5 +195,10 @@ public class Util {
 			}
 		}
 		
+	}
+
+	public static String toKoreanTime(Instant utcTime) {
+		Instant kr = utcTime.plus(9, ChronoUnit.HOURS);
+		return kr.toString().replace("T", " ").replace("Z", "");
 	}
 }

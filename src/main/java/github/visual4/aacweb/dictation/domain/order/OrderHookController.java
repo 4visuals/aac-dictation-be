@@ -54,7 +54,10 @@ public class OrderHookController {
 				.status(info.getStr("status"))
 				.build();
 		
-		aimportService.confirmPayment(hook);
+		Order order = aimportService.confirmPayment(hook);
+		if(order != null) {
+			aimportService.sendPaymentSuccessEmail(order);	
+		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

@@ -40,6 +40,7 @@ public class AacSecurityConfig extends WebSecurityConfigurerAdapter{
     			"/precache-manifest*.js",
     			"/css/*.css",
     			"/js/*.js",
+    			"/js/*.js.map",
     			"/img/**",
     			"/media/**",
     			"/robots.txt",

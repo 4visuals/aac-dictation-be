@@ -13,7 +13,7 @@ class AimPortServiceTest {
 		hook.orderUuid = "odr-8ed5ef92-4571-4761-8fed-66a7e10c4360";
 		hook.status = "paid";
 		
-		AimPortService service = new AimPortService(null,null,  null);
+		AimPortService service = new AimPortService(null,null,  null, null, null);
 		
 		service.confirmPayment(hook);
 	}

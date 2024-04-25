@@ -42,6 +42,7 @@ public class User {
 	Long teacherRef;
 	User teacher;
 	List<User> students;
+	Boolean admin;
 	
 	public boolean isTeacher() {
 		return role == UserRole.TEACHER;

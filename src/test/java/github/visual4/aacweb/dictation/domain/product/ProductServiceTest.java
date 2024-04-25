@@ -51,6 +51,7 @@ public class ProductServiceTest extends BaseDao {
 	void test_query_retail_products() {
 		List<Product> products = productService.filterProducts(product -> product.checkIfRetail());
 		assertTrue(products.size() > 0);
+		assertNotNull(products.get(0).getTax());
 		Asserts.asserts(products, (prod) -> prod.checkIfRetail());
 	}
 	

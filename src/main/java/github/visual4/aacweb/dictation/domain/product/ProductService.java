@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.YesNo;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfigService;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfiguration;
 import github.visual4.aacweb.dictation.domain.product.Product.Column;
@@ -99,10 +100,13 @@ public class ProductService {
 		 */
 		product.setType("S");
 		
-		if (product.checkIfRetail()) {			
+		if (product.checkIfRetail()) {
 			Products.assertRetailProduct(product);
 		} else {
 			Products.assertGroupBuyingProduct(product);
+		}
+		if (product.getTax() == null) {
+			product.setTax(YesNo.Y);
 		}
 		productDao.insertProduct(product);
 		return product;

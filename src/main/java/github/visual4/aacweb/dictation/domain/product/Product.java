@@ -5,6 +5,7 @@ import java.time.Instant;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.ProductSalesType;
+import github.visual4.aacweb.dictation.YesNo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,14 @@ public class Product {
 	 * 소매용인지 공동구매용인지 나타냄 (See {@link https://github.com/4visuals/aac-writing/issues/151})
 	 */
 	ProductSalesType salesType;
+	/**
+	 * true이면 온라인 상품, false이면 택배 배송이 필요한 오프라인 상품
+	 */
+	YesNo digitalType;
+	/**
+	 * 과세여부. YesNo.Y 이면 과세상품
+	 */
+	YesNo tax;
 	
 	public boolean isBeta() {
 		return "B".equals(this.type); 
