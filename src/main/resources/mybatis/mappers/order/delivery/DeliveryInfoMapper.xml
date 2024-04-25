@@ -12,6 +12,7 @@
 		, dlv.dl_zipcode
 		, dlv.dl_order_ref
 		, dlv.dl_user_ref
+		, dlv.dl_phone_num
   	</sql>
   	<resultMap type="DeliveryInfo" id="deliveryMap">
   		<id column="dl_seq" property="seq"/>
@@ -21,6 +22,7 @@
   		<result column="dl_zipcode" property="zipCode"/>
   		<result column="dl_order_ref" property="orderRef"/>
   		<result column="dl_user_ref" property="userRef"/>
+  		<result column="dl_phone_num" property="phoneNumber"/>
   	</resultMap>
   	<select id="findByOrder" parameterType="int" resultMap="deliveryMap">
 		  SELECT
@@ -36,6 +38,7 @@
 			, dl_zipcode
 			, dl_order_ref
 			, dl_user_ref
+			, dl_phone_num
 		) VALUES(
 			#{baseAddress}
 			, #{detailAddress}
@@ -43,6 +46,7 @@
 			, #{zipCode}
 			, #{orderRef}
 			, #{userRef}
+			, #{phoneNumber}
 		)
 	</insert>
   	

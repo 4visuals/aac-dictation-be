@@ -50,7 +50,6 @@ public class OrderController {
 			@RequestBody NewOrderDto form) {
 		String code = form.getProductCode();
 		DeliveryInfo delivery = form.getDelivery();
-		System.out.println(delivery);
 		final Integer numOfProduct = form.getQtt();
 		Order order = orderSerivce.createOrder(teacherSeq.longValue(),
 				code,

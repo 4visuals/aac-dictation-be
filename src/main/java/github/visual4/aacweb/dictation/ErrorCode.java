@@ -85,6 +85,7 @@ public enum ErrorCode {
     ORDER_INVALID_PRICE("null or negative price"),
     ORDER_ALREADY_ACTIVATED("order is already activated"),
     ORDER_STATE_MISMATCH("%s"),
+    ORDER_DELIVERY_ERROR("invalid delivery info: %s"),
     /**
      * 자기 주문이 아님
      */

@@ -160,6 +160,7 @@ public class OrderService {
 		
 		DeliveryInfo delivery = order.getDeliveryInfo();
 		if(delivery != null) {
+			delivery.checkPhoneNumber();
 			delivery.setUserRef(teacher.getSeq());
 			delivery.setOrderRef(order.getSeq());
 			deliveryDao.insertDeliveryInfo(delivery);
