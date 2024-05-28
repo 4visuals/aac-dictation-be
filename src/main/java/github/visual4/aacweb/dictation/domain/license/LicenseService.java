@@ -2,7 +2,9 @@ package github.visual4.aacweb.dictation.domain.license;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -60,9 +62,22 @@ public class LicenseService {
 	public List<License> findsBy(License.Column column, Object value) {
 		return licenseDao.findBy(column, value);
 	}
+	public TypeMap findLicensesWithOrder(Long teacherSeq) {
+		List<License> licenses = licenseDao.findLicensesWithOrder(License.Column.receiver_ref, teacherSeq);
+		Set<Order> orders = new HashSet<>();
+		for (License lcs : licenses) {
+			Order order = lcs.getOrder();
+			if(order != null) {
+				orders.add(order);
+			}
+			// 지워버림
+			lcs.setOrder(null);
+		}
+		return TypeMap.with("licenses", licenses, "orders", orders);
+	}
 	public License findBy(License.Column column, Object value, boolean checkValidity) {
 		List<License> licenses = findsBy(column, value);
-		if (licenses.size() == 0) {
+		if (licenses.isEmpty()) {
 			return null;
 		}
 		Instant now = Instant.now();
@@ -70,7 +85,7 @@ public class LicenseService {
 		if (alives.size() > 1) {
 			throw new AppException(ErrorCode.SERVER_ERROR, 500, String.format("expected 1 result, but %d, results", alives.size()));
 		}
-		if (alives.size() == 0) {
+		if (alives.isEmpty()) {
 			return null;
 		}
 		License license = alives.get(0);
@@ -126,13 +141,14 @@ public class LicenseService {
 		}
 	}
 	/**
-	 * 만료 기간 연장 (https://github.com/4visuals/aac-writing/issues/143)
-	 * 이용권 무료 기간을 2023년 말까지로 변경하려고 사용함
+	 * 만료 기간 변경
+	 * 사용자가 단체 이용권을 재구매할때, 이용권 시작 시간을 나중으로 늦추려고 함(미리 구매한 경우)
+	 * 
 	 * @param license
-	 * @param exp2023
+	 * @param expTime
 	 */
-	public void updateExpirationTime(License license, Instant exp2023) {
-		license.setExpiredAt(exp2023);
+	public void updateExpirationTime(License license, Instant expTime) {
+		license.setExpiredAt(expTime);
 		licenseDao.updateExpirationTime(license);
 	}
 }

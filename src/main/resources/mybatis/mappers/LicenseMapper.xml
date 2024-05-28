@@ -32,6 +32,12 @@
   		<result column="trial_version" property="trialVersion"/>
   		<result column="order_state" property="orderState"/>
   	</resultMap>
+  	<resultMap id="licenseWithOrder" type="License" extends="lcsmap">
+		<association property="order" column="order_ref" resultMap="OrderMapper.baseOrderMap"
+			notNullColumn="odr_seq" />
+		<!--<association property="order" column="{colname=colname,value=order_ref}" select="OrderMapper.findBy"/>-->
+		
+	</resultMap>
   	
   	<select id="findBy" parameterType="map" resultMap="lcsmap">
   		SELECT
@@ -43,6 +49,20 @@
   		WHERE
   			${colname} = #{value}
   	</select>
+	<select id="findLicensesWithOrder" parameterType="map" resultMap="licenseWithOrder">
+		SELECT
+  			<include refid="lcsmap_cols"/>
+  			,
+  			<include refid="OrderMapper.order_cols"></include>
+  			,
+  			'odr_seq' as colname
+  		FROM dt_licenses lcs
+  		LEFT
+  		JOIN dt_orders odr
+  		  ON lcs.order_ref = odr.odr_seq
+  		WHERE
+  			${colname} = #{value}
+	</select>
   	<insert id="insertLicense"
   		parameterType="License"
   		useGeneratedKeys="true"

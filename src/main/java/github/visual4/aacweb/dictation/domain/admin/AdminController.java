@@ -1,7 +1,8 @@
 package github.visual4.aacweb.dictation.domain.admin;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
+import github.visual4.aacweb.dictation.domain.order.dto.ExpirationUpdateDto;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderService;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm.OrderFormState;
@@ -155,6 +157,15 @@ public class AdminController {
 		userService.loadAdmin(adminSeq.longValue());
 		Order order = groupOrderService.issueGroupOrder(adminSeq.longValue(), dto);
 		return Res.success("order", order);
+	}
+	@PutMapping("/group-orders/{groupOrderSeq}/expiredAt")
+	public Object updateExpiredTime(
+			@JwtProp("useq") Integer adminSeq,
+			@PathVariable Integer groupOrderSeq,
+			@RequestBody ExpirationUpdateDto param) {
+		userService.loadAdmin(adminSeq.longValue());
+		Map<Long, Instant> times = groupOrderService.updateExpiredDate(groupOrderSeq, param);
+		return Res.success("times", times);
 	}
 
 }

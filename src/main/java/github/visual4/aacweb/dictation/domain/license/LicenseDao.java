@@ -44,6 +44,16 @@ public class LicenseDao {
 			TypeMap.with("colname", column, "value", value));
 	}
 	/**
+	 * 이용권과 주문 정보를 함께 조회함
+	 * @param receiverRef
+	 * @param teacherSeq
+	 * @return
+	 */
+	public List<License> findLicensesWithOrder(License.Column column, Object value) {
+		return session.selectList(Dao.mapper(this, "findLicensesWithOrder"),
+				TypeMap.with("colname", column, "value", value));
+	}
+	/**
 	 *  수강권에 학생을 등록함
 	 * @param lcs
 	 * @param student

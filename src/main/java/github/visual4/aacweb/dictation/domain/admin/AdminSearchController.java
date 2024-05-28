@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
-import github.visual4.aacweb.dictation.domain.license.License;
+import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
-import github.visual4.aacweb.dictation.domain.student.StudentService;
 import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserService;
 /**
@@ -37,8 +36,10 @@ public class AdminSearchController {
 	
 	@GetMapping("/member/{teacherSeq}/licenses")
 	public Object findLicensesOfTeacher(@PathVariable Long teacherSeq) {
-		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, teacherSeq);
+		TypeMap res = licenseService.findLicensesWithOrder(teacherSeq);
 		List<User> students = userService.findStudents(teacherSeq);
-		return Res.success("licenses", licenses, "students", students);
+		res.put("students", students);
+		res.put("success", Boolean.TRUE);
+		return res;
 	}
 }

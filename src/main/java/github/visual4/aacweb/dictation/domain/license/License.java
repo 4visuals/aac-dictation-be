@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.user.User;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,11 @@ public class License {
 	 * 값이 있다면 dt_orders.odr_seq 에 대한 FK
 	 */
 	Integer orderRef; // FK to dt_orders
+	/**
+	 * 이용권에 대한 주문 정보
+	 * @optional
+	 */
+	Order order;
 	/**
 	 * 라이선스가 적용된 학생의 seq
 	 * 사용 전이면 null.

@@ -9,11 +9,13 @@ import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.order.delivery.DeliveryInfo;
 import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.user.User;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Order {
 	
 	public enum OrderState {
@@ -44,6 +46,7 @@ public class Order {
 	/**
 	 * PK
 	 */
+	@EqualsAndHashCode.Include
 	Integer seq;
 	/**
 	 * 상품 참조

@@ -22,8 +22,8 @@
   		, odr.end_trx_uid
   		, odr.license_qtt
   	</sql>
-  	<resultMap type="Order" id="ordermap">
-  		<id column="odr_seq" property="seq"/>
+  	<resultMap type="Order" id="baseOrderMap">
+		<id column="odr_seq" property="seq"/>
   		<result column="product_ref" property="productRef"/>
   		<result column="order_time" property="orderTime"/>
   		<result column="payment_due_time" property="paymentDueTime"/>
@@ -39,6 +39,8 @@
   		<result column="mid_trx_uid" property="midTransactionUid"/>
   		<result column="end_trx_uid" property="endTransactionUid"/>
   		<result column="license_qtt" property="licenseQtt"/>
+  	</resultMap>
+  	<resultMap type="Order" id="ordermap" extends="baseOrderMap">
   		<association property="product" resultMap="ProductMapper.prodmap"/>
   		<association property="customer" resultMap="UserMapper.usermap"/>
   		<association property="deliveryInfo" resultMap="DeliveryInfoMapper.deliveryMap"/>

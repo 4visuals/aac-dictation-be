@@ -1,7 +1,9 @@
 package github.visual4.aacweb.dictation.domain.order.group;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,14 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.Util;
+import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.order.GroupOrderForms;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
 import github.visual4.aacweb.dictation.domain.order.OrderService;
 import github.visual4.aacweb.dictation.domain.order.PG;
+import github.visual4.aacweb.dictation.domain.order.dto.ExpirationUpdateDto;
 import github.visual4.aacweb.dictation.domain.order.Order.OrderState;
 import github.visual4.aacweb.dictation.domain.order.group.GroupOrderForm.OrderFormState;
 import github.visual4.aacweb.dictation.domain.product.Product;
@@ -270,5 +274,24 @@ public class GroupOrderService {
 	}
 	public OrderService getOrderService() {
 		return this.orderService;
+	}
+	public Map<Long, Instant> updateExpiredDate(Integer groupOrderSeq, ExpirationUpdateDto param) {
+		Order order = orderService.findOrder(param.getOrderUuid());
+		if(!order.getSeq().equals(groupOrderSeq)) {
+			throw new AppException(ErrorCode.GROUP_ORDER_ERROR, 410, "order info mismatch");
+		}
+		if(!order.isGroupOrder()) {
+			throw new AppException(ErrorCode.GROUP_ORDER_ERROR, 410, "not a group order");
+		}
+		List<License> licenses = licenseService.findsBy(License.Column.order_ref, order.getSeq());
+		
+		Instant expTime = param.getExpiredAt();
+		Map<Long, Instant> times = new HashMap<>();
+		for (License lcs : licenses) {
+			licenseService.updateExpirationTime(lcs, expTime);
+			times.put(lcs.getSeq(), lcs.getExpiredAt());
+		}
+		return times;
+		
 	}
 }
