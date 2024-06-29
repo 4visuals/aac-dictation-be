@@ -151,4 +151,18 @@ public class LicenseService {
 		license.setExpiredAt(expTime);
 		licenseDao.updateExpirationTime(license);
 	}
+	/**
+	 * 라이선스 사용자 변경함
+	 * => 기존 선생님 A가 등록한 학생을 선생님 B에게 이동시킬 때, 선생님 B를 이용권의 사용자로 변경해야 함
+	 * @param license
+	 * @param nextTeacher
+	 */
+	public void changeReciever(String licenseUuid, User currentTeacher, User nextTeacher) {
+		License lcs = this.findBy(License.Column.lcs_uuid, licenseUuid);
+		
+		lcs.setReceiverRef(nextTeacher.getSeq());
+		
+		licenseDao.changeReceiver(lcs);
+		
+	}
 }

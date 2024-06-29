@@ -27,6 +27,7 @@
   		<result column="duration_hours" property="durationInHours"/>
   		<result column="activated_at" property="activatedAt"/>
   		<result column="expired_at" property="expiredAt"/>
+  		<result column="buyer_ref" property="buyerRef"/>
   		<result column="receiver_ref" property="receiverRef"/>
   		<result column="issuer_ref" property="issuerRef"/>
   		<result column="trial_version" property="trialVersion"/>
@@ -89,6 +90,13 @@
 	  	UPDATE dt_licenses
 	  	SET
 	  	    expired_at = #{expiredAt}
+	  	WHERE
+	  		lcs_seq = #{seq}
+  	</update>
+  	<update id="changeReceiver" parameterType="License">
+	  	UPDATE dt_licenses
+	  	SET
+	  	    receiver_ref = #{receiverRef}
 	  	WHERE
 	  		lcs_seq = #{seq}
   	</update>

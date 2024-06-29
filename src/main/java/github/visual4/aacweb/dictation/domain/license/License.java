@@ -21,6 +21,7 @@ public class License {
 	public enum Column {
 		lcs_seq,
 		receiver_ref,
+		buyer_ref,
 		lcs_uuid,
 		student_ref,
 		order_ref
@@ -74,7 +75,13 @@ public class License {
 	 */
 	Instant expiredAt;
 	/**
-	 * 라이선스 사용자(선생님, 학부모 등)
+	 * 라이선스 구매자 - 사용자와 다를 수 있음
+	 * @see https://github.com/4visuals/aac-writing/issues/161
+	 */
+	Long buyerRef;
+	/**
+	 * 라이선스 사용자(선생님, 학부모 등) - 구매자와 사용자가 다를 수 있음
+	 * @see https://github.com/4visuals/aac-writing/issues/161
 	 */
 	Long receiverRef;
 	/**

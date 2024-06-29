@@ -79,4 +79,9 @@ public class LicenseDao {
 		session.update(Dao.mapper(this, "updateExpirationTime"), license);
 		
 	}
+
+	public void changeReceiver(License lcs) {
+		session.update(Dao.mapper(this, "changeReceiver"), lcs);
+		
+	}
 }

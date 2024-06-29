@@ -64,6 +64,13 @@
 	  	WHERE
 	  	    user_seq = #{seq}
   	</update>
+  	<update id="changeTeacher" parameterType="User">
+	  	UPDATE dt_users 
+	  	SET
+	  	    teacher_ref = #{teacherRef}
+	  	WHERE
+	  	    user_seq = #{seq} AND user_role = 'S'
+  	</update>
   	<delete id="deleteStudent" parameterType="map">
   	DELETE
   	FROM dt_users

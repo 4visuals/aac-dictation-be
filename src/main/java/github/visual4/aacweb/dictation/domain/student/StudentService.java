@@ -233,4 +233,13 @@ public class StudentService {
 		deleteStudents(Arrays.asList(student), teacher);
 		return student;
 	}
+	public User changeTeacher(User student, Long newTeacherSeq) {
+		User nextTeacher = userService.findTeacher(newTeacherSeq);
+		if(nextTeacher == null) {
+			//
+		}
+		student.setTeacherRef(newTeacherSeq);
+		studentDao.changeTeacher(student);
+		return student;
+	}
 }

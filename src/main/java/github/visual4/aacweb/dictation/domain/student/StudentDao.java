@@ -60,4 +60,9 @@ public class StudentDao {
 				"student", studentSeq,
 				"teacher", teacherSeq));
 	}
+
+	public void changeTeacher(User student) {
+		session.update(Dao.mapper(this, "changeTeacher"), student);
+		
+	}
 }
