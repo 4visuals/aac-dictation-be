@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
+import github.visual4.aacweb.dictation.korean.JamoSet;
 import github.visual4.aacweb.dictation.korean.Mark;
 
 public class LevelContext {
@@ -35,11 +37,18 @@ public class LevelContext {
 		return new LevelContext();
 	}
 	public Mark setMark(Difficulty df, Jamo pattern, CharSequence word) {
+		return setMark(df, pattern, word, null);
+	}
+	public Mark setMark(Difficulty df, Jamo pattern, CharSequence word, Consumer<Mark> setter) {
 		Mark m = findMark(word);
 		for(int k = 0; k < word.length(); k++) {
 			char ch = word.charAt(k);
 			if (pattern.matched(ch)) {
-				m.mark(df, k);
+				if(setter != null) {
+					setter.accept(m);
+				} else {
+					m.mark(df, k);
+				}
 			} else {
 				m.reset();
 			}
@@ -55,7 +64,11 @@ public class LevelContext {
 		}
 		return mark;
 	}
+	
 	private void install() {
+		/*
+		 * FIXME 모든 LEVEL 인스턴스에 연결된 ctx 변수를 제거하면 아래와 같이 50개의 level 인스턴스를 만들 필요가 없음
+		 */
 		Object [] args = new Object[] {this};
 		StringBuilder fqName = new StringBuilder("github.visual4.aacweb.dictation.korean.level.Level");
 		int offset = fqName.length();
@@ -74,5 +87,10 @@ public class LevelContext {
 				fqName.delete(offset, fqName.length());
 			}
 		}
+	}
+	public Mark mark(Level08 lvl8, JamoSet set) {
+		Mark mk = findMark(set.word);
+		lvl8.eval(mk, set);
+		return mk;
 	}
 }

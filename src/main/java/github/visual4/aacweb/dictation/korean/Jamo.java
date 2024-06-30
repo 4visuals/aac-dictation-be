@@ -55,7 +55,20 @@ public class Jamo {
 	/**
 	 * 한글 음절 시작 위치
 	 */
-	final private static int KO_SYLLABLE_OFFSET = 0xAC00;
+	final static int KO_SYLLABLE_OFFSET = 0xAC00;
+	
+	/**
+	 * "*'에 해당하는 초성 bit flag
+	 */
+	public final static int ANY_CHO_BIT = 524287;
+	/**
+	 * "*"에 해당하는 중성 bit flag
+	 */
+	public final static int ANY_JUNG_BIT= 2097151;
+	/**
+	 * "*"에 해당하는 종성 bit flag
+	 */
+	public final static int ANY_JONG_BIT = 0;
 	
 	int cho;
 	int jung;
@@ -65,6 +78,28 @@ public class Jamo {
 		this.cho = cho;
 		this.jung = jung;
 		this.jong = jong;
+	}
+	
+	public static String decomposeKr(String origin) {
+		
+		char [] jamo = new char[origin.length() * 3];
+		int pos = 0;
+		for(int k = 0 ; k < origin.length(); k++ ) {
+			int ko = origin.charAt(k);
+			if(ko >= KO_SYLLABLE_OFFSET && ko < 0xD7B0) {
+				int i0 = (ko - KO_SYLLABLE_OFFSET)/28/21;
+				int i1 = (ko - KO_SYLLABLE_OFFSET)/28%21;
+				int i2 = (ko - KO_SYLLABLE_OFFSET)%28;
+				jamo[pos++] = CHO.charAt(i0);
+				jamo[pos++] = JUNG.charAt(i1);
+				jamo[pos++] = JONG.charAt(i2);	
+			} else {
+				jamo[pos++] = (char)ko;
+				jamo[pos++] = (char)ko;
+				jamo[pos++] = (char)ko;
+			}
+		}
+		return new String(jamo, 0, pos);
 	}
 	
 	public static Jamo decompose(int ko) {
@@ -121,6 +156,23 @@ public class Jamo {
 
 	public boolean hasJongsung() {
 		return this.jong != 0x01;
+	}
+	private static char toJamo(int pattern, String target) {
+		int cnt = 0;
+		while(pattern > 1) {
+			cnt ++;
+			pattern >>= 1;
+		}
+		return target.charAt(cnt);
+	}
+	static char toChosung(int pattern) {
+		return toJamo(pattern, CHO);
+	}
+	static char toJungsung(int pattern) {
+		return toJamo(pattern, JUNG);
+	}
+	static char toJongsung(int pattern) {
+		return toJamo(pattern, JONG);
 	}
 	
 }

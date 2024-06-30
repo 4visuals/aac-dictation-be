@@ -48,7 +48,7 @@ public class Reporting {
 			Mark mark = ctx.parseDifficulties(sen);
 			System.out.printf("#### [LEVEL%d] %s\n",dff.level, sen.trim());
 			System.out.println("```");
-			mark.each((df, pos) -> {
+			mark.eachLevel((df, pos) -> {
 				boolean overflow = df.level > dff.level;
 				Str s = new Str(sen);
 				System.out.printf("%s %02d: ", (overflow ? "+" : " "), df.level);

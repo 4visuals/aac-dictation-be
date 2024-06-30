@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import github.visual4.aacweb.dictation.TypeMap;
 
 public class Mark {
 
 	CharSequence word;
+	CharSequence jamo;
 	Map<Difficulty, Pos> _posMap;	
 	private List<Pos> marks;
 	
@@ -18,6 +20,7 @@ public class Mark {
 	
 	public Mark(CharSequence word) {
 		this.word = word;
+		this.jamo = Jamo.decomposeKr(word.toString());
 		_posMap = new TreeMap<>();
 		marks = new ArrayList<>();
 	}
@@ -28,17 +31,37 @@ public class Mark {
 	/**
 	 * 
 	 * @param df
-	 * @param pos - (exclusive)
+	 * @param charOffset 
+	 * @return 
 	 */
-	public void mark(Difficulty df, int pos) {
+	public Pos mark(Difficulty df, int charOffset) {
+		return mark(df, charOffset, 0);
+	}
+	/**
+	 * 
+	 * @param df
+	 * @param charOffset - 글자 단위 offset
+	 * @param offsetInChar - charOffset에서 중성 또는 종성을 가리키기 위한 offset. 0 | 1 | 2 중 하나
+	 * @return
+	 */
+	public Pos mark(Difficulty df, int charOffset, int offsetInChar) {
+		/*
+		 * 글자 단위에서 자모음 단위로 변경하는 중
+		 * 앞에 공백이 있어도 3글자로 처라된다.
+		 */
+		int jamoOffset = charOffset * 3;
 		if (curPos == null) {
-			initDf(df, pos);
-		} else if (curPos.df == df){
-			curPos.setEnd(pos + 1);
-		} else if (curPos.df != df) {
+			initDf(df, jamoOffset + offsetInChar);
+		} else {
 			flushDf();
-			initDf(df, pos);
+			initDf(df, jamoOffset + offsetInChar);
 		}
+		return curPos;
+	}
+	public void markAndFlush(Difficulty df, int start, int end) {
+		Pos pos = initDf(df, start);
+		pos.setEnd(end);
+		flushDf();
 	}
 	
 	public void reset() {
@@ -51,14 +74,20 @@ public class Mark {
 			curPos = null;			
 		}
 	}
-	private Pos initDf(Difficulty df, int pos) {
+	/**
+	 * 
+	 * @param df
+	 * @param jamoOffset
+	 * @return
+	 */
+	private Pos initDf(Difficulty df, int jamoOffset) {
 		Pos existing = _posMap.get(df);
 		if (existing == null) {
-			existing = Pos.init(df, pos);
+			existing = Pos.init(df, jamoOffset);
 			addPos(existing);	
 		} else {
-			existing.setStart(pos);
-			existing.setEnd(pos + 1);
+			existing.setStart(jamoOffset);
+			existing.setEnd(jamoOffset + 3);
 		}
 		
 		return curPos = existing;
@@ -78,11 +107,21 @@ public class Mark {
 	}
 
 	public void addRange(Difficulty df, int start, int end) {
-		mark(df, start);
-		curPos.setEnd(end);
+		Pos pos = mark(df, start);
+		pos.setEnd(3 * end);
 		flushDf();
 	}
-
+	public void addRange(Difficulty df, int start, int end, int offsetInChar) {
+		Pos pos = mark(df, start, offsetInChar);
+		pos.setEnd(3 * end);
+		flushDf();
+	}
+	public void addRange(Difficulty df, int start, int offsetInStart,
+			int end, int offsetInEnd) {
+		Pos pos = mark(df, start, offsetInStart);
+		pos.setEnd(3 * end + offsetInEnd);
+		flushDf();
+	}
 	public static class Pos {
 		final Difficulty df;
 		int start;
@@ -110,29 +149,47 @@ public class Mark {
 			return this.ranges.get(0);
 		}
 		static Pos init(Difficulty df, int offset) {	
-			return new Pos(df, offset, offset + 1);
+			return new Pos(df, offset, offset + 3);
 		}
 		public int[] rangeAt(int index) {
 			int [] r = this.ranges.get(index);
 			return r;
 		}
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			this.ranges.forEach(r -> {
+				sb.append('[');
+				sb.append(r[0]);
+				sb.append(", ");
+				sb.append(r[1]);
+				sb.append(']');
+			});
+			return sb.toString();
+		}
+		public void each(Consumer<int[]> loop) {
+			this.ranges.forEach(loop);
+		}
 	}
 
-	public void each(BiConsumer<Difficulty, Pos> fn) {
+	public void eachLevel(BiConsumer<Difficulty, Pos> fn) {
 		_posMap.forEach(fn);
-		
 	}
 
+	public String textAt(int start, int end) {
+		CharSequence seq = this.jamo.subSequence(start, end);
+		return seq.toString();
+	}
+	
 	public Map<String, Object> toMap() {
 		TypeMap map = new TypeMap();
-		this.each((df, pos) -> {
+		this.eachLevel((df, pos) -> {
 			map.put(df.name(), pos.ranges);
 		});
 		return map;
 	}
 	public List<Object> toList() {
 		List<Object> arr = new ArrayList<>();
-		this.each((df, pos) -> {
+		this.eachLevel((df, pos) -> {
 			arr.add(TypeMap.with("name", df.name(), "ranges", pos.ranges));
 		});
 		return arr;

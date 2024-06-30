@@ -13,7 +13,7 @@ public class Level02 implements ILevel {
 	final Jamo pattern = Jamo.pattern("ㅇㄱㄴㄷㄹㅁㅂㅅㅈ", "ㅑㅕㅛㅠ", "_");
 	final LevelContext ctx;
 	
-	Level02(LevelContext ctx) {
+	public Level02(LevelContext ctx) {
 		this.ctx = ctx;
 	}
 	

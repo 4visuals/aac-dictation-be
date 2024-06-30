@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 
@@ -18,5 +19,4 @@ public class CharBaseLevel implements ILevel {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

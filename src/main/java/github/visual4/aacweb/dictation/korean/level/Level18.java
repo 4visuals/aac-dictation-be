@@ -15,7 +15,7 @@ public class Level18 implements ILevel {
 	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
 	final LevelContext ctx;
 	
-	Level18(LevelContext ctx) {
+	public Level18(LevelContext ctx) {
 		this.ctx = ctx;
 	}
 	
@@ -23,7 +23,7 @@ public class Level18 implements ILevel {
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
 		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L18, range[0], range[1]);
+			mk.addRange(Difficulty.L18, range[0], 2, range[1], -2);
 		});
 		return mk;
 	}

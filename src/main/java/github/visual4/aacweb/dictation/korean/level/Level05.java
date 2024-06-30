@@ -13,12 +13,12 @@ public class Level05 implements ILevel {
 	final Jamo pattern = Jamo.pattern("*", "*", "ㄴㄹㅁㅇ");
 	final LevelContext ctx;
 	
-	Level05(LevelContext ctx) {
+	public Level05(LevelContext ctx) {
 		this.ctx = ctx;
 	}
+	
 	@Override
 	public Mark eval(String word) {
 		return this.ctx.setMark(Difficulty.L05, pattern, word);
 	}
-
 }

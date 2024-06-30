@@ -16,7 +16,7 @@ public class Level01 implements ILevel {
 	final Jamo pattern = Jamo.pattern("ㅇㄱㄴㄷㄹㅁㅂㅅㅈ", "ㅏㅓㅗㅜㅡㅣ", "_");
 	final LevelContext ctx;
 	
-	Level01(LevelContext ctx ) {
+	public Level01(LevelContext ctx ) {
 		this.ctx = ctx;
 	}
 
