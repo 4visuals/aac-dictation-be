@@ -17,10 +17,11 @@ import github.visual4.aacweb.dictation.korean.Mark;
  *
  */
 public class Level38 implements ILevel {
-
+	// 영리, 승리, 
 	final Jamo [] _5j_19h = {Jamo.pattern("*", "*", "ㅁㅇ"), Jamo.pattern("ㄹ", "*", "*")};
 	final Jamo [] _5j_20h_1 = {Jamo.pattern("*", "*", "ㄴ"), Jamo.pattern("ㄹ", "*", "*")};
 	final Jamo [] _5j_20h_2 = {Jamo.pattern("*", "*", "ㄹ"), Jamo.pattern("ㄴ", "*", "*")};
+	
 	final Jamo [][] patterns = {_5j_19h, _5j_20h_1, _5j_20h_2};
 	
 	

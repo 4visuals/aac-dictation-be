@@ -1,8 +1,11 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.List;
 import java.util.function.Consumer;
 
+import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
+import github.visual4.aacweb.dictation.korean.Mark;
 
 public class Levels {
 
@@ -36,6 +39,16 @@ public class Levels {
 			char c1 = word.charAt(k+1);
 			if (prev.matched(c0) && next.matched(c1)) {
 				fn.accept(new int[] {k, k+2});
+			}
+		}
+	}
+	static void inject(Mark mk, String sentence, List<String> words, Difficulty df) {
+		for (int k = 0; k < words.size(); k++) {
+			String word = words.get(k);
+			int pos = sentence.indexOf(word);
+			if(pos >= 0) {
+				mk.addRange(df, pos, pos + word.length());
+				break;
 			}
 		}
 	}

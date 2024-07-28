@@ -48,5 +48,11 @@ class JamoTest {
 		String jamo = Jamo.decomposeKr("무ㄱㅎ회");
 		System.out.println(jamo);
 	}
+	
+	@Test
+	void test_46() {
+		Jamo jong = Jamo.pattern("*", "*", "*");
+		assertTrue(jong.matched(' '));
+	}
 
 }

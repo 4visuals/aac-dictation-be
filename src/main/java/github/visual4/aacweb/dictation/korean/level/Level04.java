@@ -11,7 +11,7 @@ import github.visual4.aacweb.dictation.korean.Mark;
  */
 public class Level04 implements ILevel{
 
-	final Jamo pattern = Jamo.pattern("ㄲㄸㅃㅆㅉ", "ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ", "_");
+	final Jamo pattern = Jamo.pattern("ㄲㄸㅃㅆㅉ", "ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ", "*");
 	final LevelContext ctx;
 	
 	Level04(LevelContext ctx) {

@@ -1,5 +1,8 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.Arrays;
+import java.util.List;
+
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
@@ -12,7 +15,12 @@ import github.visual4.aacweb.dictation.korean.Mark;
  * @author chminseo
  */
 public class Level46 implements ILevel {
-	final Jamo pattern = Jamo.pattern("*", "ㅘㅙㅝ", "*");
+	String inclusion ="꿔,꿨,눠,눴,돼,됐,둬,뒀,봐,봤,줘,줬,춰,췄";
+	List<String> words = Arrays.asList(inclusion.split(","));
+	
+	final Jamo prev = Jamo.pattern("*", "ㅘㅙㅝ", "*");
+	final Jamo next = Jamo.pattern("*", "*", "*");
+	
 	final LevelContext ctx;
 	
 	Level46(LevelContext ctx) {
@@ -21,7 +29,14 @@ public class Level46 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L46, pattern, word);
+		Mark mk = ctx.findMark(word);
+		words.forEach(wd -> {
+			int pos = word.indexOf(wd);
+			if(pos >= 0) {
+				mk.addRange(Difficulty.L46, pos, pos + 1);
+			}
+		});
+		return mk;
 	}
 
 }

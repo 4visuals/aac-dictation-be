@@ -1,5 +1,9 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
@@ -10,7 +14,7 @@ import github.visual4.aacweb.dictation.korean.Mark;
  *
  */
 public class Level20 implements ILevel {
-
+	Set<String> exlusion = new HashSet<>(Arrays.asList("꽃잎".split(",")));
 	final Jamo prev = Jamo.pattern("*", "*","ㄷㅅㅆㅈㅊㅌ");
 	final Jamo next = Jamo.pattern("ㅇ", "*", "*");
 	final LevelContext ctx;
@@ -22,8 +26,14 @@ public class Level20 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
+		if("꽃잎".equals(word)) {
+			return mk;
+		}
 		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L20, range[0], range[1]);
+			String token = word.substring(range[0], range[1]);
+			if(!exlusion.contains(token)) {
+				mk.addRange(Difficulty.L20, range[0], range[1]);				
+			}
 		});
 		return mk;
 	}

@@ -111,11 +111,11 @@ public class Mark {
 		pos.setEnd(3 * end);
 		flushDf();
 	}
-	public void addRange(Difficulty df, int start, int end, int offsetInChar) {
-		Pos pos = mark(df, start, offsetInChar);
-		pos.setEnd(3 * end);
-		flushDf();
-	}
+//	public void addRange(Difficulty df, int start, int end, int offsetInChar) {
+//		Pos pos = mark(df, start, offsetInChar);
+//		pos.setEnd(3 * end);
+//		flushDf();
+//	}
 	public void addRange(Difficulty df, int start, int offsetInStart,
 			int end, int offsetInEnd) {
 		Pos pos = mark(df, start, offsetInStart);
