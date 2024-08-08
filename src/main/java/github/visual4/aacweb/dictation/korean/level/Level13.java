@@ -19,6 +19,12 @@ public class Level13 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return this.ctx.setMark(Difficulty.L13, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				mk.addRange(Difficulty.L13, k, 2, k + 1, 0);
+			}
+		}
+		return mk;
 	}
 }

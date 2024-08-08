@@ -29,10 +29,11 @@ public class Level20 implements ILevel {
 		if("꽃잎".equals(word)) {
 			return mk;
 		}
-		Levels.findAdjPos(word, prev, next, (range) -> {
+		Levels.findAdjPos(word, prev, next, range -> {
 			String token = word.substring(range[0], range[1]);
 			if(!exlusion.contains(token)) {
-				mk.addRange(Difficulty.L20, range[0], range[1]);				
+				// 앞글자 종성과 뒷글자 초성만
+				mk.addRange(Difficulty.L20, range[0], 2, range[1], -2);				
 			}
 		});
 		return mk;

@@ -38,7 +38,7 @@ public class Level38 implements ILevel {
 		for (int k = 0; k < patterns.length; k++) {
 			Jamo [] ptn = patterns[k];
 			Levels.findAdjPos(word, ptn[0], ptn[1], (range) -> {
-				mk.addRange(Difficulty.L38, range[0], range[1]);
+				mk.addRange(Difficulty.L38, range[0], 2, range[1], -2);
 			});
 			
 		}

@@ -23,7 +23,7 @@ public class Level22 implements ILevel {
 		Mark mk = ctx.findMark(word);
 		int [] pos = Levels.findSuffixPos(word, pattern, "어요");
 		if (pos.length == 2) {
-			mk.addRange(Difficulty.L22, pos[0] , pos[1]);
+			mk.addRange(Difficulty.L22, pos[0], 2, pos[1], 0);
 		}
 		return mk;
 	}

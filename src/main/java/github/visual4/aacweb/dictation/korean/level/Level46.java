@@ -30,6 +30,9 @@ public class Level46 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
+		if(word.contains("돼지")) {
+			return mk;
+		}
 		words.forEach(wd -> {
 			int pos = word.indexOf(wd);
 			if(pos >= 0) {

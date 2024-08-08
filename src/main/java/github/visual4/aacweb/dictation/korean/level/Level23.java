@@ -20,6 +20,13 @@ public class Level23 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L23, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 초성 + 'ㅘ'만 표시해야 함
+				mk.addRange(Difficulty.L23, k, 0, k + 1, -1);
+			}
+		}
+		return mk;
 	}
 }

@@ -20,6 +20,13 @@ public class Level31 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L31, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 받침만 표시해야 함
+				mk.addRange(Difficulty.L31, k, 2, k + 1, 0);
+			}
+		}
+		return mk;
 	}
 }

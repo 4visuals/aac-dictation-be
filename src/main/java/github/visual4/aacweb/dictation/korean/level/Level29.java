@@ -34,7 +34,7 @@ public class Level29 implements ILevel {
 			Jamo pattern = i == 0 ? pattern1 : pattern2;
 			int [] pos = Levels.findSuffixPos(word, pattern, suffix[i]);
 			if (pos.length == 2) {
-				mk.addRange(Difficulty.L29, pos[0] , pos[1]);
+				mk.addRange(Difficulty.L29, pos[0], 1, pos[1], 0);
 				break;
 			}
 		}

@@ -20,6 +20,13 @@ public class Level27 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L27, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 초성까지 같이 표시함
+				mk.addRange(Difficulty.L27, k, 0, k + 1, -1);
+			}
+		}
+		return mk;
 	}
 }

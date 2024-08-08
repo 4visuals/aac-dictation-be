@@ -116,6 +116,14 @@ public class Mark {
 //		pos.setEnd(3 * end);
 //		flushDf();
 //	}
+	/**
+	 * 
+	 * @param df
+	 * @param start 글자의 시작 위치(inclusive)
+	 * @param offsetInStart 0 또는 1 또는 2. start위치의 글자에서 초성, 중성, 종성의 위치를 특정함(0이면 글자 전체)
+	 * @param end 글자의 끝 위치(exclusive)
+	 * @param offsetInEnd 0 또는 -1 또는 -2. end-1 위치의 글자에서 초성, 중성, 종성의 위치를 특정함. -1이면 중성까지, -2이면 초성까지 
+	 */
 	public void addRange(Difficulty df, int start, int offsetInStart,
 			int end, int offsetInEnd) {
 		Pos pos = mark(df, start, offsetInStart);

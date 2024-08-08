@@ -30,8 +30,12 @@ class JamoSetTest {
 	}
 	@Test
 	void test_L18() {
+		/**
+		 * ㅂㅗ[ㄲㅇ]ㅡㅁ
+		 * [2, 4]
+		 */
 		Level18 lvl = new Level18(ctx);
-		String word= "그책을";;
+		String word= "볶음";
 		Mark mark = lvl.eval(word);
 		printMark(mark);
 	}

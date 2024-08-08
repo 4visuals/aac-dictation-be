@@ -22,8 +22,9 @@ public class Level19 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
-		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L19, range[0], range[1]);
+		Levels.findAdjPos(word, prev, next, range -> {
+			// 앞글자 종성과 뒷글자 초성만
+			mk.addRange(Difficulty.L19, range[0], 2, range[1], -2);
 		});
 		return mk;
 	}

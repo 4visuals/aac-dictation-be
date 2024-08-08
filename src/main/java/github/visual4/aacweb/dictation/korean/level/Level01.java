@@ -22,7 +22,14 @@ public class Level01 implements ILevel {
 
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L01, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				mk.addRange(Difficulty.L01, k, 0, k + 1, -1);
+			}
+		}
+		return mk;
+//		return ctx.setMark(Difficulty.L01, pattern, word);
 	}
 
 }

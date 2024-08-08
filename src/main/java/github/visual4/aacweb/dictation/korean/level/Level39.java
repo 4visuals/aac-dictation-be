@@ -18,7 +18,14 @@ public class Level39 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L39, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 받침만 표시해야 함
+				mk.addRange(Difficulty.L39, k, 2, k + 1, 0);
+			}
+		}
+		return mk;
 	}
 
 }

@@ -2,6 +2,7 @@ package github.visual4.aacweb.dictation;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -200,5 +201,16 @@ public class Util {
 	public static String toKoreanTime(Instant utcTime) {
 		Instant kr = utcTime.plus(9, ChronoUnit.HOURS);
 		return kr.toString().replace("T", " ").replace("Z", "");
+	}
+
+	public static String readString(InputStream in) throws IOException {
+		BufferedInputStream bin = new BufferedInputStream(in);
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(1024 * 600);
+		int r = 0;
+		while((r = bin.read()) != -1) {
+			bos.write(r);
+		}
+		in.close();
+		return new String(bos.toByteArray());
 	}
 }

@@ -1,5 +1,9 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
@@ -21,21 +25,61 @@ import github.visual4.aacweb.dictation.korean.Mark;
  *
  */
 public class Level33 implements ILevel {
-
+	String caseText = "갈색,갈지,강가,개[울가],글자,[금덩]이,[눈사]람,달빛,들새,마[술사],몸집,물감,물[건값],[물고]기,물병,물속,[밀가]루,밤길,버[팀대],별빛,보[낼지]도,보[름달],불빛,빨대,산새,[손바]닥,손등,[손전]등,시[골집],아[침밥],열쇠,[열심]히,용돈,[일주]일,장[난감],장바구니,줄[넘기],창가";
+	Map<String, Token> parts = new HashMap<>();
+	Set<String> tokenSet;
 	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄷㅂㅅㅆㅈㅊㅋㅌㅍㄲㄳㄺㄼㄿㅄ");
 	final Jamo next = Jamo.pattern("ㄱㄷㅂㅅㅈ", "*", "*");
 	final LevelContext ctx;
 	
 	Level33(LevelContext ctx) {
 		this.ctx = ctx;
+		String [] patterns = caseText.split(",");
+		for (String pattern : patterns) {
+			int start = pattern.indexOf('[');
+			if(start == -1) {
+				start = 0;
+			}
+			int end = pattern.indexOf(']', start);
+			if(end == -1) {
+				end = pattern.length();
+			} else {
+				end --;
+			}
+			String token = pattern.replace("[", "").replace("]", "");
+			Token tk = Token.make(token, start, end);
+			parts.put(token, tk);
+		}
+		tokenSet = parts.keySet();
+		
 	}
 	
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
+		tokenSet.forEach(token ->{
+			int offset = word.indexOf(token);
+			if(offset >= 0) {
+				Token tk = parts.get(token);
+				mk.addRange(Difficulty.L33, offset + tk.start, 2, offset + tk.end, -2);
+			}
+		});
 		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L33, range[0], range[1]);
+			mk.addRange(Difficulty.L33, range[0], 2, range[1], -2);
 		});
 		return mk;
+	}
+	
+	static class Token {
+		String text;
+		int start;
+		int end;
+		static Token make(String text, int start, int end) {
+			Token tk =new Token();
+			tk.text = text;
+			tk.start = start;
+			tk.end = end;
+			return tk;
+		}
 	}
 }

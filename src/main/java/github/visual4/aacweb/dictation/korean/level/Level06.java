@@ -21,7 +21,7 @@ public class Level06 implements ILevel {
 		Mark mk = ctx.findMark(word);
 		int [] pos = Levels.findSuffixPos(word, pattern, "다");
 		if (pos.length == 2) {
-			mk.addRange(Difficulty.L06, pos[0] , pos[1]);
+			mk.addRange(Difficulty.L06, pos[0], 2, pos[1], 0);
 		}
 		return mk;
 	}

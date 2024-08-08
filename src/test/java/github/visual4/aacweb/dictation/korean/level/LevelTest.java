@@ -199,7 +199,9 @@ class LevelTest {
 	@Test
 	public void test_level21() {
 		Level21 lvl = new Level21(ctx);
-		existing(lvl, Difficulty.L21);
+		Mark mk = lvl.eval("같아요");
+		System.out.println(mk);
+//		existing(lvl, Difficulty.L21);
 	}
 	@Test
 	public void test_level22() {

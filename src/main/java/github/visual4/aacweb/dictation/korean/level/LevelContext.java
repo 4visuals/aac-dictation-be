@@ -13,13 +13,20 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.JamoSet;
 import github.visual4.aacweb.dictation.korean.Mark;
+import github.visual4.aacweb.dictation.service.analysis.SentenceTag;
 
 public class LevelContext {
 
 	private Map<CharSequence, Mark> marks ;
 	
 	private List<ILevel> levels;
+
+	private Map<String, SentenceTag> taggingMap;
 	public LevelContext() {
+		this(null);
+	}
+	public LevelContext(Map<String, SentenceTag> taggingMap) {
+		this.taggingMap = taggingMap;
 		this.marks = new HashMap<>();
 		this.levels = new ArrayList<>();
 		install();
@@ -32,7 +39,9 @@ public class LevelContext {
 		}
 		return mk;
 	}
-	
+	public Map<String, SentenceTag> getTagging() {
+		return this.taggingMap;
+	}
 	public static LevelContext createContext() {
 		return new LevelContext();
 	}

@@ -28,7 +28,7 @@ public class Level35 implements ILevel {
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
 		Levels.findAdjPos(word, prev, next, (range) -> {
-			mk.addRange(Difficulty.L35, range[0], range[1]);
+			mk.addRange(Difficulty.L35, range[0], 2, range[1], -2);
 		});
 		return mk;
 	}

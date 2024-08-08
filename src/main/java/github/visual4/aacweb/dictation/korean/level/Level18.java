@@ -30,7 +30,8 @@ public class Level18 implements ILevel {
 		Levels.findAdjPos(word, prev, next, (range) -> {
 			String token = word.substring(range[0], range[1]);
 			if(!exlusion.contains(token)) {
-				mk.addRange(Difficulty.L18, range[0], range[1]);
+				// 앞글자 종성과 뒷글자 초성만
+				mk.addRange(Difficulty.L18, range[0], 2, range[1], -2);
 			}
 		});
 		return mk;

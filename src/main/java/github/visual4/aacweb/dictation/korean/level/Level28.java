@@ -1,8 +1,14 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
+import github.visual4.aacweb.dictation.service.analysis.SentenceTag;
+import github.visual4.aacweb.dictation.service.analysis.Tagging;
 /**
  * 26. 을과 를/은과 는 (앞글자에 받침이 있으면 을,은)(받침이 없으면 를,는)
  * 
@@ -13,34 +19,40 @@ import github.visual4.aacweb.dictation.korean.Mark;
  *
  */
 public class Level28 implements ILevel {
-	/**
-	 * 는/를 - 앞글자 받침 없는 경우
-	 */
-	final Jamo jongsungN = Jamo.pattern("*", "*", "_");
-	/**
-	 * 은/을 - 앞글자 받침 있는 경우  
-	 */
-	final Jamo jongsungY = Jamo.pattern("*", "*", "ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ");
+	
+	private static String EUN = "JX"; // ~은 ~는
+	private static String EUL = "JKO"; // ~을 ~를
+	private static String WA1 = "JC"; // ~와, ~과 접속조사
+	private static String WA2 = "JKB"; // 부사격 조사 (총알과 바꾼)
+	
+	// 과 : JKB
+	
+	private Set<String> pumsaSet = Set.of("JX", "JKO", "JC", "JKB");
+	private Map<String, Set<String>> pumsaMap = new HashMap<>();
 	final LevelContext ctx;
 	
 	Level28(LevelContext ctx) {
 		this.ctx = ctx;
+		this.pumsaMap.put("JX", Set.of("은", "는"));
+		this.pumsaMap.put("JKO", Set.of("을", "를"));
+		this.pumsaMap.put("JC", Set.of("와", "과"));
+		this.pumsaMap.put("JKB", Set.of("와", "과"));
 	}
 	
 	@Override
 	public Mark eval(String word) {
-		String [] words = word.split(" ");
 		Mark mk = ctx.findMark(word);
-		String [] suffix = "와,는,를,과,은,을".split(",");
-		for (int i = 0; i < suffix.length; i++) {
-			Jamo pattern = i < 3 ? jongsungN: jongsungY;
-			int offset = 0;
-			for (int k = 0; k < words.length; k++) {
-				int [] pos = Levels.findSuffixPos(words[k], pattern, suffix[i]);
-				if (pos.length == 2) {
-					mk.addRange(Difficulty.L28, offset + pos[0]+1 , offset + pos[1]);
+		Map<String, SentenceTag> taging = ctx.getTagging();
+		SentenceTag sen = taging.get(word);
+		if (sen != null) {
+			for (Tagging tag : sen.tags) {
+				Set<String> tokens = pumsaMap.get(tag.pumsa);
+				if(tokens != null) {
+					String token = word.substring(tag.pos[0], tag.pos[1]);
+					if (tokens.contains(token)) {
+						mk.addRange(Difficulty.L28, tag.pos[0], tag.pos[1]);
+					}
 				}
-				offset += words[k].length() + 1;
 			}
 		}
 		return mk;
