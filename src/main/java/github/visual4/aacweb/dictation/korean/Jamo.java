@@ -81,12 +81,19 @@ public class Jamo {
 	}
 	
 	public static String decomposeKr(String origin) {
-		
+		if ("".equals(origin)) {
+			return "___";
+		}
 		char [] jamo = new char[origin.length() * 3];
 		int pos = 0;
 		for(int k = 0 ; k < origin.length(); k++ ) {
 			int ko = origin.charAt(k);
-			if(ko >= KO_SYLLABLE_OFFSET && ko < 0xD7B0) {
+			if(ko == '_') {
+				jamo[pos++] = '_';
+				jamo[pos++] = '_';
+				jamo[pos++] = '_';
+			}
+			else if(ko >= KO_SYLLABLE_OFFSET && ko < 0xD7B0) {
 				int i0 = (ko - KO_SYLLABLE_OFFSET)/28/21;
 				int i1 = (ko - KO_SYLLABLE_OFFSET)/28%21;
 				int i2 = (ko - KO_SYLLABLE_OFFSET)%28;

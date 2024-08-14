@@ -18,7 +18,14 @@ public class Level03 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return ctx.setMark(Difficulty.L03, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 중성만 표시해야 함
+				mk.addRange(Difficulty.L03, k, 0, k + 1, -1);
+			}
+		}
+		return mk;
 	}
 
 }

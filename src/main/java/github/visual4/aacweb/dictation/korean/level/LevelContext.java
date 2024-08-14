@@ -23,7 +23,7 @@ public class LevelContext {
 
 	private Map<String, SentenceTag> taggingMap;
 	public LevelContext() {
-		this(null);
+		this(new HashMap<>());
 	}
 	public LevelContext(Map<String, SentenceTag> taggingMap) {
 		this.taggingMap = taggingMap;

@@ -19,6 +19,13 @@ public class Level05 implements ILevel {
 	
 	@Override
 	public Mark eval(String word) {
-		return this.ctx.setMark(Difficulty.L05, pattern, word);
+		Mark mk = ctx.findMark(word);
+		for(int k = 0 ; k < word.length(); k++) {
+			if(pattern.matched(word.charAt(k))) {
+				// 중성만 표시해야 함
+				mk.addRange(Difficulty.L05, k, 2, k + 1, 0);
+			}
+		}
+		return mk;
 	}
 }

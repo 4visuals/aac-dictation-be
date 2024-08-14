@@ -12,6 +12,8 @@ import org.apache.commons.text.diff.EditScript;
 import org.apache.commons.text.diff.StringsComparator;
 import org.junit.jupiter.api.Test;
 
+import github.visual4.aacweb.dictation.korean.Jamo;
+
 class TextDiffTest {
 
 	@Test
@@ -44,47 +46,81 @@ class TextDiffTest {
 		});
 //	    assertEquals(3, mod);
 	}
-	
 	@Test
-	void diff() {
-//		List<TextDiff.Mapping> mappings = TextDiff.build("ㅂㅜ_ㅅㅏㄴ", "ㅁㅜㄴㅅㅏㄴ");
-		// 물회 => 무래 (종성의 ㄹ이 초성의 ㄹ과 매칭됨)
-		// 간호사 => 가노사
-		// 어두워요 => 어둥워요, 어두어요
-		// 책을 넣으니 가방 => 책을 넣어 가방
-		// 책을 넣어 가방
-		// ㅁ ㅜ ㄹ ㅎ ㅚ _
-		// ㅁ ㅜ _ ㄹ ㅐ _
-//		String origin = "책을 넣으니 가방";
-//		String answer = "책을 넣어 가방"; // "어둥워요";
+	void dff1() {
+		String question = "잡으러";
 		
-		AssessmentService service = new AssessmentService();
-//		Map<String, int[]> mark = service.mark("넣어서", "넣고");
+		String answer = "자브으러";
+		TextDiff diff = TextDiff.build(question, answer);
+		System.out.println(diff);
+		
+		diff = TextDiff.build("잡으러", "자로");
+		System.out.println(diff);
+		String jamo = Jamo.decomposeKr("잡으러");
+		System.out.println(jamo);
+	}
+	@Test
+	void diff() {		
+		AssessmentService service = new AssessmentService(null);
 		
 		String question = "풀을 뜯는 젖소들";
-		String answer = "풀을 뜯는 덪소들";
-		Map<String, int[]> mark = service.mark(question, answer);
-		print(question, answer, mark);
+		List<String> answers = Arrays.asList(new String[]{
+				"푸를 뜯는 덪소들",
+				"풀을뜯는 젖소들", // 공백 탈락
+				"풀을 뜬는 젓소들",
+				"풀을 뜯으는 젖소들",
+				"풀을 뜯는 젖들",
+		});
+//		String question = "잡으러";
+//		String answer = "자브러";
+		boolean printLabel = true;
+		for (String answer : answers) {
+			Map<String, int[]> mark = service.mark(question, answer);
+			print(printLabel, question, answer, mark);
+			printLabel = false;
+		}
+		
 		
 	}
-	void print(String origin, String answer, Map<String, int[]> mark) {
+	@Test
+	void diff28() {		
+		AssessmentService service = new AssessmentService(null);
+		
+		String question = "원숭이와 토끼는 치마를 입고 춤을 췄다.";
+		List<String> answers = Arrays.asList(new String[]{
+				"원숭이와 토끼는 치마를 입고 춤을 췄다.",
+				"원숭이와토끼는치마를입고춤을췄다.", // 공백 탈락
+				"원 숭 이 와 토 끼 는 치 마 를 입 고 춤 을 췄 다.",
+				"원숭이과 토끼가 치마 입고 춤 췄다.",
+		});
+//		String question = "잡으러";
+//		String answer = "자브러";
+		boolean printLabel = true;
+		for (String answer : answers) {
+			Map<String, int[]> mark = service.mark(question, answer);
+			print(printLabel, question, answer, mark);
+			printLabel = false;
+		}
+		
+		
+	}
+	void print(boolean label, String origin, String answer, Map<String, int[]> mark) {
 		List<String> levels = new ArrayList<>(mark.keySet());
 		
 		levels.sort((a,b) -> a.compareTo(b));
-		
-		System.out.printf("%s,%s",q("#"), q("LEVELS"));
-		levels.forEach(lvl -> {
-			System.out.printf(",%s", q(lvl));
-		});
-		System.out.println();
-		
-		System.out.printf("%s,%s",q("정답"), q(origin));
-		levels.forEach(key ->{
-			int [] v = mark.get(key);
-			System.out.printf(",%d", v[1]);
-		});
-		System.out.println();
-		
+		if(label) {
+			System.out.printf("%s,%s",q("#"), q("LEVELS"));
+			levels.forEach(lvl -> {
+				System.out.printf(",%s", q(lvl));
+			});
+			System.out.println();
+			System.out.printf("%s,%s",q("정답"), q(origin));
+			levels.forEach(key ->{
+				int [] v = mark.get(key);
+				System.out.printf(",%d", v[1]);
+			});
+			System.out.println();
+		}
 		System.out.printf("%s,%s", q("오답"), q(answer));
 		levels.forEach(key ->{
 			int [] v = mark.get(key);
