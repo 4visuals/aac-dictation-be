@@ -13,6 +13,7 @@ import org.apache.commons.text.diff.StringsComparator;
 import org.junit.jupiter.api.Test;
 
 import github.visual4.aacweb.dictation.korean.Jamo;
+import github.visual4.aacweb.dictation.service.analysis.AnalysisService;
 
 class TextDiffTest {
 
@@ -61,7 +62,8 @@ class TextDiffTest {
 	}
 	@Test
 	void diff() {		
-		AssessmentService service = new AssessmentService(null);
+		AnalysisService ansService = new AnalysisService();
+		AssessmentService service = new AssessmentService(ansService);
 		
 		String question = "풀을 뜯는 젖소들";
 		List<String> answers = Arrays.asList(new String[]{
@@ -83,8 +85,9 @@ class TextDiffTest {
 		
 	}
 	@Test
-	void diff28() {		
-		AssessmentService service = new AssessmentService(null);
+	void diff28() {
+		AnalysisService ansService = new AnalysisService();
+		AssessmentService service = new AssessmentService(ansService);
 		
 		String question = "원숭이와 토끼는 치마를 입고 춤을 췄다.";
 		List<String> answers = Arrays.asList(new String[]{

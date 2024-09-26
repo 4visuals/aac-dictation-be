@@ -47,6 +47,10 @@ public class ExamPaper {
 	 * 오답연습 및 재시도 시험인지 나타냄. true인 경우 현재 section에 대한 오답의 갯수만 업데이트 해야함. 
 	 */
 	boolean retry;
+	/**
+	 * 학습이력에서 참조할 Level별 상세 오답 정보가 분석되었는지 나타냄
+	 */
+	Boolean analyzed;
 	
 	List<ExamAnswer> submissions;
 	
@@ -96,6 +100,10 @@ public class ExamPaper {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 	            .withZone(ZoneId.systemDefault());
 		return formatter.format(this.startTime);
+	}
+
+	public boolean checkIfAnalyzied() {
+		return this.analyzed != null && this.analyzed.booleanValue();
 	}
 	
 }

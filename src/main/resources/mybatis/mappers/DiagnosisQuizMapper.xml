@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="DiagnosisQuizMapper">
+  	
+  	<sql id="diagnosis_cols">
+  		 ddq.dq_seq
+  		 , ddq.dq_question
+  		 , ddq.dq_version
+  		 
+  	</sql>
+  	<resultMap type="DiagnosisQuiz" id="diagnsisMap">
+  		<id column="dq_seq" property="seq"/>
+  		<result column="dq_question" property="question"/>
+  		<result column="dq_version" property="version"/>
+  	</resultMap>
+  	<select id="listQuiz" resultMap="diagnsisMap">
+		SELECT 
+			<include refid="diagnosis_cols"></include> 
+		FROM dt_diagnosis_quiz ddq;
+  	</select>
+  	<select id="findBySeq" resultMap="diagnsisMap" parameterType="int">
+		SELECT 
+			<include refid="diagnosis_cols"></include> 
+		FROM dt_diagnosis_quiz ddq
+		WHERE ddq.dq_seq = #{seq};
+  	</select>
+  </mapper>

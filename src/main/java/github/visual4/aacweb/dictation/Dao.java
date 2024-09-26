@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Dao {
 	
 	private Dao() {}
@@ -24,6 +27,7 @@ public class Dao {
 	public static void updateOne(SqlSession session, String queryPath, Object param) {
 		int nUpdated = session.update(queryPath, param);
 		if (nUpdated > 1) {
+			Dao.log.error("[DAO] multiple updates: {} query: {}, param: {}", nUpdated, queryPath, param);
 			throw new AppException(ErrorCode.APP_BUG, 500, "tried to update " + nUpdated + " rows.");
 		}
 	}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import github.visual4.aacweb.dictation.Dao;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.exam.dto.PaperQuery;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 
 @Repository
@@ -49,6 +50,19 @@ public class ExamPaperDao {
 	public List<ExamPaper> findRecentExamsPerSegment(long studentSeq) {
 		return session.selectList(Dao.mapper(this, "findRecentExamsPerSegment"), studentSeq);
 		
+	}
+
+	public List<ExamPaper> findExamsByQuery(PaperQuery query) {
+		return session.selectList(Dao.mapper(this, "findExamsByQuery"), query);
+	}
+
+	public void updateAsAnalyzed(ExamPaper paper) {
+		Dao.updateOne(session, Dao.mapper(this, "updateAsAnalyzed"), paper);
+		
+	}
+
+	public List<ExamPaper> findExamPapersToAnalyze(Integer limit) {
+		return session.selectList(Dao.mapper(this, "findExamPapersToAnalyze"), limit);
 	}
 
 }

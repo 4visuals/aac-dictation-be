@@ -23,4 +23,6 @@ public class ExamAnswer {
 	 * @transient;
 	 */
 	String mode;
+	
+	String analysis;
 }

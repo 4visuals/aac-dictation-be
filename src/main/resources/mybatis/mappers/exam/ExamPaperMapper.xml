@@ -16,6 +16,7 @@
  			, dep.num_of_questions
  			, dep.start_time
  			, dep.end_time
+ 			, dep.analyzed
   	</sql>
   	<resultMap type="ExamPaper" id="exam_map">
   		<id column="exam_seq" property="seq"/>
@@ -29,11 +30,10 @@
   		<result column="num_of_questions" property="numOfQuestions"/>
   		<result column="start_time" property="startTime"/>
   		<result column="end_time" property="endTime"/>
-  		<collection property="submissions"  javaType="list"
+  		<result column="analyzed" property="analyzed"/>
+  		<collection property="submissions"  javaType="list" notNullColumn="exam_ref"
   			resultMap="ExamAnswerMapper.ans_map" ofType="ExamAnswer"></collection>
   	</resultMap>
-  	<!-- <select id="" parameterType="" resultMap="*">
-  	</select> -->
   	<select id="findExamBySectionAndStudent" parameterType="map" resultMap="exam_map">
 	  	SELECT 
 	  		<include refid="exam_full_cols"></include>
@@ -86,6 +86,43 @@
 		ORDER
 		  BY dep.section_ref, dep.question_offset  
   	</select>
+  	<select id="findExamsByQuery" parameterType="PaperQuery" resultMap="exam_map">
+		SELECT 
+	  		<include refid="exam_full_cols"></include>
+	  		, <include refid="ExamAnswerMapper.ans_full_cols"></include>
+		FROM dt_exam_papers  dep 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref 
+		<where>
+			dep.student_ref = #{studentRef}
+			AND dep.origin = 'L'
+			<if test="mode != null"> AND dep.mode = #{mode}</if>
+			<if test="sentenceType != null"> AND dep.type = #{sentenceType} </if>
+			<if test="sectionRef != null"> AND dep.section_ref = ${sectionRef}</if>
+		</where>
+	</select>
+	<!--
+	// 분석되지 않은 퀴즈 답안지를 조회함
+	// mode: 'Q' 퀴즈만
+	-->
+	<select id="findExamPapersToAnalyze" parameterType="int" resultMap="exam_map">
+		SELECT 
+	  		<include refid="exam_full_cols"></include>
+	  		, <include refid="ExamAnswerMapper.ans_full_cols"></include>
+		FROM (
+			SELECT
+				_ref.exam_seq
+			FROM dt_exam_papers _ref
+			WHERE 
+				_ref.analyzed = 'N' AND _ref.mode = 'Q'
+			LIMIT #{limit}
+			) dep0
+		JOIN dt_exam_papers  dep
+		  ON dep0.exam_seq = dep.exam_seq
+		LEFT 
+		JOIN dt_exam_answers ans
+		  ON dep.exam_seq = ans.exam_ref
+	</select>
   	<insert id="insertExamPaper" parameterType="ExamPaper"
   		useGeneratedKeys="true"
   		keyColumn="exam_seq"
@@ -114,4 +151,10 @@
 			, #{endTime} 
 		);
   	</insert>
+  	<update id="updateAsAnalyzed" parameterType="ExamPaper">
+		UPDATE dt_exam_papers
+		SET
+			analyzed  = 'Y'
+		WHERE exam_seq = #{seq};
+	</update>
   </mapper>

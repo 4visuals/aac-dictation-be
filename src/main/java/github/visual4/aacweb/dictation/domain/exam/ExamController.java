@@ -45,13 +45,17 @@ public class ExamController {
 			@PathVariable SentenceType type,
 			@RequestParam String license) {
 		Object papers = null;
-		/* -----+--------+-------+-------+
-		 *      | 보고쓰기 |  학습  |  퀴즈  |
-		 * -----+--------+-------+-------+
-		 *  낱말 |   EP   |   EP  |   EP  |
-		 * -----+--------+-------+-------+
-		 *  문장 |   LP   |   LP  |   EP  |
-		 * -----+--------+-------+-------+
+		/* --------+--------+-------+----------+
+		 *         | 보고쓰기 |  학습  |  퀴즈(Q)  |
+		 * --------+--------+-------+----------+
+		 *  낱말(W) |   EP   |   EP  |   EP     |
+		 * --------+--------+-------+----------+
+		 *  문장(S) |   LP   |   LP  |   EP     |
+		 * --------+--------+-------+----------+
+		 * 
+		 * 문장의 경우 보고쓰기와 학습의 경우 어절 단위로 입력을 받는다. LearningPaper(LP)
+		 * 문장에 대한 퀴즈모드에서는 전체 문장을 통째로 입력 받는다. ExamPaper(EP)
+		 * 낱말의 경우 전체 낱말을 통째로 입력받으므로 ExamMode의 구분이 없음. 모두 EP로 입력받음
 		 */
 		if (mode == ExamMode.Q || type == SentenceType.W) {
 			papers = examService.findExamPapersBySection(sectionSeq, type, license);

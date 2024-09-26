@@ -2,25 +2,36 @@ package github.visual4.aacweb.dictation.domain.exam;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.Util;
+import github.visual4.aacweb.dictation.domain.assessment.AssessmentService;
+import github.visual4.aacweb.dictation.domain.exam.dto.PaperQuery;
 import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.section.Section;
 import github.visual4.aacweb.dictation.domain.section.SectionService;
+import github.visual4.aacweb.dictation.domain.sentence.Sentence;
 import github.visual4.aacweb.dictation.domain.sentence.Sentence.SentenceType;
 import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserService;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@Slf4j
 public class ExamService {
+	final ObjectMapper om;
 	final LicenseService licenseService;
 	final UserService userService;
 	final ExamPaperDao examPaperDao;
@@ -29,8 +40,10 @@ public class ExamService {
 	final EojeolAnswerDao eojeolAnswerDao;
 	final SectionService sectionService;
 	final RecentPaperService recentPaperService;
+	final AssessmentService assessmentService;
 
 	public ExamService(
+			ObjectMapper om,
 			LicenseService licenseService,
 			UserService userService,
 			ExamPaperDao examPaperDao,
@@ -38,8 +51,10 @@ public class ExamService {
 			ExamAnswerDao examAnswerDao,
 			EojeolAnswerDao eojeolAnswerDao,
 			SectionService sectionService,
-			RecentPaperService recentPaperService) {
+			RecentPaperService recentPaperService,
+			AssessmentService assessmentService) {
 		super();
+		this.om = om;
 		this.licenseService = licenseService;
 		this.userService = userService;
 		this.examPaperDao = examPaperDao;
@@ -48,6 +63,7 @@ public class ExamService {
 		this.eojeolAnswerDao = eojeolAnswerDao;
 		this.sectionService = sectionService;
 		this.recentPaperService = recentPaperService;
+		this.assessmentService = assessmentService;
 	}
 
 	/**
@@ -111,7 +127,7 @@ public class ExamService {
 		eojeolAnswerDao.insertAnswer(learningPaper.getSubmissions());
 	}
 	/**
-	 * 라이선스에 연결된 학생이 제출한 section의 답안지 상세 정보(문제 및 정오답 모두 포함)
+	 * 문장 기반 시험 문제 결과. 라이선스에 연결된 학생이 제출한 section의 답안지 상세 정보(문제 및 정오답 모두 포함)
 	 * @param sectionSeq
 	 * @param type
 	 * @para licenseUuid
@@ -129,16 +145,20 @@ public class ExamService {
 				student.getSeq());
 		return papers;
 	}
-	
+	/**
+	 * 어절 기반 시험 문제 결과
+	 * @param sectionSeq
+	 * @param licenseUuid
+	 * @return
+	 */
 	public List<LearningPaper> findLearningPapersBySection(
 			Integer sectionSeq,
 			String licenseUuid) {
 		License license = licenseService.findBy(License.Column.lcs_uuid, licenseUuid, true);
 		User student = licenseToStudent(license);
-		List<LearningPaper> papers = learningPaperDao.findLearningPapersBySection(
+		return learningPaperDao.findLearningPapersBySection(
 				sectionSeq,
 				student.getSeq());
-		return papers;
 	}
 	
 	private User licenseToStudent (License license) {
@@ -190,6 +210,51 @@ public class ExamService {
 		
 		List<ExamPaper> papers = examPaperDao.findRecentExamsPerSegment(student.getSeq());
 		return TypeMap.with("quiz", papers);
-		
+	}
+	
+	public List<ExamPaper> queryForExamPapers(PaperQuery query) {
+		if(query.studentRef == null) {
+			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "student required");
+		}
+		return this.examPaperDao.findExamsByQuery(query);
+	}
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public ExamPaper analyizeExamPaper(ExamPaper paper) {
+		List<ExamAnswer> submissions = paper.getSubmissions();
+		Section section = sectionService.findBy(Section.Column.seq, paper.getSectionRef());
+		Map<Integer, Sentence> sentenceMap = section.getSentenceMap();
+		ExamService.log.debug("[ANALYSIS] {} submissions for exam {}", submissions.size(), paper.getSeq());
+		for (ExamAnswer sbm : submissions) {
+			Sentence sen = sentenceMap.get(sbm.getSentenceRef());
+			String analysis = null;
+			if(sen != null) {
+				String question = sen.getSentence();
+				Map<String, int[]> mark = assessmentService.mark(question, sbm.getValue());
+				analysis = Util.stringify(om, new TypeMap(mark));
+			} else {
+				/*
+				 * 
+				 */
+				ExamService.log.warn("[MISSING] sentence: {} at section {} from exam {}. answer: {} ", 
+						sbm.getSentenceRef(),
+						section.getSeq(),
+						paper.getSeq(),
+						sbm.getValue());
+				analysis = "{}";
+			}
+			sbm.setAnalysis(analysis);
+			this.examAnswerDao.updateAnalysis(sbm);
+		}
+		paper.setAnalyzed(Boolean.TRUE);
+		this.examPaperDao.updateAsAnalyzed(paper);
+		return paper;
+	}
+	/**
+	 * 분석해야할 시험 답안 조회
+	 * @param limit
+	 * @return
+	 */
+	public List<ExamPaper> findExamPapersToAnalyze(int limit) {
+		return this.examPaperDao.findExamPapersToAnalyze(limit);
 	}
 }

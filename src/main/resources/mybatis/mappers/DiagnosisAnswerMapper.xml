@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="DiagnosisAnswerMapper">
+  	
+  	<sql id="diagnosis_answer_cols">
+  		dda.dda_seq
+  		, dda.dda_ansser
+  		, dda.dda_student_ref
+  		, dda.dda_quiz_ref
+  		, dda.dda_analysis
+  		, dda.dda_commit
+  	</sql>
+  	<resultMap type="DiagnosisAnswer" id="diagnosisMap">
+  		<id column="dda_seq" property="seq"/>
+  		<result column="dda_ansser" property="answer"/>
+  		<result column="dda_student_ref" property="studentRef"/>
+  		<result column="dda_quiz_ref" property="quizRef"/>
+  		<result column="dda_analysis" property="analysis"/>
+  		<result column="dda_commit" property="commit"/>
+  	</resultMap>
+  	
+  	<sql id="diagnosis_answer_cols_with_version">
+		  <include refid="diagnosis_answer_cols"></include>
+		  , ddq.dq_version
+	</sql>
+  	<resultMap id="diagnosisVersionMap" type="DiagnosisAnswer" extends="diagnosisMap">
+		  <result column="dq_version" property="version"/>
+	</resultMap>
+  	<select id="findAnswersByStudent" parameterType="int" resultMap="diagnosisVersionMap">
+		SELECT 
+			<include refid="diagnosis_answer_cols_with_version"></include>
+		FROM dt_diagnosis_answer dda
+		JOIN dt_diagnosis_quiz ddq
+		  ON dda.dda_quiz_ref = ddq.dq_seq
+  		WHERE dda.dda_student_ref = #{seq}
+  	</select>
+  	<select id="findAnswerByQuizAndStudent" parameterType="DiagnosisAnswer" resultMap="diagnosisMap">
+		SELECT 
+			<include refid="diagnosis_answer_cols"></include>
+		FROM dt_diagnosis_answer dda
+  		WHERE dda.dda_student_ref = #{studentRef} and dda_quiz_ref=#{quizRef}
+	</select>
+	<insert id="insertAnswer" parameterType="DiagnosisAnswer"
+		useGeneratedKeys="true"
+		keyColumn="dda_seq"
+		keyProperty="seq">
+		INSERT 
+		INTO dt_diagnosis_answer (
+			dda_ansser,
+			dda_student_ref ,
+			dda_quiz_ref,
+			dda_analysis,
+			dda_commit
+		) VALUES (
+			#{answer},
+			#{studentRef},
+			#{quizRef},
+			#{analysis},
+			'N'
+		)
+	</insert>
+	<update id="updateAnswer" parameterType="DiagnosisAnswer">
+		UPDATE dt_diagnosis_answer 
+		SET
+			dda_ansser = #{answer}
+			, dda_analysis = #{analysis}
+		WHERE dda_seq = #{seq}
+	</update>
+	<update id="updateCommit" parameterType="DiagnosisAnswer">
+		UPDATE dt_diagnosis_answer 
+		SET
+			dda_commit = #{commit}
+		WHERE dda_seq = #{seq}
+	</update>
+  </mapper>

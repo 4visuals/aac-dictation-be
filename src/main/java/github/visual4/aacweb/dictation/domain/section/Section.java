@@ -1,6 +1,8 @@
 package github.visual4.aacweb.dictation.domain.section;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import github.visual4.aacweb.dictation.domain.sentence.Sentence;
 import github.visual4.aacweb.dictation.tools.Origin;
@@ -45,5 +47,11 @@ public class Section {
 		} else {			
 			return Origin.B;
 		}
+	}
+
+	public Map<Integer, Sentence> getSentenceMap() {
+		return this.sentences
+				.stream()
+				.collect(Collectors.toMap(Sentence::getSeq, elem -> elem));
 	}
 }

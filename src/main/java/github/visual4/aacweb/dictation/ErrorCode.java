@@ -10,6 +10,7 @@ public enum ErrorCode {
      * 부적합한 입력(null 공백 등)
      */
     INVALID_VALUE("invalid value found"),
+    INVALID_VALUE2("invalid value found: %s"),
     /**
      * 계정 정보가 없음(로그인 실패 등)
      */

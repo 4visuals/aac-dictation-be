@@ -10,14 +10,16 @@
 		, ans.correct
 		, ans.trial
 		, ans.elapsed_time
+		, ans.analysis
   	</sql>
   	
   	<resultMap type="ExamAnswer" id="ans_map">
-  		<result column="exam_ref" property="examRef"/>
-  		<result column="sentence_ref" property="sentenceRef"/>
+  		<id column="exam_ref" property="examRef"/>
+  		<id column="sentence_ref" property="sentenceRef"/>
   		<result column="correct" property="correct"/>
   		<result column="trial" property="value"/>
   		<result column="elapsed_time" property="elapsedTimeMillis"/>
+  		<result column="analysis" property="analysis"/>
   	</resultMap>
   	
   	<!-- <select id="" parameterType="" resultMap="*">
@@ -37,4 +39,11 @@
 			, #{elapsedTimeMillis}
 		)
   	</insert>
+  	<update id="updateAnalysis" parameterType="ExamAnswer">
+		UPDATE dt_exam_answers
+		SET
+			analysis = #{analysis}
+		WHERE exam_ref     = #{examRef}
+		 AND  sentence_ref = #{sentenceRef}
+	</update>
   </mapper>

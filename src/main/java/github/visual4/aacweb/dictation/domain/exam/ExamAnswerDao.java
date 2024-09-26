@@ -18,5 +18,9 @@ public class ExamAnswerDao {
 	public void insertExamAnswer(ExamAnswer answer) {
 		session.insert(Dao.mapper(this, "insertExamAnswer"), answer);
 	}
+
+	public void updateAnalysis(ExamAnswer sbm) {
+		Dao.updateOne(session, Dao.mapper(this, "updateAnalysis"), sbm);
+	}
 	
 }
