@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.chapter.Chapter;
 import github.visual4.aacweb.dictation.domain.diagnosys.dto.StudentDiagnosisDto;
 import github.visual4.aacweb.dictation.domain.exam.ExamPaper;
 import github.visual4.aacweb.dictation.domain.exam.ExamService;
@@ -37,13 +38,15 @@ public class DiagnosisController {
 		List<ExamPaper> exams = examService.queryForExamPapers(PaperQuery.byDiagnosis(studentSeq));
 		return Res.success("diagnosis", diagnosis, "exams", exams);
 	}
-//	private void checkAnalysis(List<ExamPaper> exams) {
-//		for (ExamPaper paper : exams) {
-//			if(!paper.checkIfAnalyzied()) {
-//				this.examService.analyizeExamPaper(paper);
-//			}
-//		}
-//	}
+	@GetMapping("/chapter-form")
+	public Object getAsChapterForm() {
+		Chapter chapter = diagnosisService.getAsChapterForm();
+		return Res.success("chapter", chapter);
+	}
+	@GetMapping("/difficulties")
+	public Object parseDifficulties() {
+		return this.diagnosisService.parseDifficulties();
+	}
 
 	@PostMapping("/{quizSeq}/student/{studentSeq}")
 	public Object insertAnswer(
@@ -61,4 +64,5 @@ public class DiagnosisController {
 		this.diagnosisService.commitDiagnosis(studentSeq, version);
 		return param;
 	}
+	
 }

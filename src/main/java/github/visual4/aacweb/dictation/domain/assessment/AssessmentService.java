@@ -36,12 +36,10 @@ public class AssessmentService {
 		Map<String, int[]> scores = new HashMap<>();
 		Mark mark = ansService.parseDifficulties(question);
 		mark.eachLevel((Difficulty df, Pos poses) -> {
-//			System.out.printf("%s\n", df);
 			int [] score = {0, poses.size()};
 			poses.each(pos -> {
 				String txt = mark.textAt(pos[0], pos[1]);
 				String ans = diff.getJamoAt(pos[0], pos[1]);
-//				System.out.printf("[%d, %d] %s => %s\n",pos[0], pos[1], txt, ans );
 				if(txt.equals(ans)) {
 					score[0]++;
 				}

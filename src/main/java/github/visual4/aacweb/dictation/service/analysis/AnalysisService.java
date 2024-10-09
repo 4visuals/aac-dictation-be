@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
 
@@ -28,8 +31,6 @@ public class AnalysisService {
 		ObjectMapper om = new ObjectMapper();
 		InputStream in = AnalysisService.class.getResourceAsStream("/greamhangul.txt");
 		
-//		String json = "[{\"sen\":\"아기 나무\",\"tags\":[{\"pos\":[0,2],\"pumsa\":\"NNG\"},{\"pos\":[3,5],\"pumsa\":\"NNG\"}]}]";
-		
 		try {
 			if(in == null) {
 				throw new RuntimeException("null");
@@ -41,7 +42,6 @@ public class AnalysisService {
 			for (SentenceTag sen : data) {
 				taggingMap.put(sen.sen, sen);
 			}
-//			System.out.println(map);
 			
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
@@ -54,10 +54,9 @@ public class AnalysisService {
 	
 	public Mark parseDifficulties(String text) {
 		LevelContext ctx = new LevelContext(this.taggingMap);
-		Mark mark = ctx.parseDifficulties(text.trim());
-		return mark;
+		return ctx.parseDifficulties(text.trim());
 	}
-
+	
 	public TypeMap parseDifficulties(Section section) {
 		LevelContext ctx = new LevelContext(this.taggingMap);
 		TypeMap dfMap = new TypeMap();
@@ -66,6 +65,5 @@ public class AnalysisService {
 			dfMap.put("" +sen.getSeq(), mark.toMap());
 		});
 		return dfMap;
-		
 	}
 }

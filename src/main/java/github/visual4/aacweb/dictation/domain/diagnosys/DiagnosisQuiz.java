@@ -17,6 +17,10 @@ public class DiagnosisQuiz {
 	String version;
 	
 	DiagnosisAnswer answer;
+	/**
+	 * 문제 자체에 대한 레빌 분석 정보(json)
+	 */
+	String analysis;
 
 	public Boolean checkIfCommitted() {
 		if(this.answer == null) {

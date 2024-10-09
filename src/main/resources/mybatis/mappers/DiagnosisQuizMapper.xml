@@ -8,12 +8,14 @@
   		 ddq.dq_seq
   		 , ddq.dq_question
   		 , ddq.dq_version
+  		 , ddq.dq_analysis
   		 
   	</sql>
   	<resultMap type="DiagnosisQuiz" id="diagnsisMap">
   		<id column="dq_seq" property="seq"/>
   		<result column="dq_question" property="question"/>
   		<result column="dq_version" property="version"/>
+  		<result column="dq_analysis" property="analysis"/>
   	</resultMap>
   	<select id="listQuiz" resultMap="diagnsisMap">
 		SELECT 
