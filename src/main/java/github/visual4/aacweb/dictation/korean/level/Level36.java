@@ -4,7 +4,7 @@ import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
- * 36. ㄷㅌ이 ㅈㅊ으로 바뀌어 소리나요.
+ * 36. ㄷㅌ이 ㅈㅊ으로 바뀌어 소리나요. 구개음화
  * (ㄷㅌ+ㅣㅑㅕㅛㅠ→ㅈㅊ)
  * 
  * @author chminseo
@@ -12,8 +12,8 @@ import github.visual4.aacweb.dictation.korean.Mark;
  */
 public class Level36 implements ILevel {
 
-	final Jamo prev = Jamo.pattern("*", "*", "ㄷㅌ");
-	final Jamo next = Jamo.pattern("ㅇ", "ㅣㅑㅕㅛㅠ", "*");
+	public static final Jamo prev = Jamo.pattern("*", "*", "ㄷㅌ");
+	public static final Jamo next = Jamo.pattern("ㅇㅎ", "ㅣㅕ", "*");
 	final LevelContext ctx;
 	
 	Level36(LevelContext ctx) {

@@ -6,6 +6,10 @@ import github.visual4.aacweb.dictation.korean.Mark;
 /**
  * 32. ㅎ뒤엔 거센소리로 바뀌어요.
  * (ㅎ받침+ㄱㄷㅈ→ㅋㅌㅍㅊ)
+ * ex) 좋다 => 조타
+ *     낳다 => 나타
+ *     좋게 => 조케
+ *     하얗다 => 하야타
  * 
  * 4장 받침의 발음, 12항 받침 'ㅎ'의 발음
  * https://kornorms.korean.go.kr/regltn/regltnView.do?regltn_code=0002&regltn_no=346#a405

@@ -7,6 +7,7 @@ import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
 /**
  * 38. 소리를 닮아가요(2)
+ * 뒷글자의 초성(소리)이 바뀜
  * (ㄴ+ㄹ→ㄹ,ㅁㅇ+ㄹ→ㄴ)
  * 
  * 제5장 음의 동화
