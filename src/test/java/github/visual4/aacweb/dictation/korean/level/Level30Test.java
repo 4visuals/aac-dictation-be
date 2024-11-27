@@ -6,15 +6,14 @@ import org.junit.jupiter.api.Test;
 
 import github.visual4.aacweb.dictation.korean.Mark;
 
-class Level32Test {
+class Level30Test {
 
 	@Test
 	void test() {
 		LevelContext ctx = new LevelContext();
-		Level32 lvl = new Level32(ctx);
+		Level30 lvl = new Level30(ctx);
 		Mark mk = lvl.eval("직업");
 		System.out.println(mk.toMap());
-		
 	}
 
 }
