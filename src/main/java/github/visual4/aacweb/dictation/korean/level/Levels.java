@@ -1,6 +1,7 @@
 package github.visual4.aacweb.dictation.korean.level;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import github.visual4.aacweb.dictation.korean.Difficulty;
@@ -39,6 +40,23 @@ public class Levels {
 			char c1 = word.charAt(k+1);
 			if (prev.matched(c0) && next.matched(c1)) {
 				fn.accept(new int[] {k, k+2});
+			}
+		}
+	}
+	static void findAdjPos(String word, Jamo prev, Set<Jamo> nexts, Consumer<int[]> fn) {
+		if (word.length() < 2) {
+			return;
+		}
+		for(int k = 0; k < word.length() - 1; k++) {
+			char c0 = word.charAt(k+0);
+			char c1 = word.charAt(k+1);
+			if (prev.matched(c0)) {
+				for (Jamo next : nexts) {
+					if(next.matched(c1)) {						
+						fn.accept(new int[] {k, k+2});
+						break;
+					}
+				}
 			}
 		}
 	}

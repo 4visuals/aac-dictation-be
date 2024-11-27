@@ -69,6 +69,7 @@ public class Jamo {
 	 * "*"에 해당하는 종성 bit flag
 	 */
 	public final static int ANY_JONG_BIT = 0;
+	public static final Jamo SPACE = new Space();
 	
 	int cho;
 	int jung;
@@ -110,6 +111,9 @@ public class Jamo {
 	}
 	
 	public static Jamo decompose(int ko) {
+		if(ko == ' ') {
+			return SPACE;
+		}
 		int i0 = (ko - KO_SYLLABLE_OFFSET)/28/21;
 		int i1 = (ko - KO_SYLLABLE_OFFSET)/28%21;
 		int i2 = (ko - KO_SYLLABLE_OFFSET)%28;
@@ -155,7 +159,12 @@ public class Jamo {
 		return matched(jm);		
 	}
 
-	public boolean matched(Jamo jm) {		
+	public boolean matched(Jamo jm) {
+		if(this == jm) {
+			return true;
+		} else if(jm == SPACE) {
+			return false;
+		}
 		return (this.cho & jm.cho) > 0 
 				&& (this.jung & jm.jung) > 0
 				&& (this.jong & jm.jong) > 0;
@@ -180,6 +189,31 @@ public class Jamo {
 	}
 	static char toJongsung(int pattern) {
 		return toJamo(pattern, JONG);
+	}
+
+	public static char chosung(char ko) {
+		int i0 = (ko - KO_SYLLABLE_OFFSET)/28/21;
+		if(i0 >= 0) {
+			return CHO.charAt(i0);			
+		} else {
+			return '_';
+		}
+	}
+	
+	private static class Space extends Jamo {
+
+		Space() {
+			super(-1, -1, -1);
+		}
+		@Override
+		public boolean matched(Jamo jm) {
+			return this.cho == jm.cho && jm.jung == -1 && jm.jong == -1; 
+		}
+		@Override
+		public boolean hasJongsung() {
+			return false;
+		}
+		
 	}
 	
 }

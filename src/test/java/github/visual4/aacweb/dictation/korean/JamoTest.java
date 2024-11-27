@@ -54,5 +54,12 @@ class JamoTest {
 		Jamo jong = Jamo.pattern("*", "*", "*");
 		assertTrue(jong.matched(' '));
 	}
+	@Test
+	void test_chosung() {
+		assertEquals('ㅎ',Jamo.chosung('황'));
+		assertEquals('ㄱ',Jamo.chosung('과'));
+		assertEquals('ㅇ',Jamo.chosung('왕'));
+		assertEquals('ㅇ',Jamo.chosung('1'));
+	}
 
 }

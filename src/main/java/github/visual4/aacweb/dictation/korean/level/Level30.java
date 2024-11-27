@@ -6,12 +6,14 @@ import github.visual4.aacweb.dictation.korean.Mark;
 /**
  * 30. 받침 ㅂㅍ은 읽을 때 ㅂ으로 소리나요
  * 
+ * 어말) 종성이 ㅂ,ㅍ으로 끝나고 다음 글자의 초성이 ㄱㄷㅂㅅㅈ으로 시작하는 경우만
  * @author chminseo
  *
  */
 public class Level30 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㅂㅍ");
+	final Jamo prev = Jamo.pattern("*", "*", "ㅂㅍ");
+	final Jamo next = Jamo.pattern("ㄱㄲㄷㄸㅂㅃㅅㅆㅈㅉㅊㅋㅌㅍ", "*", "*");
 	final LevelContext ctx;
 	
 	Level30(LevelContext ctx) {
@@ -21,11 +23,12 @@ public class Level30 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
-		for(int k = 0 ; k < word.length(); k++) {
-			if(pattern.matched(word.charAt(k))) {
-				// 받침만 표시해야 함
-				mk.addRange(Difficulty.L30, k, 2, k + 1, 0);
-			}
+		Levels.findAdjPos(word, prev, next,
+			range ->mk.addRange(Difficulty.L30, range[0], 2, range[1], -3)
+		);
+		int lastIdx = word.length() - 1 ;
+		if(prev.matched(word.charAt(lastIdx))) {
+			mk.addRange(Difficulty.L30, lastIdx, 2, lastIdx + 1, -3);
 		}
 		return mk;
 	}

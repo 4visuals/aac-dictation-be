@@ -6,12 +6,17 @@ import github.visual4.aacweb.dictation.korean.Mark;
 /**
  * 31. 받침 ㄱㅋㄲ은 읽을 때 ㄱ으로 소리나요.
  * 
+ * ㄱㄷㅂㅅㅈ
+ * ㄲㄸㅃㅆㅉ
+ * ㅋㅌㅍ_ㅊ  
  * @author chminseo
  *
  */
 public class Level31 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㄱㅋㄲ");
+	final Jamo prev = Jamo.pattern("*", "*", "ㄱㄲㅋ");
+//	final Jamo next = Jamo.pattern("ㄱㄷㅂㅅㅈ", "*", "*");
+	final Jamo next = Jamo.pattern("ㄱㄲㄷㄸㅂㅃㅅㅆㅈㅉㅊㅋㅌㅍ", "*", "*");
 	final LevelContext ctx;
 	
 	Level31(LevelContext ctx) {
@@ -21,11 +26,12 @@ public class Level31 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
-		for(int k = 0 ; k < word.length(); k++) {
-			if(pattern.matched(word.charAt(k))) {
-				// 받침만 표시해야 함
-				mk.addRange(Difficulty.L31, k, 2, k + 1, 0);
-			}
+		Levels.findAdjPos(word, prev, next,
+			range ->mk.addRange(Difficulty.L31, range[0], 2, range[1], -3)
+		);
+		int lastIdx = word.length() - 1 ;
+		if(prev.matched(word.charAt(lastIdx))) {
+			mk.addRange(Difficulty.L31, lastIdx, 2, lastIdx + 1, -3);
 		}
 		return mk;
 	}

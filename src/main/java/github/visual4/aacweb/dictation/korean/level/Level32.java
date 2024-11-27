@@ -1,5 +1,7 @@
 package github.visual4.aacweb.dictation.korean.level;
 
+import java.util.Set;
+
 import github.visual4.aacweb.dictation.korean.Difficulty;
 import github.visual4.aacweb.dictation.korean.Jamo;
 import github.visual4.aacweb.dictation.korean.Mark;
@@ -11,7 +13,9 @@ import github.visual4.aacweb.dictation.korean.Mark;
  */
 public class Level32 implements ILevel {
 
-	final Jamo pattern = Jamo.pattern("*", "*", "ㄷㅅㅆㅈㅊㅌ");
+//	final Jamo pattern = Jamo.pattern("*", "*", "ㄷㅅㅆㅈㅊㅌ");
+	final Jamo prev = Jamo.pattern("*", "*", "ㄷㅅㅆㅈㅊㅌ");
+	final Set<Jamo> nexts = Set.of(Jamo.pattern("ㄱㄲㄷㄸㅂㅃㅅㅆㅈㅉㅊㅋㅌㅍ", "*", "*"), Jamo.SPACE);
 	final LevelContext ctx;
 	
 	Level32(LevelContext ctx) {
@@ -21,12 +25,14 @@ public class Level32 implements ILevel {
 	@Override
 	public Mark eval(String word) {
 		Mark mk = ctx.findMark(word);
-		for(int k = 0 ; k < word.length(); k++) {
-			if(pattern.matched(word.charAt(k))) {
-				// 받침만 표시해야 함
-				mk.addRange(Difficulty.L32, k, 2, k + 1, 0);
-			}
+		Levels.findAdjPos(word, prev, nexts,
+			range ->mk.addRange(Difficulty.L32, range[0], 2, range[1], -3)
+		);
+		int lastIdx = word.length() - 1 ;
+		if(prev.matched(word.charAt(lastIdx))) {
+			mk.addRange(Difficulty.L32, lastIdx, 2, lastIdx + 1, -3);
 		}
+		
 		return mk;
 	}
 }
