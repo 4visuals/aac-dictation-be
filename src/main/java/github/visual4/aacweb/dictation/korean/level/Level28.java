@@ -20,6 +20,7 @@ import github.visual4.aacweb.dictation.service.analysis.Tagging;
  */
 public class Level28 implements ILevel {
 	
+	private static String EGA = "JKS"; // ~이 ~가
 	private static String EUN = "JX"; // ~은 ~는
 	private static String EUL = "JKO"; // ~을 ~를
 	private static String WA1 = "JC"; // ~와, ~과 접속조사
@@ -27,12 +28,13 @@ public class Level28 implements ILevel {
 	
 	// 과 : JKB
 	
-	private Set<String> pumsaSet = Set.of("JX", "JKO", "JC", "JKB");
+	private Set<String> pumsaSet = Set.of("JKS","JX", "JKO", "JC", "JKB");
 	private Map<String, Set<String>> pumsaMap = new HashMap<>();
 	final LevelContext ctx;
 	
 	Level28(LevelContext ctx) {
 		this.ctx = ctx;
+		this.pumsaMap.put("JKS", Set.of("이", "가"));
 		this.pumsaMap.put("JX", Set.of("은", "는"));
 		this.pumsaMap.put("JKO", Set.of("을", "를"));
 		this.pumsaMap.put("JC", Set.of("와", "과"));
