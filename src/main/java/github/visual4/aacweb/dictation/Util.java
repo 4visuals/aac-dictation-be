@@ -48,6 +48,13 @@ public class Util {
 			throw new AppException(ErrorCode.SERVER_ERROR, 500, "error while stringify data");
 		}
 	}
+	public static <K, V> String stringify(ObjectMapper om, Map<K, V> map) {
+		try {
+			return om.writeValueAsString(map);
+		} catch (JsonProcessingException e) {
+			throw new AppException(ErrorCode.SERVER_ERROR, 500, "error while stringify data");
+		}
+	}
 	
 	public static String readFile(String absolutePath) {
 		File priv = new File(absolutePath);

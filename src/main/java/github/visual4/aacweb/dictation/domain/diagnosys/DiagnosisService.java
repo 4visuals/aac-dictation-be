@@ -58,6 +58,7 @@ public class DiagnosisService {
 	}
 	
 	public StudentDiagnosisDto findDiagnosisByStudent(Integer studentSeq) {
+		TypeMap diffMap = this.parseDifficulties();
 		List<DiagnosisQuiz> quizes = quizDao.listQuiz();
 		List<DiagnosisAnswer> answers = answerDao.findAnswersByStudent(studentSeq);
 		for (DiagnosisQuiz quiz : quizes) {
@@ -65,6 +66,9 @@ public class DiagnosisService {
 					.filter(ans -> ans.quizRef.equals(quiz.seq))
 					.findFirst().orElse(null);
 			quiz.setAnswer(answer);
+			Map<String, Object> analysisMap = diffMap.get("" + quiz.getSeq());
+			String json = Util.stringify(om, analysisMap);
+			quiz.setAnalysis(json);
 		}
 		Map<String, List<DiagnosisQuiz>> group = quizes.stream()
 	            .collect(Collectors.groupingBy(DiagnosisQuiz::getVersion));

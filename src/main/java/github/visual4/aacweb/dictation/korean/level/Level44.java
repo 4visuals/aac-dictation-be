@@ -14,7 +14,10 @@ import github.visual4.aacweb.dictation.korean.Mark;
  */
 public class Level44 implements ILevel {
 
-	List<String> words = Arrays.asList("졸였다", "조렸다", "있다가", "이따가", "닫히다","다치다","늘이다","느리다", "절이다", "저리다", "닫혔", "다쳤", "늘여", "절인");
+	List<String> words = Arrays.asList(
+			"졸였다", "조렸다", "있다가", "이따가", "닫히다","다치다",
+			"늘이다","느리다", "느린",
+			"절이다", "저리다", "닫혔", "다쳤", "늘여", "절인");
 	
 	final LevelContext ctx;
 	

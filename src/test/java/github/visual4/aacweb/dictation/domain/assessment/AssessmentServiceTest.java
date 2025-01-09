@@ -47,6 +47,13 @@ class AssessmentServiceTest {
 			printLabel = false;
 		}
 	}
+	@Test
+	void testnx() {
+		String q = "장난쳤습니다.";
+		String a = "장난을 쳤습니다";
+		Map<String, int[]> mark = service.mark(q, a);
+		print(true, q, a, mark);
+	}
 	void print(boolean label, String origin, String answer, Map<String, int[]> mark) {
 		List<String> levels = new ArrayList<>(mark.keySet());
 		
