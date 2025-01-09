@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.domain.diagnosys.DiagnosisService;
 import github.visual4.aacweb.dictation.domain.license.License;
 import github.visual4.aacweb.dictation.domain.order.Order;
 import github.visual4.aacweb.dictation.domain.order.OrderCommitDto;
@@ -52,6 +53,9 @@ public class AdminController {
 	
 	@Autowired
 	GroupOrderService groupOrderService;
+	
+	@Autowired
+	DiagnosisService diagnosisService;
 	
 	@PostMapping("/auth")
 	public Object checkAuthority(@JwtProp("useq") Integer userSeq) {
@@ -166,6 +170,11 @@ public class AdminController {
 		userService.loadAdmin(adminSeq.longValue());
 		Map<Long, Instant> times = groupOrderService.updateExpiredDate(groupOrderSeq, param);
 		return Res.success("times", times);
+	}
+	@PostMapping("/level/analyze")
+	public Object analyze(@RequestBody TypeMap param) {
+		String sentence = param.getStr("sentence");
+		return diagnosisService.parseDifficulty(sentence);
 	}
 
 }

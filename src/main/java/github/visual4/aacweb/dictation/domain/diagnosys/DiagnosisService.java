@@ -138,6 +138,12 @@ public class DiagnosisService {
 		
 		return analysisService.parseDifficulties(section);
 	}
+	public TypeMap parseDifficulty(String sentence) {
+		TypeMap dfMap = new TypeMap();
+		Mark mark = analysisService.parseDifficulties(sentence);
+		dfMap.put("" +0, mark.toMap());
+		return dfMap;
+	}
 
 	public Chapter getAsChapterForm() {
 		List<DiagnosisQuiz> questions = this.quizDao.listQuiz();
