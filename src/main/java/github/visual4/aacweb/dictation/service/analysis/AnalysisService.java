@@ -29,7 +29,7 @@ public class AnalysisService {
 	Map<String, SentenceTag> taggingMap;
 	public AnalysisService() {
 		ObjectMapper om = new ObjectMapper();
-		InputStream in = AnalysisService.class.getResourceAsStream("/greamhangul.txt");
+		InputStream in = AnalysisService.class.getResourceAsStream("/greamhangul.json");
 		
 		try {
 			if(in == null) {
