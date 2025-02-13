@@ -196,7 +196,7 @@ public class TextDiff {
 			if(m.idx1 <= start) {
 				continue;
 			}
-			if(singleWord && (m.cause == Cause.ADD || m.cause == Cause.DEL)) {
+			if(m.cause == Cause.ADD || m.cause == Cause.DEL) {
 				continue;
 			}
 			for(int offset = 0 ; offset < 3 ; offset ++) {

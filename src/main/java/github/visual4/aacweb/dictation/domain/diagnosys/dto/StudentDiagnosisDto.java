@@ -10,14 +10,18 @@ import lombok.Setter;
 @Setter
 public class StudentDiagnosisDto {
 	
+	private List<DiagnosisQuiz> v0;
 	private List<DiagnosisQuiz> v1;
 	private List<DiagnosisQuiz> v2;
 
+	private boolean v0Ready;
 	private boolean v1Ready;
 	private boolean v2Ready;
-	public StudentDiagnosisDto(List<DiagnosisQuiz> v1, List<DiagnosisQuiz> v2 ) {
+	public StudentDiagnosisDto(List<DiagnosisQuiz> v0, List<DiagnosisQuiz> v1, List<DiagnosisQuiz> v2 ) {
+		this.v0 = v0;
 		this.v1 = v1;
 		this.v2 = v2;
+		this.v0Ready = allFiied(v0);
 		this.v1Ready = allFiied(v1);
 		this.v2Ready = allFiied(v2);
 	}

@@ -33,7 +33,7 @@ public class Level31 implements ILevel {
 		);
 		int lastIdx = word.length() - 1 ;
 		if(prev.matched(word.charAt(lastIdx))) {
-			mk.addRange(Difficulty.L31, lastIdx, 2, lastIdx + 3, -3);
+			mk.addRange(Difficulty.L31, lastIdx, 2, lastIdx + 1, -1);
 		}
 		return mk;
 	}

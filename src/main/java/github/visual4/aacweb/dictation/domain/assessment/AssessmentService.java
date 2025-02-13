@@ -1,5 +1,6 @@
 package github.visual4.aacweb.dictation.domain.assessment;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public class AssessmentService {
 		mark.eachLevel((Difficulty df, Pos poses) -> {
 			int [] score = {0, poses.size()};
 			poses.each(pos -> {
+				System.out.printf("[df] %s, pos: %s\n", df, Arrays.toString(pos));
 				String txt = mark.textAt(pos[0], pos[1]);
 				String ans = diff.getJamoAt(pos[0], pos[1]);
 				if(txt.equals(ans)) {

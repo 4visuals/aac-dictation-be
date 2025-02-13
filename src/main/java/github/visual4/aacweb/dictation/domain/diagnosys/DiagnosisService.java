@@ -72,7 +72,7 @@ public class DiagnosisService {
 		}
 		Map<String, List<DiagnosisQuiz>> group = quizes.stream()
 	            .collect(Collectors.groupingBy(DiagnosisQuiz::getVersion));
-		return new StudentDiagnosisDto(group.get("2024_v1"), group.get("2024_v2"));
+		return new StudentDiagnosisDto(group.get("2024_v0"), group.get("2024_v1"), group.get("2024_v2"));
 	}
 	public DiagnosisAnswer putAnswer(Integer studentSeq, Integer quizSeq, String answer) {
 		DiagnosisQuiz quiz = this.quizDao.findBySeq(quizSeq);
