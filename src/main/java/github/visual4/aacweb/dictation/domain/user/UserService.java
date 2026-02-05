@@ -33,6 +33,7 @@ import github.visual4.aacweb.dictation.service.rule.Rules;
 public class UserService {
 
 	final GoogleAuthService googleAuthService;
+	final NaverAuthService naverAuthService;
 	final AppConfigService configService;
 	final ProductService productService;
 	final LicenseService licenseService;
@@ -44,6 +45,7 @@ public class UserService {
 	
 	public UserService(
 			GoogleAuthService googleAuthService,
+			NaverAuthService naverAuthService,
 			AppConfigService configService, 
 			ProductService productService,
 			LicenseService licenseService,
@@ -51,6 +53,7 @@ public class UserService {
 			StudentDao studentDao,
 			@Value("${dictation.admin.seq}") Integer adminSeq) {
 		this.googleAuthService = googleAuthService;
+		this.naverAuthService = naverAuthService;
 		this.configService = configService;
 		this.productService = productService;
 		this.licenseService = licenseService;
@@ -74,17 +77,10 @@ public class UserService {
 	}
 
 
-
 	public TypeMap getMembership(String vendor, String accessToken) {
-		TypeMap profile = googleAuthService.getUserProfile(accessToken);
-		String email = profile.getStr("email");
-		User user = userDao.findBy(User.Column.user_email, email);
-		if (user == null) {
-			Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
-			return TypeMap.with("membership", membership,  "licenses", Collections.EMPTY_LIST);			
-		} else {
-			return login(profile);
-		}
+		Vendor vendorType = resolveVendor(vendor, Vendor.GOOGLE);
+		TypeMap profile = getProfileByAccessToken(vendorType, accessToken);
+		return resolveMembership(profile, vendorType);
 	}
 	/**
 	 * id_token을 통한 로그인
@@ -93,16 +89,27 @@ public class UserService {
 	 * @return
 	 */
 	public TypeMap getMembershipFromIdToken(String vendor, String idToken) {
+		Vendor vendorType = resolveVendor(vendor, Vendor.GOOGLE);
+		if (vendorType != Vendor.GOOGLE) {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "vendor");
+		}
 		TypeMap param = TypeMap.with("token", idToken);
 		TypeMap profile = googleAuthService.getUserProfile(param);
-		String email = profile.getStr("email");
-		User user = userDao.findBy(User.Column.user_email, email);
-		if (user == null) {
-			Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
-			return TypeMap.with("membership", membership,  "licenses", Collections.EMPTY_LIST);			
-		} else {
-			return login(profile);
+		return resolveMembership(profile, vendorType);
+	}
+
+	public TypeMap getMembershipFromCode(String vendor, String code, String state) {
+		Vendor vendorType = resolveVendor(vendor, Vendor.GOOGLE);
+		if (vendorType != Vendor.NAVER) {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "vendor");
 		}
+		TypeMap tokenRes = naverAuthService.issueAccessToken(code, state);
+		String accessToken = tokenRes.getStr("access_token");
+		if (accessToken == null || accessToken.isBlank()) {
+			throw new AppException(ErrorCode.OAUTH_EXCEPTION, 500, "NAVER");
+		}
+		TypeMap profile = naverAuthService.getUserProfile(accessToken);
+		return resolveMembership(profile, vendorType);
 	}
 
 	public TypeMap login(TypeMap profile) {
@@ -114,7 +121,8 @@ public class UserService {
 		if(configService.isAdmin(user)) {
 			user.setAdmin(Boolean.TRUE);
 		}
-		return buildLoginResponse(profile, user, Vendor.GOOGLE);
+		Vendor vendor = resolveVendor(profile.getStr("vendor"), user.getVendor());
+		return buildLoginResponse(profile, user, vendor);
 	}
 
 	/**
@@ -136,6 +144,9 @@ public class UserService {
 
 	private TypeMap buildLoginResponse(TypeMap profile, User user, Vendor vendor) {
 		user.setStudents(studentDao.findStudentsByTeacher(user.getSeq()));
+		if (profile.get("vendor") == null) {
+			profile.put("vendor", vendor.name().toLowerCase());
+		}
 		profile.put("useq", user.getSeq());
 		profile.put("aac_id", user.getEmail());
 		/*
@@ -158,12 +169,16 @@ public class UserService {
 		if (existing != null) {
 			throw new AppException(ErrorCode.EXISTING_USER, 409);
 		}
+		Vendor vendor = resolveVendor(profile.getStr("vendor"), Vendor.GOOGLE);
+		if (profile.get("vendor") == null) {
+			profile.put("vendor", vendor.name().toLowerCase());
+		}
 		User user = new User();
 		user.setCreationTime(currentTime);
 		user.setName(profile.getStr("name"));
 		user.setUserId(email);
 		user.setEmail(email);
-		user.setVendor(Vendor.GOOGLE);
+		user.setVendor(vendor);
 		user.setPass(UUID.randomUUID().toString());
 		user.setRole(UserRole.TEACHER);
 		user.setStudents(Collections.emptyList());
@@ -177,7 +192,7 @@ public class UserService {
 		
 		user.setPass(null);
 //		System.out.println(user.getSeq() + ", " + user.getEmail());
-		Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
+		Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
 	
 		return TypeMap.with(
 				"membership", membership, 
@@ -214,6 +229,43 @@ public class UserService {
 	
 		
 		return user;
+	}
+
+	private Vendor resolveVendor(String vendor, Vendor fallback) {
+		if (vendor == null || vendor.trim().isEmpty()) {
+			return fallback == null ? Vendor.GOOGLE : fallback;
+		}
+		try {
+			return Vendor.valueOf(vendor.trim().toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "vendor");
+		}
+	}
+
+	private TypeMap getProfileByAccessToken(Vendor vendor, String accessToken) {
+		if (vendor == Vendor.NAVER) {
+			return naverAuthService.getUserProfile(accessToken);
+		}
+		if (vendor == Vendor.GOOGLE) {
+			return googleAuthService.getUserProfile(accessToken);
+		}
+		throw new AppException(ErrorCode.INVALID_VALUE2, 400, "vendor");
+	}
+
+	private TypeMap resolveMembership(TypeMap profile, Vendor vendor) {
+		if (profile.get("vendor") == null) {
+			profile.put("vendor", vendor.name().toLowerCase());
+		}
+		String email = profile.getStr("email");
+		if (email == null || email.isBlank()) {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "email");
+		}
+		User user = userDao.findBy(User.Column.user_email, email);
+		if (user == null) {
+			Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
+			return TypeMap.with("membership", membership, "licenses", Collections.EMPTY_LIST);
+		}
+		return buildLoginResponse(profile, user, vendor);
 	}
 	/**
 	 * 교사 조회(교사가 아니면 예외 던짐)

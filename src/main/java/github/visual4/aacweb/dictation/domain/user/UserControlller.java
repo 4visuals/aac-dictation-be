@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import github.visual4.aacweb.dictation.Res;
 import github.visual4.aacweb.dictation.TypeMap;
+import github.visual4.aacweb.dictation.AppException;
+import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.domain.exam.ExamService;
 import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaper;
 import github.visual4.aacweb.dictation.domain.exam.recent.RecentPaperService;
@@ -57,12 +59,16 @@ public class UserControlller {
 		String vendor = params.getStr("vendor");
 		String type = params.getStr("type");
 		
-		String token = params.getStr("token"); // access token from google oauth
+		String token = params.getStr("token");
 		TypeMap res = null;
 		if ("id_token".equals(type)) {
 			res = userService.getMembershipFromIdToken(vendor, token);
 		} else if ("access_token".equals(type)) {
 			res = userService.getMembership(vendor, token);
+		} else if ("code".equals(type)) {
+			res = userService.getMembershipFromCode(vendor, token, params.getStr("state"));
+		} else {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "type");
 		}
 		checkTrialLicense(res);
 		String jwtToken = tokenService.generateJwt(
