@@ -32,7 +32,7 @@ public class DiagnosisService {
 
 	private final static int DUMMY_SECTION_NUM = 100000;
 	private final static int DUMMY_SETENCE_NUM = 200000;
-	private final static Set<String> DIAGNOSIS_VERSION = Set.of("2024_v1", "2024_v2");
+	private final static Set<String> DIAGNOSIS_VERSION = Set.of("2024_v0", "2024_v1", "2024_v2");
 	final ObjectMapper om;
 	final DiagnosisQuizDao quizDao;
 	final DiagnosisAnswerDao answerDao;

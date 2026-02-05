@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class VoiceController {
 
 	final VoiceService voiceService;
-	
+
 	public VoiceController(VoiceService voiceService) {
 		this.voiceService = voiceService;
 	}
