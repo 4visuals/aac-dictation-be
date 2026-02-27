@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="QuotationFormItemMapper">
+  	
+  	<sql id="quotation_item_cols">
+  		qi.qi_seq
+  		, qi.qf_seq
+  		, qi.prod_seq
+  		, qi.prod_name
+  		, qi.prod_code
+  		, qi.qty
+  		, qi.unit_price
+  		, qi.amount
+  		, qi.created_at
+  		, qi.updated_at
+  	</sql>
+  	<resultMap type="QuotationFormItem" id="quotationItemMap">
+  		<id column="qi_seq" property="seq"/>
+  		<result column="qf_seq" property="formRef"/>
+  		<result column="prod_seq" property="productRef"/>
+  		<result column="prod_name" property="productName"/>
+  		<result column="prod_code" property="productCode"/>
+  		<result column="qty" property="qty"/>
+  		<result column="unit_price" property="unitPrice"/>
+  		<result column="amount" property="amount"/>
+  		<result column="created_at" property="createdAt"/>
+  		<result column="updated_at" property="updatedAt"/>
+  	</resultMap>
+  	
+  	<insert id="insertItem" parameterType="QuotationFormItem"
+  		useGeneratedKeys="true"
+  		keyColumn="qi_seq"
+  		keyProperty="seq">
+	  	INSERT INTO dt_quotation_item(
+	  		qf_seq
+	  		, prod_seq
+	  		, prod_name
+	  		, prod_code
+	  		, qty
+	  		, unit_price
+	  		, amount
+	  	) VALUES (
+	  		#{formRef}
+	  		, #{productRef}
+	  		, #{productName}
+	  		, #{productCode}
+	  		, #{qty}
+	  		, #{unitPrice}
+	  		, #{amount}
+	  	)
+  	</insert>
+  	
+  	<delete id="deleteItemsByFormRef" parameterType="long">
+  		DELETE FROM dt_quotation_item
+  		WHERE qf_seq = #{value}
+  	</delete>
+  </mapper>

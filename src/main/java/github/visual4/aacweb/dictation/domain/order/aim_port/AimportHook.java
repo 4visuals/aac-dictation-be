@@ -7,9 +7,11 @@ import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import lombok.Getter;
 import lombok.Setter;
+
 /**
  * 
- *  {imp_uid=imp_1234567890, merchant_uid=merchant_1234567890, status=ready}
+ * {imp_uid=imp_1234567890, merchant_uid=merchant_1234567890, status=ready}
+ * 
  * @author chminseo
  *
  */
@@ -23,10 +25,11 @@ public class AimportHook {
 		failed,
 		cancelled
 	}
+
 	String aimportUuid;
 	String orderUuid;
 	String status;
-	
+
 	public static class Builder {
 		String ip;
 		String xff;
@@ -34,7 +37,7 @@ public class AimportHook {
 		String merchant_uid;
 		String status; // 'paid', 'ready', etc
 		final Set<String> validIPs = Set.of("52.78.100.19", "52.78.48.223", "52.78.5.241");
-		
+
 		public Builder clientIP(String clientIp, String xff) {
 			if (!validIPs.contains(xff)) {
 				throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "not a valid ip");
@@ -63,9 +66,11 @@ public class AimportHook {
 			return this;
 		}
 	}
+
 	public static Builder newBuilder() {
 		return new Builder();
 	}
+
 	/**
 	 * 
 	 * @param aimportUuid
@@ -74,6 +79,7 @@ public class AimportHook {
 	public boolean checkUuid(String aimportUuid, String orderUuid) {
 		return this.aimportUuid.equals(aimportUuid) && this.orderUuid.equals(orderUuid);
 	}
+
 	/**
 	 * 
 	 * @param status
@@ -81,5 +87,14 @@ public class AimportHook {
 	 */
 	public boolean checkStatus(PayStatus status) {
 		return this.status.equals(status.name());
+	}
+
+	@Override
+	public String toString() {
+		return "AimportHook{"
+				+ "aimportUuid=" + aimportUuid
+				+ ", orderUuid=" + orderUuid
+				+ ", status=" + status
+				+ "}";
 	}
 }

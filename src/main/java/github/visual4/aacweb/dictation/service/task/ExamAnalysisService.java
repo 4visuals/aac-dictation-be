@@ -15,12 +15,13 @@ public class ExamAnalysisService {
 
 	final ExamService examService;
 	private boolean analyzed = false;
-	
+
 	public ExamAnalysisService(ExamService examService) {
 		this.examService = examService;
 	}
+
 	/**
-	 * 학생이 제출한 받아쓰기(ExamPaper)에 대한 상세 분석을 실행함 
+	 * 학생이 제출한 받아쓰기(ExamPaper)에 대한 상세 분석을 실행함
 	 */
 	@Scheduled(fixedRate = 3000)
 	public void analyzieExamPapers() {
@@ -29,8 +30,8 @@ public class ExamAnalysisService {
 		for (ExamPaper paper : papers) {
 			examService.analyizeExamPaper(paper);
 		}
-		if(!analyzed) {
-//			examService.analyizeDiagnosisQuestions();
+		if (!analyzed) {
+			// examService.analyizeDiagnosisQuestions();
 			analyzed = true;
 		}
 	}

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="QuotationFormMapper">
+  	
+  	<sql id="quotation_form_cols">
+  		qf.qf_seq
+  		, qf.origin
+  		, qf.issue_date
+  		, qf.org_name
+  		, qf.admin_name
+  		, qf.admin_email
+  		, qf.gream_email
+  		, qf.admin_phone
+  		, qf.requester_name
+  		, qf.requester_email
+  		, qf.requester_phone
+  		, qf.total_amount
+  		, qf.qf_state
+  		, qf.close_reason
+  		, qf.closed_at
+  		, qf.created_at as qf_created_at
+  		, qf.updated_at as qf_updated_at
+  	</sql>
+  	<resultMap type="QuotationForm" id="quotationFormMap">
+  		<id column="qf_seq" property="seq"/>
+  		<result column="origin" property="origin"/>
+  		<result column="issue_date" property="issueDate"/>
+  		<result column="org_name" property="orgName"/>
+  		<result column="admin_name" property="adminName"/>
+  		<result column="admin_email" property="adminEmail"/>
+  		<result column="gream_email" property="greamEmail"/>
+  		<result column="admin_phone" property="adminPhone"/>
+  		<result column="requester_name" property="requesterName"/>
+  		<result column="requester_email" property="requesterEmail"/>
+  		<result column="requester_phone" property="requesterPhone"/>
+  		<result column="total_amount" property="totalAmount"/>
+  		<result column="qf_state" property="state"/>
+  		<result column="close_reason" property="closeReason"/>
+  		<result column="closed_at" property="closedAt"/>
+  		<result column="qf_created_at" property="createdAt"/>
+  		<result column="qf_updated_at" property="updatedAt"/>
+  	</resultMap>
+  	<resultMap type="QuotationForm" id="quotationFormWithItems" extends="quotationFormMap">
+  		<collection property="items" resultMap="QuotationFormItemMapper.quotationItemMap"
+  			notNullColumn="qi_seq"/>
+  	</resultMap>
+  	
+  	<select id="findQuotationForms" resultMap="quotationFormWithItems">
+  		SELECT
+	  		<include refid="quotation_form_cols"/>
+	  		,
+	  		<include refid="QuotationFormItemMapper.quotation_item_cols"/>
+	  	FROM dt_quotation_form qf
+	  	LEFT JOIN dt_quotation_item qi
+	  	  ON qf.qf_seq = qi.qf_seq
+	  	ORDER BY qf.qf_seq DESC, qi.qi_seq ASC
+  	</select>
+  	
+  	<update id="updateForm" parameterType="QuotationForm">
+  		UPDATE dt_quotation_form
+  		SET
+  			origin = #{origin}
+  			, issue_date = #{issueDate}
+  			, org_name = #{orgName}
+  			, admin_name = #{adminName}
+  			, admin_email = #{adminEmail}
+  			, gream_email = #{greamEmail}
+  			, admin_phone = #{adminPhone}
+  			, requester_name = #{requesterName}
+  			, requester_email = #{requesterEmail}
+  			, requester_phone = #{requesterPhone}
+  			, total_amount = #{totalAmount}
+  			, qf_state = #{state}
+  			, close_reason = #{closeReason}
+  			, closed_at = #{closedAt}
+  		WHERE
+  			qf_seq = #{seq}
+  	</update>
+  	
+  	<update id="closeForm" parameterType="QuotationForm">
+  		UPDATE dt_quotation_form
+  		SET
+  			qf_state = #{state}
+  			, close_reason = #{closeReason}
+  			, closed_at = #{closedAt}
+  		WHERE
+  			qf_seq = #{seq}
+  	</update>
+  	
+  	<insert id="insertForm" parameterType="QuotationForm"
+  		useGeneratedKeys="true"
+  		keyColumn="qf_seq"
+  		keyProperty="seq">
+	  	INSERT INTO dt_quotation_form(
+	  		origin
+	  		, issue_date
+	  		, org_name
+	  		, admin_name
+	  		, admin_email
+	  		, gream_email
+	  		, admin_phone
+	  		, requester_name
+	  		, requester_email
+	  		, requester_phone
+	  		, total_amount
+	  	) VALUES (
+	  		#{origin}
+	  		, #{issueDate}
+	  		, #{orgName}
+	  		, #{adminName}
+	  		, #{adminEmail}
+	  		, #{greamEmail}
+	  		, #{adminPhone}
+	  		, #{requesterName}
+	  		, #{requesterEmail}
+	  		, #{requesterPhone}
+	  		, #{totalAmount}
+	  	)
+  	</insert>
+  </mapper>

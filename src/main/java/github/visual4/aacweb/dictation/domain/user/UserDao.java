@@ -20,6 +20,10 @@ public class UserDao {
 				TypeMap.with("colname", column.name(), "value", value));
 	}
 
+	public User findTeacherByEmail(String email) {
+		return session.selectOne(Dao.mapper(this, "findTeacherByEmail"), TypeMap.with("email", email));
+	}
+
 	public void insertUser(User user) {
 		session.insert(Dao.mapper(this, "insertUser"), user);
 	}

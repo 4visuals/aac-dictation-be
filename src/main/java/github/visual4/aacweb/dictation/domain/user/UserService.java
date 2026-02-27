@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -17,12 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
 import github.visual4.aacweb.dictation.TypeMap;
-import github.visual4.aacweb.dictation.Util;
 import github.visual4.aacweb.dictation.domain.appconfig.AppConfigService;
-import github.visual4.aacweb.dictation.domain.appconfig.AppConfiguration;
 import github.visual4.aacweb.dictation.domain.license.LicenseService;
 import github.visual4.aacweb.dictation.domain.license.License;
-import github.visual4.aacweb.dictation.domain.product.Product;
 import github.visual4.aacweb.dictation.domain.product.ProductService;
 import github.visual4.aacweb.dictation.domain.student.StudentDao;
 import github.visual4.aacweb.dictation.domain.user.User.Column;
@@ -39,14 +35,14 @@ public class UserService {
 	final LicenseService licenseService;
 	final UserDao userDao;
 	final StudentDao studentDao;
-	
+
 	private User adminAccount;
 	private Integer adminSeq;
-	
+
 	public UserService(
 			GoogleAuthService googleAuthService,
 			NaverAuthService naverAuthService,
-			AppConfigService configService, 
+			AppConfigService configService,
 			ProductService productService,
 			LicenseService licenseService,
 			UserDao userDao,
@@ -61,12 +57,11 @@ public class UserService {
 		this.studentDao = studentDao;
 		this.adminSeq = adminSeq;
 	}
-	
+
 	@PostConstruct
 	public void loadAdminAccount() {
 		adminAccount = userDao.findBy(User.Column.user_seq, adminSeq);
 	}
-	
 
 	public User loadAdmin(Long adminSeq) {
 		User user = this.findUser(adminSeq);
@@ -76,14 +71,15 @@ public class UserService {
 		return user;
 	}
 
-
 	public TypeMap getMembership(String vendor, String accessToken) {
 		Vendor vendorType = resolveVendor(vendor, Vendor.GOOGLE);
 		TypeMap profile = getProfileByAccessToken(vendorType, accessToken);
 		return resolveMembership(profile, vendorType);
 	}
+
 	/**
 	 * id_token을 통한 로그인
+	 * 
 	 * @param vendor
 	 * @param idToken
 	 * @return
@@ -118,7 +114,7 @@ public class UserService {
 		if (user == null) {
 			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
 		}
-		if(configService.isAdmin(user)) {
+		if (configService.isAdmin(user)) {
 			user.setAdmin(Boolean.TRUE);
 		}
 		Vendor vendor = resolveVendor(profile.getStr("vendor"), user.getVendor());
@@ -127,9 +123,10 @@ public class UserService {
 
 	/**
 	 * 카드 결제 심사용 계정을 위해서 추가함 - id, password를 입력받아서 테스트 계정을 조회함
+	 * 
 	 * @param id
 	 * @param pass
-	 * @return 
+	 * @return
 	 */
 	public TypeMap loginManually(TypeMap payload) {
 		String id = payload.getStr("id");
@@ -155,10 +152,12 @@ public class UserService {
 		 */
 		List<License> licenses = licenseService.findsBy(License.Column.receiver_ref, user.getSeq());
 		Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
-		return TypeMap.with("membership", membership,  "licenses", licenses);
+		return TypeMap.with("membership", membership, "licenses", licenses);
 	}
+
 	/**
 	 * 회원가입
+	 * 
 	 * @param profile - map of {email, vendor, }
 	 * @return map of {membership: Membership, licenses: [License, ..]}
 	 */
@@ -183,22 +182,23 @@ public class UserService {
 		user.setRole(UserRole.TEACHER);
 		user.setStudents(Collections.emptyList());
 		// user.setBirth(LocalDate.of(1900, 1, 1));
-				
+
 		userDao.insertUser(user);
-		
+
 		profile.put("useq", user.getSeq());
-		
+
 		List<License> licenses = Collections.emptyList();
-		
+
 		user.setPass(null);
-//		System.out.println(user.getSeq() + ", " + user.getEmail());
+		// System.out.println(user.getSeq() + ", " + user.getEmail());
 		Membership membership = new Membership(user, profile, vendor.name().toLowerCase());
-	
+
 		return TypeMap.with(
-				"membership", membership, 
+				"membership", membership,
 				"licenses", licenses,
 				"students", Collections.<User>emptyList());
 	}
+
 	/**
 	 * 회원 가입 - 직접 입력
 	 * PG사 심사를 위해서 추가함(toss)
@@ -209,7 +209,7 @@ public class UserService {
 	public User joinManually(JoinDto joinForm) {
 		isValidateProperty("email", joinForm.getEmail());
 		isValidateProperty("pass", joinForm.getPassword());
-		
+
 		Instant currentTime = Instant.now();
 		User user = new User();
 		user.setName(joinForm.getUserId());
@@ -220,14 +220,14 @@ public class UserService {
 		user.setVendor(Vendor.MANUAL);
 		user.setRole(UserRole.TEACHER);
 		user.setStudents(Collections.emptyList());
-		
+
 		userDao.insertUser(user);
-		
+
 		user.setPass(null);
 		System.out.println(user.getSeq() + ", " + user.getEmail());
-		// Membership membership = new Membership(user, profile, Vendor.GOOGLE.name().toLowerCase());
-	
-		
+		// Membership membership = new Membership(user, profile,
+		// Vendor.GOOGLE.name().toLowerCase());
+
 		return user;
 	}
 
@@ -267,8 +267,10 @@ public class UserService {
 		}
 		return buildLoginResponse(profile, user, vendor);
 	}
+
 	/**
 	 * 교사 조회(교사가 아니면 예외 던짐)
+	 * 
 	 * @param userSeq
 	 * @return
 	 */
@@ -279,14 +281,16 @@ public class UserService {
 		}
 		return teacher;
 	}
+
 	/**
 	 * 주어진 선생님의 학생 조회
+	 * 
 	 * @param studentSeq 학생 PK
 	 * @param teacherSeq 선생님 PK
 	 * @return
 	 */
 	public User findStudent(Long studentSeq, Predicate<User> fn) {
-//		studentDao.findStudentsByTeacher(studentSeq);
+		// studentDao.findStudentsByTeacher(studentSeq);
 		User student = studentDao.findBy(User.Column.user_seq, studentSeq);
 		if (fn.test(student)) {
 			return student;
@@ -294,36 +298,57 @@ public class UserService {
 			return null;
 		}
 	}
+
 	/**
 	 * 주어진 선생님의 학생 조회
+	 * 
 	 * @param teacherSeq
 	 * @return
 	 */
 	public List<User> findStudents(Long teacherSeq) {
 		User teacher = userDao.findBy(User.Column.user_seq, teacherSeq);
-		if(!teacher.isTeacher()) {
+		if (!teacher.isTeacher()) {
 			throw new AppException(ErrorCode.NOT_A_TEACHER, 400);
 		}
 		return studentDao.findStudentsByTeacher(teacherSeq);
 	}
+
 	public User findUser(Long userSeq) {
 		return studentDao.findBy(User.Column.user_seq, userSeq);
 	}
-	
+
 	public User findTeacher(String teacherId) {
 		return userDao.findBy(User.Column.user_id, teacherId);
 	}
+
+	public User findTeacherByEmail(String email) {
+		if (email == null || email.isBlank()) {
+			throw new AppException(ErrorCode.INVALID_VALUE2, 400, "email");
+		}
+		User teacher = userDao.findTeacherByEmail(email.trim());
+		if (teacher == null) {
+			throw new AppException(ErrorCode.NOT_FOUND, 404, "user_email");
+		}
+		if (!teacher.isTeacher()) {
+			throw new AppException(ErrorCode.NOT_A_TEACHER, 403);
+		}
+		return teacher;
+	}
+
 	/**
 	 * 사용자 검색
+	 * 
 	 * @param keyword
 	 * @return
 	 */
 	public List<User> searchUsers(String keyword) {
-		return userDao.searchUsers(keyword, 
+		return userDao.searchUsers(keyword,
 				TypeMap.with(User.Column.user_role.name(), UserRole.TEACHER.getCode()));
 	}
+
 	/**
-	 * 존재하는지 확인함 
+	 * 존재하는지 확인함
+	 * 
 	 * @param col
 	 * @param value
 	 * @return
@@ -353,7 +378,7 @@ public class UserService {
 				throw new AppException(ErrorCode.DUP_USER_EMAIL, 409);
 			}
 			return Rules.checkUserEmail(value.toString());
-		}  else if ("name".equals(column)) {
+		} else if ("name".equals(column)) {
 			if (value == null || value.toString().trim().length() == 0) {
 				throw new AppException(ErrorCode.NULL_USER_NAME, 422);
 			}
@@ -366,11 +391,10 @@ public class UserService {
 			System.out.println(value);
 			LocalDate time = LocalDate.parse(value.toString());
 			return time;
-		}
-		else {
+		} else {
 			throw new AppException(ErrorCode.INVALID_VALUE, 422);
 		}
-		
+
 	}
 
 	public String findPassword(Long teacherSeq) {
@@ -380,11 +404,11 @@ public class UserService {
 	public boolean updatePassword(Long teacherSeq, String newPass, String curPass) {
 		isValidateProperty("pass", newPass);
 		return userDao.updatePassword(teacherSeq, newPass, curPass);
-		
+
 	}
 
 	public void deleteUser(User teacher) {
 		userDao.deleteUser(teacher.getSeq());
 	}
-	
+
 }

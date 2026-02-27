@@ -31,6 +31,19 @@ public class ProductController {
 		return Res.success("products", products);
 	}
 	/**
+	 * S2B 상품 조회
+	 * @return
+	 */
+	@GetMapping("/products/s2b")
+	public Object listS2bProducts() {
+		List<Product> products = productService.filterProducts(
+				product -> product.getSalesType() == ProductSalesType.S2B);
+		Util.<Product>forEach(products, prod -> {
+			prod.setSeq(null);
+		});
+		return Res.success("products", products);
+	}
+	/**
 	 * 모든 상품 전부 조회
 	 * @return
 	 */

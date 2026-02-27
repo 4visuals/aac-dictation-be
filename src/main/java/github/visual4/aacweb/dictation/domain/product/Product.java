@@ -62,7 +62,7 @@ public class Product {
 	/**
 	 * true이면 온라인 상품, false이면 택배 배송이 필요한 오프라인 상품
 	 */
-	YesNo digitalType;
+	YesNo digitalType = YesNo.Y;
 	/**
 	 * 과세여부. YesNo.Y 이면 과세상품
 	 */

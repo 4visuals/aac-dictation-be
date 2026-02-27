@@ -28,6 +28,13 @@
 	  	FROM dt_users u
 	  	WHERE ${colname} = #{value}
   	</select>
+  	<select id="findTeacherByEmail" parameterType="map" resultMap="usermap">
+  		SELECT
+	  		<include refid="usermap_cols" />
+	  	FROM dt_users u
+	  	WHERE u.user_email = #{email}
+	  		AND u.user_role = 'T'
+  	</select>
   	<!-- password -->
   	<select id="findPassword" parameterType="long" resultType="string">
 	  	SELECT user_pass
