@@ -102,6 +102,9 @@ public class ProductService {
 		if (!product.hasValidSalesType()) {
 			throw new AppException(ErrorCode.PRODUCT_ERROR, 400, "sales type required [RT, GB]");
 		}
+		if (product.getDigitalType() == YesNo.N) {
+			product.setLicenseQtt(0);
+		}
 		/* FIXME 상품 노출 시간이 없는 경우에만... */
 		product.setActivatedAt(Instant.now());
 		product.setCode(PRODUCT_CODE_PREFIX + UUID.randomUUID().toString());
@@ -132,6 +135,9 @@ public class ProductService {
 	 * @return
 	 */
 	public Product updateBasicInfo(Product product) {
+		if (product.getDigitalType() == YesNo.N) {
+			product.setLicenseQtt(0);
+		}
 		productDao.updateBasicInfo(product);
 		return productDao.findBy(Product.Column.prod_seq, product.seq);
 

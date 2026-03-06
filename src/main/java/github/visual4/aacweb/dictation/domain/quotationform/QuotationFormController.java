@@ -15,6 +15,7 @@ import github.visual4.aacweb.dictation.TypeMap;
 import github.visual4.aacweb.dictation.domain.quotationform.dto.NewQuotationFormDto;
 import github.visual4.aacweb.dictation.domain.user.User;
 import github.visual4.aacweb.dictation.domain.user.UserService;
+import github.visual4.aacweb.dictation.web.aop.JwtProp;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -50,6 +51,16 @@ public class QuotationFormController {
   public Object closeQuotationForm(@PathVariable Long seq) {
     QuotationForm form = quotationFormService.closeQuotationForm(seq);
     return Res.success("form", form);
+  }
+
+  @PostMapping("/quotation/{quotationSeq}/commit")
+  public Object commitQuotationForm(
+      @JwtProp("useq") Integer adminSeq,
+      @PathVariable Long quotationSeq) {
+    TypeMap res = quotationFormService.commitQuotationForm(
+        quotationSeq,
+        adminSeq == null ? null : adminSeq.longValue());
+    return Res.success(res);
   }
 
   @PostMapping("/quotation/user")

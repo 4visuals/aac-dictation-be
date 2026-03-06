@@ -46,6 +46,10 @@ public class Product {
 	 * 
 	 */
 	Integer durationInHours;
+	/**
+	 * 상품의 이용권 갯수
+	 */
+	Integer licenseQtt = 1;
 	
 	Instant activatedAt;
 	Instant expiredAt;

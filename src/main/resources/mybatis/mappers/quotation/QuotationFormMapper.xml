@@ -58,6 +58,17 @@
 	  	ORDER BY qf.qf_seq DESC, qi.qi_seq ASC
   	</select>
   	
+  	<select id="findQuotationFormBySeq" parameterType="map" resultMap="quotationFormWithItems">
+  		SELECT
+	  		<include refid="quotation_form_cols"/>
+	  		,
+	  		<include refid="QuotationFormItemMapper.quotation_item_cols"/>
+	  	FROM dt_quotation_form qf
+	  	LEFT JOIN dt_quotation_item qi
+	  	  ON qf.qf_seq = qi.qf_seq
+	  	WHERE qf.qf_seq = #{seq}
+  	</select>
+  	
   	<update id="updateForm" parameterType="QuotationForm">
   		UPDATE dt_quotation_form
   		SET

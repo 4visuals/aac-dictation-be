@@ -211,8 +211,16 @@ public class OrderService {
 			Long confirmerSeq,
 			final Integer qttLicenses,
 			Consumer<Order> fn) {
+		return activateOrder(orderCode, confirmerSeq, qttLicenses, Instant.now(), fn);
+	}
+	public Order activateOrder(
+			String orderCode,
+			Long confirmerSeq,
+			final Integer qttLicenses,
+			Instant activationTime,
+			Consumer<Order> fn) {
 		Order order = orderDao.findOneBy(Order.Column.order_uuid, orderCode);
-		order.markAsActivated(Instant.now(), confirmerSeq);
+		order.markAsActivated(activationTime, confirmerSeq);
 		order.setOrderState(OrderState.ATV);
 		if (fn != null) {
 			fn.accept(order);
@@ -223,7 +231,7 @@ public class OrderService {
 		User teacher = userService.findTeacher(order.getCustomerRef());
 		Product product = productService.findBy(Product.Column.prod_seq, order.getProductRef());
 		
-		Instant cur = Instant.now();
+		Instant cur = activationTime;
 		AppConfiguration config = configService.getConfiguration();
 		List<License> items = licenseService.createLicenses( qttLicenses, order, (lcs) -> {
 			lcs.setIssuerRef(config.getAdminAccountSeq());

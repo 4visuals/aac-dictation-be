@@ -14,6 +14,7 @@
   		, prod.prod_type
   		, prod_sales_type
   		, prod.prod_duration_hours
+  		, prod.prod_license_qtt
   		, prod_activated_at
   		, prod_expired_at
   		, prod_created_by
@@ -30,6 +31,7 @@
   		<result column="prod_type" property="type"/>
   		<result column="prod_sales_type" property="salesType"/>
   		<result column="prod_duration_hours" property="durationInHours"/>
+  		<result column="prod_license_qtt" property="licenseQtt"/>
   		<result column="prod_digital" property="digitalType" />
   		<result column="prod_tax" property="tax" />
   	</resultMap>
@@ -80,6 +82,7 @@
 			prod_type,
 			prod_sales_type,
 			prod_duration_hours,
+			prod_license_qtt,
 			prod_activated_at,
 			prod_created_by,
 			prod_digital,
@@ -94,6 +97,7 @@
 			#{type},
 			#{salesType},
 			#{durationInHours},
+			#{licenseQtt},
 			#{activatedAt},
 			#{createdBy},
 			#{digitalType},
@@ -101,14 +105,21 @@
 		)
   	</insert>
   	
-  	<update id="updateBasicInfo" parameterType="Product">
-  		UPDATE dt_products
-  		SET
-  			prod_name = #{name},
-  			prod_desc = #{description}
-  		WHERE
-  			prod_seq = #{seq}
-  	</update>
+	<update id="updateBasicInfo" parameterType="Product">
+		UPDATE dt_products
+		<set>
+			prod_name = #{name},
+			prod_desc = #{description}
+			<if test="licenseQtt != null">
+				, prod_license_qtt = #{licenseQtt}
+			</if>
+			<if test="digitalType != null">
+				, prod_digital = #{digitalType}
+			</if>
+		</set>
+		WHERE
+			prod_seq = #{seq}
+	</update>
   	<!--
   	// 제품 단종 처리함 
   	-->

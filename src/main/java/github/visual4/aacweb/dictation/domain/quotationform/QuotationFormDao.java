@@ -24,6 +24,11 @@ public class QuotationFormDao {
 		return session.selectList(Dao.mapper(this, "findQuotationForms"));
 	}
 
+	public QuotationForm findQuotationFormBySeq(Long seq) {
+		return session.selectOne(Dao.mapper(this, "findQuotationFormBySeq"), 
+				github.visual4.aacweb.dictation.TypeMap.with("seq", seq));
+	}
+
 	public void updateForm(QuotationForm form) {
 		Dao.updateOne(session, Dao.mapper(this, "updateForm"), form);
 	}

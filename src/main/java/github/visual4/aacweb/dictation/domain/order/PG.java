@@ -18,5 +18,9 @@ public enum PG {
 	 *  @see GroupOrderService.commit
 	 */
 	group_order,
-	danal_tpay
+	danal_tpay,
+	/**
+	 * 견적서 기반(S2B) 주문
+	 */
+	s2b
 }

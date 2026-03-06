@@ -4,6 +4,7 @@ import java.time.Instant;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.YesNo;
 
 public class Products {
 	/**
@@ -44,9 +45,11 @@ public class Products {
 		if (product.getCreatedBy() == null) {
 			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "creator email required");
 		}
-		Integer duration = product.getDurationInHours() ;
-		if (duration== null || duration <= 0) {
-			throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "duration is " + duration);
+		if (product.getDigitalType() == null || product.getDigitalType() != YesNo.N) {
+			Integer duration = product.getDurationInHours() ;
+			if (duration== null || duration <= 0) {
+				throw new AppException(ErrorCode.VALUE_MISMATCH, 400, "duration is " + duration);
+			}
 		}
 		String name = product.getName();
 		if (product.getName() == null || name.trim().length() == 0) {
