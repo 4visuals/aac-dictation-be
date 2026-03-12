@@ -47,19 +47,30 @@ public class UserDao {
 	public String findPassword(Long userSeq) {
 		return session.selectOne(Dao.mapper(this, "findPassword"), userSeq);
 	}
+	
+	public List<User> findUsersWithUnencodedPass(int limit) {
+		return session.selectList(
+				Dao.mapper(this, "findUsersWithUnencodedPass"),
+				TypeMap.with("limit", limit));
+	}
 	/**
 	 * 비밀번호 변경
 	 * @param userSeq 
 	 * @param newPass - 새로운 비번
-	 * @param curPass - 현재 비번
 	 * @return
 	 */
-	public boolean updatePassword(Long userSeq, String newPass, String curPass) {
+	public boolean updatePassword(Long userSeq, String newPass) {
 		TypeMap param = TypeMap.with(
 				"userSeq", userSeq,
-				"newPass", newPass,
-				"curPass", curPass);
+				"newPass", newPass);
 		return session.update(Dao.mapper(this, "updatePassword"), param) == 1;
+	}
+
+	public boolean updatePasswordEncoded(Long userSeq, String encodedPass) {
+		TypeMap param = TypeMap.with(
+				"userSeq", userSeq,
+				"newPass", encodedPass);
+		return session.update(Dao.mapper(this, "updatePasswordEncoded"), param) == 1;
 	}
 	/**
 	 * 회원 삭제

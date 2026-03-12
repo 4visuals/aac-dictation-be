@@ -11,6 +11,7 @@
   		,std.user_email
   		,std.user_birth
   		,std.user_pass
+  		,std.user_pass_encoded
   		,std.vendor
   		,std.created_at
   		,std.user_role
@@ -23,6 +24,7 @@
   		<result column="user_email" property="email"/>
   		<result column="user_birth" property="birth"/>
   		<result column="user_pass" property="pass"/>
+  		<result column="user_pass_encoded" property="passEncoded"/>
   		<result column="vendor" property="vendor"/>
   		<result column="created_at" property="creationTime"/>
   		<result column="user_role" property="role"/>
@@ -49,9 +51,9 @@
   		keyProperty="seq"
   		keyColumn="user_seq">
   		INSERT INTO dt_users(
-	  		user_name, user_id, user_email, user_birth, user_pass, vendor, created_at, user_role, teacher_ref 
+	  		user_name, user_id, user_email, user_birth, user_pass, user_pass_encoded, vendor, created_at, user_role, teacher_ref 
 	  	) VALUES (
-	  		#{name}, #{userId}, #{email}, #{birth}, #{pass}, #{vendor}, #{creationTime}, #{role}, #{teacherRef}
+	  		#{name}, #{userId}, #{email}, #{birth}, #{pass}, IFNULL(#{passEncoded}, 'N'), #{vendor}, #{creationTime}, #{role}, #{teacherRef}
 	  	)
   	</insert>
   	<update id="updateStudent" parameterType="User">
@@ -60,7 +62,8 @@
 	  	    user_name = #{name},
 	  	    user_id = #{userId},
 	  	    user_birth = #{birth},
-	  	    user_pass = #{pass}
+	  	    user_pass = #{pass},
+	  	    user_pass_encoded = #{passEncoded}
 	  	WHERE
 	  	    user_seq = #{seq}
   	</update>

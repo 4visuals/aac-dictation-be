@@ -10,6 +10,7 @@ import org.springframework.util.ReflectionUtils;
 
 import github.visual4.aacweb.dictation.AppException;
 import github.visual4.aacweb.dictation.ErrorCode;
+import github.visual4.aacweb.dictation.YesNo;
 import github.visual4.aacweb.dictation.domain.license.License;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class User {
 	String email;
 	String userId;
 	String pass;
+	YesNo passEncoded;
 	String name;
 	Vendor vendor;
 	Instant creationTime;

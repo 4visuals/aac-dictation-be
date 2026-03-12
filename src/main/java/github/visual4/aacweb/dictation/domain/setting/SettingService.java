@@ -34,8 +34,7 @@ public class SettingService {
 	 * @param password
 	 */
 	public void unlockPassword(Long teacherSeq, String password) {
-		String currentPass = userService.findPassword(teacherSeq);
-		if (!currentPass.equals(password)) {
+		if (!userService.matchesPassword(teacherSeq, password)) {
 			throw new AppException(ErrorCode.SETTING_UNLOCK_FAILED, 400);
 		}
 	}

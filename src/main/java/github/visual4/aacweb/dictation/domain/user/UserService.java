@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class UserService {
 	final LicenseService licenseService;
 	final UserDao userDao;
 	final StudentDao studentDao;
+	final PasswordEncoder passwordEncoder;
 
 	private User adminAccount;
 	private Integer adminSeq;
@@ -47,6 +49,7 @@ public class UserService {
 			LicenseService licenseService,
 			UserDao userDao,
 			StudentDao studentDao,
+			PasswordEncoder passwordEncoder,
 			@Value("${dictation.admin.seq}") Integer adminSeq) {
 		this.googleAuthService = googleAuthService;
 		this.naverAuthService = naverAuthService;
@@ -55,6 +58,7 @@ public class UserService {
 		this.licenseService = licenseService;
 		this.userDao = userDao;
 		this.studentDao = studentDao;
+		this.passwordEncoder = passwordEncoder;
 		this.adminSeq = adminSeq;
 	}
 
@@ -131,8 +135,11 @@ public class UserService {
 	public TypeMap loginManually(TypeMap payload) {
 		String id = payload.getStr("id");
 		String pass = payload.getStr("password");
-		User user = userDao.loginManually(id, pass);
-		if (user == null) {
+		User user = userDao.findBy(User.Column.user_id, id);
+		if (user == null || !user.isTeacher()) {
+			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
+		}
+		if (!matchesPassword(user.getSeq(), pass)) {
 			throw new AppException(ErrorCode.NOT_A_MEMBER, 401);
 		}
 		TypeMap profile = TypeMap.with("email", user.getEmail(), "name", user.getName());
@@ -178,7 +185,7 @@ public class UserService {
 		user.setUserId(email);
 		user.setEmail(email);
 		user.setVendor(vendor);
-		user.setPass(UUID.randomUUID().toString());
+		user.setPass(passwordEncoder.encode(UUID.randomUUID().toString()));
 		user.setRole(UserRole.TEACHER);
 		user.setStudents(Collections.emptyList());
 		// user.setBirth(LocalDate.of(1900, 1, 1));
@@ -215,7 +222,7 @@ public class UserService {
 		user.setName(joinForm.getUserId());
 		user.setUserId(joinForm.getUserId());
 		user.setEmail(joinForm.getEmail());
-		user.setPass(joinForm.getPassword());
+		user.setPass(passwordEncoder.encode(joinForm.getPassword()));
 		user.setCreationTime(currentTime);
 		user.setVendor(Vendor.MANUAL);
 		user.setRole(UserRole.TEACHER);
@@ -401,10 +408,29 @@ public class UserService {
 		return userDao.findPassword(teacherSeq);
 	}
 
+	public boolean matchesPassword(Long userSeq, String rawPass) {
+		String encodedPass = userDao.findPassword(userSeq);
+		if (!isEncodedPassword(encodedPass) || rawPass == null) {
+			return false;
+		}
+		return passwordEncoder.matches(rawPass, encodedPass);
+	}
+
 	public boolean updatePassword(Long teacherSeq, String newPass, String curPass) {
 		isValidateProperty("pass", newPass);
-		return userDao.updatePassword(teacherSeq, newPass, curPass);
+		if (!matchesPassword(teacherSeq, curPass)) {
+			return false;
+		}
+		String encodedPass = passwordEncoder.encode(newPass);
+		return userDao.updatePassword(teacherSeq, encodedPass);
 
+	}
+
+	private boolean isEncodedPassword(String encodedPass) {
+		return encodedPass != null
+				&& (encodedPass.startsWith("$2a$")
+						|| encodedPass.startsWith("$2b$")
+						|| encodedPass.startsWith("$2y$"));
 	}
 
 	public void deleteUser(User teacher) {

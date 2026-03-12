@@ -22,6 +22,11 @@
   		<result column="created_at" property="creationTime"/>
   		<result column="user_role" property="role"/>
   	</resultMap>
+  	<resultMap type="User" id="usermap_pass">
+  		<id column="user_seq" property="seq"/>
+  		<result column="user_pass" property="pass"/>
+  		<result column="user_pass_encoded" property="passEncoded"/>
+  	</resultMap>
   	<select id="findBy" parameterType="map" resultMap="usermap">
   		SELECT
 	  		<include refid="usermap_cols" />
@@ -41,15 +46,33 @@
 	  	FROM dt_users u
 	  	WHERE u.user_seq = #{seq}
   	</select>
-  	<update id="updatePassword" parameterType="map">
-  		UPDATE dt_users
-  		SET
-  			user_pass = #{newPass}
-  		WHERE
-  			user_seq = #{userSeq}
-  			AND
-  			user_pass = #{curPass}
-  	</update>
+  	<select id="findUsersWithUnencodedPass" parameterType="map" resultMap="usermap_pass">
+  		SELECT
+  			u.user_seq,
+  			u.user_pass,
+  			u.user_pass_encoded
+  		FROM dt_users u
+  		WHERE u.user_pass_encoded = 'N'
+  		ORDER BY u.user_seq
+  		LIMIT #{limit}
+  	</select>
+	<update id="updatePassword" parameterType="map">
+		UPDATE dt_users
+		SET
+			user_pass = #{newPass},
+			user_pass_encoded = 'Y'
+		WHERE
+			user_seq = #{userSeq}
+	</update>
+	<update id="updatePasswordEncoded" parameterType="map">
+		UPDATE dt_users
+		SET
+			user_pass = #{newPass},
+			user_pass_encoded = 'Y'
+		WHERE
+			user_seq = #{userSeq}
+			AND user_pass_encoded = 'N'
+	</update>
   	
   	<!-- 카드 결제 심사를 위해 추가함 -->
   	<select id="loginManually" parameterType="map" resultMap="usermap">

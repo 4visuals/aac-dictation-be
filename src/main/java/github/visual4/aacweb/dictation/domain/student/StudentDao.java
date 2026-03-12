@@ -26,7 +26,13 @@ public class StudentDao {
 	}
 	
 	public List<User> findStudentsByTeacher(Long teacherSeq) {
-		return session.selectList(Dao.mapper(this, "findStudentsByTeacher"), teacherSeq);
+		List<User> students = session.selectList(Dao.mapper(this, "findStudentsByTeacher"), teacherSeq);
+		if (students != null) {
+			for (User student : students) {
+				student.setPass("");
+			}
+		}
+		return students;
 	}
 
 	public User findBy(User.Column column, Object value) {
